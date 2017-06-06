@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <com.facebook.drawee.view.SimpleDraweeView xmlns:fresco="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/photopicker_image"
+        android:layout_width="match_parent"
+        android:layout_height="118dip"
+        fresco:placeholderImage="@mipmap/icon_default_image"
+        fresco:placeholderImageScaleType="centerCrop"
+        fresco:retryImage="@mipmap/icon_default_image"
+        fresco:retryImageScaleType="focusCrop"
+        fresco:failureImage="@mipmap/icon_default_image"
+        fresco:failureImageScaleType="focusCrop"/>
+    <LinearLayout
+        android:id="@+id/camera_image"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        android:gravity="center"
+        android:layout_height="118dip">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/icon_camera_color"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#00bed2"
+            android:textSize="13sp"
+            android:layout_margin="5dip"
+            android:text="拍摄照片"/>
+    </LinearLayout>
+    <ImageView
+        android:id="@+id/photopicker_choice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="5dip"
+        android:src="@mipmap/ic_choice_normal"/>
+</RelativeLayout>

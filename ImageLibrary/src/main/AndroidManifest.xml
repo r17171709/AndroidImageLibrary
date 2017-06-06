@@ -1,0 +1,16 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.renyu.imagelibrary">
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+
+    <application>
+        <activity android:name=".camera.CameraActivity" android:screenOrientation="portrait"></activity>
+        <activity android:name=".crop.CropUActivity" android:screenOrientation="portrait"></activity>
+        <activity android:name=".preview.ImagePreviewActivity" android:screenOrientation="portrait"></activity>
+        <activity android:name=".photopicker.PhotoPickerActivity" android:screenOrientation="portrait"></activity>
+    </application>
+
+</manifest>
