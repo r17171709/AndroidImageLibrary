@@ -37,9 +37,9 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.github.r17171709:AndroidCommonLibrary:v1.0.0'
     // CircleIndicator  A lightweight viewpager indicator like in nexus 5 launcher
-    compile 'me.relex:circleindicator:1.2.2'
+    compile 'me.relex:circleindicator:1.2.2@aar'
     // PhotoDraweeView  PhotoView For Fresco
-    compile 'me.relex:photodraweeview:1.1.2'
+    compile 'me.relex:photodraweeview:1.1.3'
     // butterknife
     apt 'com.jakewharton:butterknife-compiler:8.6.0'
     // uCrop  Image Cropping Library for Android
