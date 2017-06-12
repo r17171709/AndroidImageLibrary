@@ -12,11 +12,13 @@ import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.imagelibrary.camera.CameraActivity;
 import com.renyu.imagelibrary.crop.UCrop;
 import com.renyu.imagelibrary.photopicker.PhotoPickerActivity;
+import com.renyu.imagelibrary.preview.ImagePreviewActivity;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Created by renyu on 2017/1/3.
@@ -143,5 +145,24 @@ public class Utils {
         Intent intent_scan=new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
         intent_scan.setData(Uri.fromFile(new File(newFile)));
         context.sendBroadcast(intent_scan);
+    }
+
+    /**
+     * 相册预览
+     * @param context
+     * @param canDownload
+     * @param position
+     * @param canEdit
+     * @param urls
+     */
+    public static void showPreiew(Context context, boolean canDownload, int position, boolean canEdit, ArrayList<String> urls) {
+        Intent intent=new Intent(context, ImagePreviewActivity.class);
+        Bundle bundle=new Bundle();
+        bundle.putBoolean("canDownload", canDownload);
+        bundle.putInt("position", position);
+        bundle.putBoolean("canEdit", canEdit);
+        bundle.putStringArrayList("urls", urls);
+        intent.putExtras(bundle);
+        context.startActivity(intent);
     }
 }
