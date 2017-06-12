@@ -17,6 +17,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
+import com.renyu.commonlibrary.commonutils.ResourceUtils;
 import com.renyu.imagelibrary.R;
 import com.renyu.imagelibrary.bean.Photo;
 
@@ -89,7 +90,7 @@ public class PhotoPickerAdapter extends RecyclerView.Adapter<PhotoPickerAdapter.
                     return;
                 }
                 models.get(position).setSelect(!flag);
-                holder.photopicker_choice.setImageResource(!flag?R.mipmap.ic_choice_select:R.mipmap.ic_choice_normal);
+                holder.photopicker_choice.setImageResource(!flag? ResourceUtils.getMipmapId(context, "ic_choice_select"):ResourceUtils.getMipmapId(context, "ic_choice_normal"));
                 if (!flag) {
                     listener.add(models.get(position).getPath());
                 }
@@ -98,7 +99,7 @@ public class PhotoPickerAdapter extends RecyclerView.Adapter<PhotoPickerAdapter.
                 }
             }
         });
-        holder.photopicker_choice.setImageResource(models.get(position).isSelect()?R.mipmap.ic_choice_select:R.mipmap.ic_choice_normal);
+        holder.photopicker_choice.setImageResource(models.get(position).isSelect()?ResourceUtils.getMipmapId(context, "ic_choice_select"):ResourceUtils.getMipmapId(context, "ic_choice_normal"));
     }
 
     @Override
