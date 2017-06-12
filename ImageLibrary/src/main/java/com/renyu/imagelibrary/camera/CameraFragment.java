@@ -88,7 +88,7 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         FileUtils.createOrExistsDir(InitParams.IMAGE_PATH);
         dirPath=InitParams.IMAGE_PATH+"/"+System.currentTimeMillis()+".jpg";
-        FileUtils.createFileByDeleteOldFile(dirPath);
+        FileUtils.createFileByDeleteOldFile(new File(dirPath));
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
