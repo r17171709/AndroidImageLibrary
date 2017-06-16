@@ -176,7 +176,6 @@ public class PhotoPickerActivity extends BaseActivity {
             public void show(String path) {
                 Intent intent=new Intent(PhotoPickerActivity.this, ImagePreviewActivity.class);
                 Bundle bundle=new Bundle();
-                bundle.putBoolean("canHead", false);
                 bundle.putBoolean("canDownload", false);
                 bundle.putInt("position", 0);
                 bundle.putBoolean("canEdit", false);
@@ -212,7 +211,6 @@ public class PhotoPickerActivity extends BaseActivity {
                 if (imagePaths.size()>0) {
                     Intent intent=new Intent(PhotoPickerActivity.this, ImagePreviewActivity.class);
                     Bundle bundle=new Bundle();
-                    bundle.putBoolean("canHead", false);
                     bundle.putBoolean("canDownload", false);
                     bundle.putInt("position", 0);
                     bundle.putBoolean("canEdit", true);
