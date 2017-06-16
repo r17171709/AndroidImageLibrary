@@ -1,14 +1,12 @@
 package com.renyu.imagelibrary.commonutils;
 
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 
 import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.imagelibrary.camera.CameraActivity;
@@ -133,24 +131,21 @@ public class Utils {
 
     /**
      * 拍照后刷新系统相册
+     *
      * @param context
-     * @param photoFile
+     * @param newFile
      */
-    public static void displayToGallery(Context context, File photoFile) {
-        if (photoFile == null || !photoFile.exists()) {
-            return;
+    public static void refreshAlbum(Context context, String newFile, String dirPath) {
+        //刷新文件夹
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.KITKAT) {
+            Intent scan_dir = new Intent(Intent.ACTION_MEDIA_MOUNTED);
+            scan_dir.setData(Uri.fromFile(new File(dirPath)));
+            context.sendBroadcast(scan_dir);
         }
-        String photoPath = photoFile.getAbsolutePath();
-        String photoName = photoFile.getName();
-        // 其次把文件插入到系统图库
-        try {
-            ContentResolver contentResolver = context.getContentResolver();
-            MediaStore.Images.Media.insertImage(contentResolver, photoPath, photoName, null);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        // 最后通知图库更新
-        context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + photoPath)));
+        //刷新文件
+        Intent intent_scan = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        intent_scan.setData(Uri.fromFile(new File(newFile)));
+        context.sendBroadcast(intent_scan);
     }
 
     /**
