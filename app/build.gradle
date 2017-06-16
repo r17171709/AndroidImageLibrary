@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 26
     buildToolsVersion "26.0.0"
     defaultConfig {
         applicationId "com.renyu.androidimagelibrary"
@@ -26,6 +26,5 @@ dependencies {
     })
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
-    compile 'com.github.r17171709:AndroidImageLibrary:v1.0.5'
-//    compile project(':ImageLibrary')
+    compile project(':ImageLibrary')
 }
