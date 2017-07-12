@@ -9,8 +9,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,6 +22,7 @@ import com.renyu.commonlibrary.baseact.BaseActivity;
 import com.renyu.imagelibrary.R;
 import com.renyu.imagelibrary.commonutils.Utils;
 import com.renyu.imagelibrary.params.CommonParams;
+import com.renyu.imagelibrary.preview.impl.RightNavClickImpl;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -42,6 +45,9 @@ public class ImagePreviewActivity extends BaseActivity {
     CircleIndicator imagepreview_indicator;
     RelativeLayout layout_imagepreview_edit;
     TextView imagepreview_edit;
+    TextView tv_nav_title;
+    TextView tv_nav_right;
+    ImageButton ib_nav_left;
 
     int position=0;
     // 图片路径
@@ -88,8 +94,31 @@ public class ImagePreviewActivity extends BaseActivity {
 
         imagepreview_viewpager= (MultiTouchViewPager) findViewById(R.id.imagepreview_viewpager);
         imagepreview_indicator= (CircleIndicator) findViewById(R.id.imagepreview_indicator);
-        layout_imagepreview_edit= (RelativeLayout) findViewById(R.id.layout_imagepreview_edit);
+        layout_imagepreview_edit = (RelativeLayout) findViewById(R.id.layout_imagepreview_edit);
         imagepreview_edit= (TextView) findViewById(R.id.imagepreview_edit);
+        tv_nav_title= (TextView) findViewById(R.id.tv_nav_title);
+        tv_nav_title.setTextColor(Color.WHITE);
+        tv_nav_right= (TextView) findViewById(R.id.tv_nav_right);
+        tv_nav_right.setTextColor(Color.WHITE);
+        if (!TextUtils.isEmpty(getIntent().getExtras().getString("rightNav"))) {
+            tv_nav_right.setText(getIntent().getExtras().getString("rightNav"));
+            tv_nav_right.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (getIntent().getExtras().getParcelable("rightNavClick")!=null) {
+                        ((RightNavClickImpl) getIntent().getExtras().getParcelable("rightNavClick")).click(ImagePreviewActivity.this);
+                    }
+                }
+            });
+        }
+        ib_nav_left= (ImageButton) findViewById(R.id.ib_nav_left);
+        ib_nav_left.setImageResource(R.mipmap.ic_arrow_write_left);
+        ib_nav_left.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
 
         position=getIntent().getExtras().getInt("position");
         urls=getIntent().getExtras().getStringArrayList("urls");
@@ -133,6 +162,7 @@ public class ImagePreviewActivity extends BaseActivity {
                         }
                     }
                 });
+                tv_nav_title.setText((position+1)+"/"+urls.size());
             }
 
             @Override
@@ -152,6 +182,7 @@ public class ImagePreviewActivity extends BaseActivity {
                 Utils.cropImage(urls.get(imagepreview_viewpager.getCurrentItem()), ImagePreviewActivity.this, CommonParams.RESULT_CROP, 0);
             }
         });
+        tv_nav_title.setText((position+1)+"/"+urls.size());
     }
 
     private class MyPagerAdapter extends FragmentPagerAdapter {
