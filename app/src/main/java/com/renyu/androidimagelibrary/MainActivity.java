@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
         Fresco.initialize(this);
 
         ArrayList<String> strings=new ArrayList<>();
-        strings.add("http://www.ccarting.com/img/opus/photograph/h000/h41/img201008181910520.jpg");
+        strings.add("http://7b1g8u.com1.z0.glb.clouddn.com/ccc.jpg");
         strings.add("http://img.sj33.cn/uploads/allimg/201302/1-130201105055.jpg");
         Intent intent=new Intent(this, ImagePreviewActivity.class);
         Bundle bundle=new Bundle();
