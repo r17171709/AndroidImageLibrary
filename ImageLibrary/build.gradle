@@ -35,7 +35,7 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     testCompile 'junit:junit:4.12'
-    compile 'com.github.r17171709:AndroidCommonLibrary:v1.4.2'
+    compile 'com.github.r17171709:AndroidCommonLibrary:v1.4.3'
     // CircleIndicator  A lightweight viewpager indicator like in nexus 5 launcher
     compile 'me.relex:circleindicator:1.2.2@aar'
     // PhotoDraweeView  PhotoView For Fresco
@@ -44,4 +44,6 @@ dependencies {
     apt 'com.jakewharton:butterknife-compiler:8.8.1'
     // uCrop  Image Cropping Library for Android
     compile 'com.github.yalantis:ucrop:2.2.1'
+    // subsampling-scale-image-view  Highly configurable, easily extendable view with pan and zoom gestures for displaying huge images without loss of detail. Perfect for photo galleries, maps, building plans etc.
+    compile 'com.davemorrissey.labs:subsampling-scale-image-view:3.6.0'
 }
