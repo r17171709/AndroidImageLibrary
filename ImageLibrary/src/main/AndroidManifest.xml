@@ -11,6 +11,7 @@
         <activity android:name=".crop.CropUActivity" android:screenOrientation="portrait"></activity>
         <activity android:name=".preview.ImagePreviewActivity" android:screenOrientation="portrait"></activity>
         <activity android:name=".photopicker.PhotoPickerActivity" android:screenOrientation="portrait"></activity>
+        <activity android:name=".preview.SubsamplingActivity" android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>

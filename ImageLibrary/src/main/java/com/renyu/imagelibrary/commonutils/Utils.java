@@ -13,6 +13,7 @@ import com.renyu.imagelibrary.camera.CameraActivity;
 import com.renyu.imagelibrary.crop.UCrop;
 import com.renyu.imagelibrary.photopicker.PhotoPickerActivity;
 import com.renyu.imagelibrary.preview.ImagePreviewActivity;
+import com.renyu.imagelibrary.preview.SubsamplingActivity;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -156,7 +157,7 @@ public class Utils {
      * @param canEdit
      * @param urls
      */
-    public static void showPreiew(Context context, boolean canDownload, int position, boolean canEdit, ArrayList<String> urls) {
+    public static void showPreview(Context context, boolean canDownload, int position, boolean canEdit, ArrayList<String> urls) {
         Intent intent=new Intent(context, ImagePreviewActivity.class);
         Bundle bundle=new Bundle();
         bundle.putBoolean("canDownload", canDownload);
@@ -164,6 +165,19 @@ public class Utils {
         bundle.putBoolean("canEdit", canEdit);
         bundle.putStringArrayList("urls", urls);
         intent.putExtras(bundle);
+        context.startActivity(intent);
+    }
+
+    /**
+     * 打开长图预览
+     * @param context
+     * @param url
+     * @param filePath
+     */
+    public static void showLongPreview(Context context, String url, String filePath) {
+        Intent intent=new Intent(context, SubsamplingActivity.class);
+        intent.putExtra("url", url);
+        intent.putExtra("filePath", filePath);
         context.startActivity(intent);
     }
 }

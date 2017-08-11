@@ -4,6 +4,7 @@
     android:layout_height="match_parent">
     <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
         android:id="@+id/iv_sub"
+        android:background="@android:color/black"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 </LinearLayout>
