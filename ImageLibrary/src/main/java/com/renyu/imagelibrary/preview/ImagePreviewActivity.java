@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.imagepipeline.image.ImageInfo;
+import com.renyu.commonlibrary.adapter.ViewPagerFragmentAdapter;
 import com.renyu.commonlibrary.baseact.BaseActivity;
 import com.renyu.imagelibrary.R;
 import com.renyu.imagelibrary.commonutils.Utils;
@@ -41,7 +42,7 @@ import me.relex.circleindicator.CircleIndicator;
 public class ImagePreviewActivity extends BaseActivity {
 
     MultiTouchViewPager imagepreview_viewpager;
-    MyPagerAdapter adapter;
+    ViewPagerFragmentAdapter adapter;
     CircleIndicator imagepreview_indicator;
     RelativeLayout layout_imagepreview_edit;
     TextView imagepreview_edit;
@@ -139,7 +140,7 @@ public class ImagePreviewActivity extends BaseActivity {
             });
             fragments.add(fragment);
         }
-        adapter=new MyPagerAdapter(getSupportFragmentManager());
+        adapter=new ViewPagerFragmentAdapter(fragments, getSupportFragmentManager());
         imagepreview_viewpager.setAdapter(adapter);
         imagepreview_viewpager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -183,59 +184,6 @@ public class ImagePreviewActivity extends BaseActivity {
             }
         });
         tv_nav_title.setText((position+1)+"/"+urls.size());
-    }
-
-    private class MyPagerAdapter extends FragmentPagerAdapter {
-        public MyPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            return fragments.get(position);
-        }
-
-        @Override
-        public int getCount() {
-            return fragments.size();
-        }
-
-        @Override
-        public int getItemPosition(Object object) {
-            return POSITION_NONE;
-        }
-
-        @Override
-        public Object instantiateItem(ViewGroup container, int position) {
-            removeFragment(container,position);
-            return super.instantiateItem(container, position);
-        }
-    }
-
-    private void removeFragment(ViewGroup container,int index) {
-        String tag = getFragmentTag(container.getId(), index);
-        Fragment fragment = getSupportFragmentManager().findFragmentByTag(tag);
-        if (fragment == null)
-            return;
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.remove(fragment);
-        ft.commitAllowingStateLoss();
-        getSupportFragmentManager().executePendingTransactions();
-    }
-
-    private String getFragmentTag(int viewId, int index) {
-        try {
-            Class<FragmentPagerAdapter> cls = FragmentPagerAdapter.class;
-            Class<?>[] parameterTypes = { int.class, long.class };
-            Method method = cls.getDeclaredMethod("makeFragmentName",
-                    parameterTypes);
-            method.setAccessible(true);
-            String tag = (String) method.invoke(this, viewId, index);
-            return tag;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "";
-        }
     }
 
     @Override
