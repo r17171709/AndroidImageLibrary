@@ -17,9 +17,7 @@ import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.renyu.commonlibrary.basefrag.BaseFragment;
 import com.renyu.imagelibrary.R;
-import com.renyu.imagelibrary.R2;
 
-import butterknife.BindView;
 import me.relex.photodraweeview.OnPhotoTapListener;
 import me.relex.photodraweeview.PhotoDraweeView;
 
@@ -29,7 +27,6 @@ import me.relex.photodraweeview.PhotoDraweeView;
 
 public class ImagePreviewFragment extends BaseFragment {
 
-    @BindView(R2.id.photo_view)
     PhotoDraweeView photoDraweeView;
 
     OnPicChangedListener onPicChangedListener;
@@ -53,6 +50,8 @@ public class ImagePreviewFragment extends BaseFragment {
 
     @Override
     public void initParams() {
+        photoDraweeView = view.findViewById(R.id.photo_view);
+
         String url=getArguments().getString("url");
         PipelineDraweeControllerBuilder controller = Fresco.newDraweeControllerBuilder();
         ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(url.indexOf("http")!=-1?url:"file://"+url))

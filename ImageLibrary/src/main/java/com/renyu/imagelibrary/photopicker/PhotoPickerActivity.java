@@ -22,12 +22,11 @@ import com.blankj.utilcode.util.SizeUtils;
 import com.renyu.commonlibrary.baseact.BaseActivity;
 import com.renyu.commonlibrary.commonutils.BarUtils;
 import com.renyu.imagelibrary.R;
-import com.renyu.imagelibrary.R2;
+import com.renyu.imagelibrary.bean.Photo;
+import com.renyu.imagelibrary.bean.PhotoDirectory;
 import com.renyu.imagelibrary.camera.CameraActivity;
 import com.renyu.imagelibrary.commonutils.PhotoDirectoryLoader;
 import com.renyu.imagelibrary.commonutils.Utils;
-import com.renyu.imagelibrary.bean.Photo;
-import com.renyu.imagelibrary.bean.PhotoDirectory;
 import com.renyu.imagelibrary.params.CommonParams;
 import com.renyu.imagelibrary.preview.ImagePreviewActivity;
 
@@ -38,7 +37,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import butterknife.BindView;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -56,18 +54,12 @@ import static android.provider.MediaStore.MediaColumns.DATE_ADDED;
  */
 public class PhotoPickerActivity extends BaseActivity {
 
-    @BindView(R2.id.ib_nav_left)
     ImageView ib_nav_left;
-    @BindView(R2.id.tv_nav_title)
     TextView tv_nav_title;
-    @BindView(R2.id.tv_nav_right)
     TextView tv_nav_right;
-    @BindView(R2.id.photopicker_rv)
     RecyclerView photopicker_rv;
     PhotoPickerAdapter adapter;
-    @BindView(R2.id.photopicker_dict)
     TextView photopicker_dict;
-    @BindView(R2.id.photopicker_preview)
     TextView photopicker_preview;
     ListPopupWindow popupWindow;
     DictAdapter dictAdapter;
@@ -107,6 +99,13 @@ public class PhotoPickerActivity extends BaseActivity {
 
     @Override
     public void initParams() {
+        ib_nav_left = findViewById(R.id.ib_nav_left);
+        tv_nav_title = findViewById(R.id.tv_nav_title);
+        tv_nav_right = findViewById(R.id.tv_nav_right);
+        photopicker_rv = findViewById(R.id.photopicker_rv);
+        photopicker_dict = findViewById(R.id.photopicker_dict);
+        photopicker_preview = findViewById(R.id.photopicker_preview);
+
         allHashMap=new LinkedHashMap<>();
         models=new ArrayList<>();
         dictModels=new ArrayList<>();

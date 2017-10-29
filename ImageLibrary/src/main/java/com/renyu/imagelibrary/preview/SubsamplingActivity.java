@@ -25,11 +25,8 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.renyu.commonlibrary.baseact.BaseActivity;
 import com.renyu.commonlibrary.network.OKHttpHelper;
 import com.renyu.imagelibrary.R;
-import com.renyu.imagelibrary.R2;
 
 import java.io.File;
-
-import butterknife.BindView;
 
 /**
  * Created by renyu on 2017/8/10.
@@ -37,7 +34,6 @@ import butterknife.BindView;
 
 public class SubsamplingActivity extends BaseActivity {
 
-    @BindView(R2.id.iv_sub)
     SubsamplingScaleImageView iv_sub;
 
     OKHttpHelper httpHelper;
@@ -46,6 +42,8 @@ public class SubsamplingActivity extends BaseActivity {
 
     @Override
     public void initParams() {
+        iv_sub = findViewById(R.id.iv_sub);
+
         httpHelper=new OKHttpHelper();
         progressDialog=ProgressDialog.show(SubsamplingActivity.this, "", "正在加载文件");
     }

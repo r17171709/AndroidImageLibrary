@@ -15,7 +15,6 @@ import android.widget.TextView;
 
 import com.renyu.commonlibrary.baseact.BaseActivity;
 import com.renyu.imagelibrary.R;
-import com.renyu.imagelibrary.R2;
 import com.yalantis.ucrop.UCrop;
 import com.yalantis.ucrop.UCropActivity;
 import com.yalantis.ucrop.callback.BitmapCropCallback;
@@ -28,21 +27,15 @@ import com.yalantis.ucrop.view.UCropView;
 
 import java.util.ArrayList;
 
-import butterknife.BindView;
-
 /**
  * Created by renyu on 2017/3/7.
  */
 
 public class CropUActivity extends BaseActivity {
 
-    @BindView(R2.id.nav_layout)
     RelativeLayout nav_layout;
-    @BindView(R2.id.ib_nav_left)
     ImageButton ib_nav_left;
-    @BindView(R2.id.tv_nav_right)
     TextView tv_nav_right;
-    @BindView(R2.id.cv_crop)
     UCropView cv_crop;
     private GestureCropImageView mGestureCropImageView;
     private OverlayView mOverlayView;
@@ -59,6 +52,11 @@ public class CropUActivity extends BaseActivity {
 
     @Override
     public void initParams() {
+        nav_layout = findViewById(R.id.nav_layout);
+        ib_nav_left = findViewById(R.id.ib_nav_left);
+        tv_nav_right = findViewById(R.id.tv_nav_right);
+        cv_crop = findViewById(R.id.cv_crop);
+
         nav_layout.setBackgroundColor(Color.parseColor("#80000000"));
         ib_nav_left.setOnClickListener(new View.OnClickListener() {
             @Override

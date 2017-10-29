@@ -2,11 +2,9 @@ package com.renyu.androidimagelibrary;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.renyu.imagelibrary.commonutils.Utils;
 import com.renyu.imagelibrary.preview.ImagePreviewActivity;
 
 import java.util.ArrayList;
@@ -18,7 +16,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        com.blankj.utilcode.util.Utils.init(this);
+        com.blankj.utilcode.util.Utils.init(getApplication());
         Fresco.initialize(this);
 
         ArrayList<String> strings=new ArrayList<>();
