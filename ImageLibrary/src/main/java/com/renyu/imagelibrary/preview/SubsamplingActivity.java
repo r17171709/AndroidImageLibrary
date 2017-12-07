@@ -23,7 +23,6 @@ import com.facebook.imagepipeline.image.CloseableImage;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.renyu.commonlibrary.baseact.BaseActivity;
-import com.renyu.commonlibrary.network.OKHttpHelper;
 import com.renyu.imagelibrary.R;
 
 import java.io.File;
@@ -36,15 +35,12 @@ public class SubsamplingActivity extends BaseActivity {
 
     SubsamplingScaleImageView iv_sub;
 
-    OKHttpHelper httpHelper;
-
     ProgressDialog progressDialog;
 
     @Override
     public void initParams() {
         iv_sub = findViewById(R.id.iv_sub);
 
-        httpHelper=new OKHttpHelper();
         progressDialog=ProgressDialog.show(SubsamplingActivity.this, "", "正在加载文件");
     }
 
