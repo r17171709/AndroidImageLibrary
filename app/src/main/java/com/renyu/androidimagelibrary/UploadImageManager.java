@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.renyu.commonlibrary.network.OKHttpHelper;
 import com.renyu.commonlibrary.network.OKHttpUtils;
+import com.renyu.commonlibrary.network.ProgressRequestBody;
 import com.renyu.imagelibrary.bean.UploadTaskBean;
 
 import org.json.JSONObject;
@@ -59,7 +60,9 @@ public class UploadImageManager {
 
             HashMap<String, File> fileHashMap=new HashMap<>();
             fileHashMap.put("fileData", new File(filePath));
-            Response resp=okHttpUtils.syncUpload(url, new HashMap<>(), fileHashMap);
+            Response resp=okHttpUtils.syncUpload(url, new HashMap<>(), fileHashMap, (l, l1) -> {
+                Log.d("UploadImageManager", "UploadImageManager " + l + " " + l1);
+            });
             if (resp==null) {
                 Log.d("UploadImageManager", filePath + "发布失败");
             }
@@ -102,7 +105,7 @@ public class UploadImageManager {
         bean.setStatue(UploadTaskBean.UploadState.UPLOADPREPARE);
         beans.put(filePath, bean);
         // 添加上传线程Map中
-        tasks.put(filePath, uploadService.submit(runnable));
+        tasks.put("aizuna_"+new File(filePath).getName().substring(0, new File(filePath).getName().indexOf(".")), uploadService.submit(runnable));
     }
 
     /**

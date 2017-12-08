@@ -3,6 +3,7 @@ package com.renyu.androidimagelibrary
 import android.graphics.Color
 import com.renyu.commonlibrary.baseact.BaseActivity
 import kotlinx.android.synthetic.main.activity_upload.*
+import java.io.File
 
 /**
  * Created by renyu on 2017/12/7.
@@ -36,6 +37,9 @@ class UploadActivity: BaseActivity() {
         button_start.setOnClickListener {
             upload.addTask(pics[count%5], "http://www.zksell.com/index.php?s=Api/Base/uploadpic")
             count++
+        }
+        button_cancel.setOnClickListener {
+            upload.cancelTask("aizuna_"+File(pics[(count-1)%5]).name.substring(0, File(pics[(count-1)%5]).name.indexOf(".")))
         }
     }
 
