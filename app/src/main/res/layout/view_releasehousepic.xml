@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center_vertical">
+    <com.facebook.drawee.view.SimpleDraweeView xmlns:fresco="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/iv_releasehousepic"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="3dip"
+        fresco:roundAsCircle="false"
+        fresco:placeholderImage="@mipmap/ic_release_camera"
+        fresco:placeholderImageScaleType="centerCrop"
+        fresco:retryImage="@mipmap/ic_release_camera"
+        fresco:retryImageScaleType="centerCrop"
+        fresco:failureImage="@mipmap/ic_release_camera"
+        fresco:failureImageScaleType="centerCrop"/>
+    <TextView
+        android:id="@+id/tv_releasehousepic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="添加图片"
+        android:paddingTop="40dip"
+        android:textColor="#999999"
+        android:textSize="12sp"/>
+    <ImageView
+        android:id="@+id/iv_releasehousepic_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_alignParentRight="true"
+        android:src="@mipmap/ic_deleteimage"/>
+    <TextView
+        android:id="@+id/iv_releasehousepic_cover"
+        android:background="#ffac00"
+        android:text="封面"
+        android:visibility="gone"
+        android:padding="2dip"
+        android:textSize="10sp"
+        android:gravity="center"
+        android:layout_margin="3dip"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</RelativeLayout>

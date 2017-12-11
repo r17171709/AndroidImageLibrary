@@ -4,7 +4,6 @@ import android.util.Log;
 
 import com.renyu.commonlibrary.network.OKHttpHelper;
 import com.renyu.commonlibrary.network.OKHttpUtils;
-import com.renyu.commonlibrary.network.ProgressRequestBody;
 import com.renyu.imagelibrary.bean.UploadTaskBean;
 
 import org.json.JSONObject;
@@ -27,6 +26,7 @@ public class UploadImageManager {
     ExecutorService uploadService;
     OKHttpUtils okHttpUtils;
 
+    // 上传状态回调
     public interface UpdateCallBack {
         void updateMap(UploadTaskBean bean);
     }
@@ -62,6 +62,15 @@ public class UploadImageManager {
             fileHashMap.put("fileData", new File(filePath));
             Response resp=okHttpUtils.syncUpload(url, new HashMap<>(), fileHashMap, (l, l1) -> {
                 Log.d("UploadImageManager", "UploadImageManager " + l + " " + l1);
+                // 上传每20%进度刷新一次，上传完成不进行修改以防止与后续成功的回调不一致
+                if ((l*100/l1 - bean.getProgress() >= 20) && l != l1) {
+                    bean.setUrl("");
+                    bean.setProgress((int) (l*100/l1));
+                    bean.setStatue(UploadTaskBean.UploadState.UPLOADING);
+                    if (callBack != null) {
+                        callBack.updateMap(bean);
+                    }
+                }
             });
             if (resp==null) {
                 Log.d("UploadImageManager", filePath + "发布失败");
@@ -69,6 +78,7 @@ public class UploadImageManager {
             else if (resp.isSuccessful()) {
                 JSONObject jsonObject= null;
                 try {
+                    // 上传成功
                     jsonObject = new JSONObject(resp.body().string());
                     String picUrl=jsonObject.getJSONObject("data").getString("picUrl");
                     Log.d("UploadImageManager", filePath + "发布成功:" + picUrl);
@@ -89,7 +99,7 @@ public class UploadImageManager {
                 Log.d("UploadImageManager", filePath + "发布失败");
             }
 
-            // 下载失败
+            // 上传失败
             bean.setProgress(0);
             bean.setUrl("");
             bean.setStatue(UploadTaskBean.UploadState.UPLOADFAIL);
@@ -98,13 +108,13 @@ public class UploadImageManager {
             }
         };
 
-        // 添加上传状态Map中
         UploadTaskBean bean = new UploadTaskBean();
         bean.setFilePath(filePath);
         bean.setProgress(0);
         bean.setStatue(UploadTaskBean.UploadState.UPLOADPREPARE);
+        // 添加上传状态Map中
         beans.put(filePath, bean);
-        // 添加上传线程Map中
+        // 添加上传线程池中
         tasks.put("aizuna_"+new File(filePath).getName().substring(0, new File(filePath).getName().indexOf(".")), uploadService.submit(runnable));
     }
 
