@@ -50,10 +50,10 @@ public class UploadImageManager {
      * 添加任务
      * @param filePath
      */
-    public synchronized void addTask(String filePath, String url) {
+    public synchronized void addTask(String filePath, String url, String tag) {
         Runnable runnable = () -> {
             // 开始上传
-            UploadTaskBean bean = beans.get(filePath);
+            UploadTaskBean bean = beans.get(tag);
             bean.setUrl("");
             bean.setProgress(0);
             bean.setStatue(UploadTaskBean.UploadState.UPLOADING);
@@ -108,14 +108,35 @@ public class UploadImageManager {
             }
         };
 
+        // 存在相同任务
+        if (beans.containsKey(tag) && tasks.containsKey(tag)) {
+            // 如果上传完成，则直接刷新
+            if (beans.get(tag).getStatue() == UploadTaskBean.UploadState.UPLOADSUCCESS) {
+                if (callBack != null) {
+                    callBack.updateMap(beans.get(tag));
+                }
+                return;
+            }
+            // 如果上传失败，则重新上传
+            else if (beans.get(tag).getStatue() == UploadTaskBean.UploadState.UPLOADFAIL) {
+
+            }
+            // 如果正在上传中或者处于队列中，则不进行添加
+            else {
+                return;
+            }
+        }
+        // 防止出现错误情况
+        cancelTask(tag);
+
         UploadTaskBean bean = new UploadTaskBean();
         bean.setFilePath(filePath);
         bean.setProgress(0);
         bean.setStatue(UploadTaskBean.UploadState.UPLOADPREPARE);
         // 添加上传状态Map中
-        beans.put(filePath, bean);
+        beans.put(tag, bean);
         // 添加上传线程池中
-        tasks.put("aizuna_"+new File(filePath).getName().substring(0, new File(filePath).getName().indexOf(".")), uploadService.submit(runnable));
+        tasks.put(tag, uploadService.submit(runnable));
     }
 
     /**

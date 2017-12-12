@@ -8,7 +8,23 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#a0000000"
+        android:layout_margin="3dip"
         android:layout_alignParentBottom="true">
 
     </View>
+    <TextView
+        android:id="@+id/tv_uploadretry"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:visibility="gone"
+        android:layout_margin="3dip"
+        android:text="重试"/>
+    <ImageView
+        android:id="@+id/iv_releasehousepic_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_alignParentRight="true"
+        android:src="@mipmap/ic_deleteimage"/>
 </com.renyu.androidimagelibrary.view.UploadView>

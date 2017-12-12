@@ -27,10 +27,12 @@ class UploadView : RelativeLayout {
     var tv_releasehousepic: TextView? = null
     var iv_releasehousepic_delete: ImageView? = null
     var iv_releasehousepic_cover: TextView? = null
+    var tv_uploadretry: TextView? = null
 
     interface OnUIControllListener {
         fun deletePic()
         fun clickPic()
+        fun retryUploadPic()
     }
     var listener: OnUIControllListener? = null
 
@@ -48,12 +50,17 @@ class UploadView : RelativeLayout {
         tv_releasehousepic = findViewById(R.id.tv_releasehousepic)
         iv_releasehousepic_delete = findViewById(R.id.iv_releasehousepic_delete)
         iv_releasehousepic_cover = findViewById(R.id.iv_releasehousepic_cover)
+        tv_uploadretry = findViewById(R.id.tv_uploadretry)
 
         iv_releasehousepic_delete?.setOnClickListener {
             listener?.deletePic()
         }
         iv_releasehousepic?.setOnClickListener {
             listener?.clickPic()
+        }
+        tv_uploadretry?.setOnClickListener {
+            tv_uploadretry?.visibility = View.GONE
+            listener?.retryUploadPic()
         }
     }
 
@@ -79,8 +86,27 @@ class UploadView : RelativeLayout {
         tag = "$path"
     }
 
-    fun updateMaskPercent(percent: Int) {
+    /**
+     * 上传遮罩更新
+     */
+    fun uploadMaskPercent(percent: Int) {
         view_mask?.layoutParams?.height = (measuredHeight * ((100-percent)*1.0f/100)).toInt()
         view_mask?.requestLayout()
+    }
+
+    /**
+     * 上传成功
+     */
+    fun uploadSuccess() {
+        view_mask?.visibility = View.GONE
+    }
+
+    /**
+     * 上传失败
+     */
+    fun uploadError() {
+        view_mask?.layoutParams?.height = measuredHeight
+        view_mask?.requestLayout()
+        tv_uploadretry?.visibility = View.VISIBLE
     }
 }

@@ -15,6 +15,7 @@ import com.blankj.utilcode.util.SizeUtils
 import com.renyu.androidimagelibrary.view.UploadView
 import com.renyu.commonlibrary.baseact.BaseActivity
 import com.renyu.commonlibrary.views.actionsheet.ActionSheetFragment
+import com.renyu.imagelibrary.bean.UploadTaskBean
 import com.renyu.imagelibrary.commonutils.Utils
 import kotlinx.android.synthetic.main.activity_upload.*
 import java.io.File
@@ -24,15 +25,10 @@ import java.io.File
  */
 class UploadActivity: BaseActivity() {
 
-    val pics = arrayOf("/storage/emulated/0/Pictures/dongqiudi/1512634878367.jpg",
-            "/storage/emulated/0/Pictures/dongqiudi/1512635214549.jpg",
-            "/storage/emulated/0/Pictures/dongqiudi/1512635218258.jpg",
-            "/storage/emulated/0/Pictures/dongqiudi/1512635223683.jpg",
-            "/storage/emulated/0/Pictures/dongqiudi/1512635228373.jpg")
-
-    var count = 0
-
+    // 选择的本地图片文件路径集合
     val picPath = ArrayList<String>()
+    // 远程上传完成的图片文件集合
+    val urlMaps = HashMap<String, String>()
 
     val upload: UploadImageManager by lazy {
         UploadImageManager()
@@ -56,7 +52,9 @@ class UploadActivity: BaseActivity() {
             if (msg != null && msg.data != null) {
                 val path = msg.data.getString("path")
                 val percent = msg.data.getInt("percent")
-                refreshPic(path, percent)
+                val statue = msg.data.getSerializable("statue") as UploadTaskBean.UploadState
+                val url = msg.data.getString("url")
+                refreshPic(path, percent, statue, url)
             }
         }
     }
@@ -68,15 +66,17 @@ class UploadActivity: BaseActivity() {
             val bundle = Bundle()
             bundle.putString("path", it.filePath)
             bundle.putInt("percent", it.progress)
+            bundle.putSerializable("statue", it.statue)
+            bundle.putString("url", it.url)
             message.data = bundle
             handler.sendMessage(message)
         }
-        button_start.setOnClickListener {
-            upload.addTask(pics[count%5], "http://www.zksell.com/index.php?s=Api/Base/uploadpic")
-            count++
-        }
-        button_cancel.setOnClickListener {
-            upload.cancelTask("aizuna_"+File(pics[(count-1)%5]).name.substring(0, File(pics[(count-1)%5]).name.indexOf(".")))
+        button_commit.setOnClickListener {
+            picPath.filter {
+                urlMaps.containsKey(it)
+            }.forEach {
+                println(urlMaps[it])
+            }
         }
     }
 
@@ -121,6 +121,10 @@ class UploadActivity: BaseActivity() {
     fun addImage(path: String, position: Int) {
         val view: UploadView = LayoutInflater.from(this).inflate(R.layout.view_upload, null, false) as UploadView
         view.listener = object : UploadView.OnUIControllListener {
+            override fun retryUploadPic() {
+                retryPic(path)
+            }
+
             override fun deletePic() {
                 upload.cancelTask("aizuna_"+File(path).name.substring(0, File(path).name.indexOf(".")))
                 picPath.remove(path)
@@ -139,7 +143,7 @@ class UploadActivity: BaseActivity() {
         view.loadPic(path)
         if (!TextUtils.isEmpty(path)) {
             view.post {
-                upload.addTask(path, "http://www.zksell.com/index.php?s=Api/Base/uploadpic")
+                upload.addTask(path, "http://www.zksell.com/index.php?s=Api/Base/uploadpic", File(path).name.substring(0, File(path).name.indexOf(".")))
             }
         }
 
@@ -156,6 +160,10 @@ class UploadActivity: BaseActivity() {
         else {
             grid_pic.addView(view, params)
         }
+    }
+
+    fun retryPic(path: String) {
+        upload.addTask(path, "http://www.zksell.com/index.php?s=Api/Base/uploadpic", File(path).name.substring(0, File(path).name.indexOf(".")))
     }
 
     fun choicePic() {
@@ -185,11 +193,20 @@ class UploadActivity: BaseActivity() {
         }
     }
 
-    fun refreshPic(path: String, percent: Int) {
+    fun refreshPic(path: String, percent: Int, statue: UploadTaskBean.UploadState, url: String) {
         for (i in 0 until grid_pic.childCount) {
             val tag = grid_pic.getChildAt(i).tag
             if (tag != null && grid_pic.getChildAt(i).tag == path) {
-                (grid_pic.getChildAt(i) as UploadView).updateMaskPercent(percent)
+                when (statue) {
+                    UploadTaskBean.UploadState.UPLOADFAIL -> {
+                        (grid_pic.getChildAt(i) as UploadView).uploadError()
+                    }
+                    UploadTaskBean.UploadState.UPLOADSUCCESS -> {
+                        (grid_pic.getChildAt(i) as UploadView).uploadSuccess()
+                        urlMaps.put(path, url)
+                    }
+                    else -> (grid_pic.getChildAt(i) as UploadView).uploadMaskPercent(percent)
+                }
             }
         }
     }
