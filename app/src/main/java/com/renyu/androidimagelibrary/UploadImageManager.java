@@ -60,7 +60,7 @@ public class UploadImageManager {
 
             HashMap<String, File> fileHashMap=new HashMap<>();
             fileHashMap.put("fileData", new File(filePath));
-            Response resp=okHttpUtils.syncUpload(url, new HashMap<>(), fileHashMap, (l, l1) -> {
+            String uploadValue=okHttpUtils.syncUpload(url, new HashMap<>(), fileHashMap, (l, l1) -> {
                 Log.d("UploadImageManager", "UploadImageManager " + l + " " + l1);
                 // 上传每20%进度刷新一次，上传完成不进行修改以防止与后续成功的回调不一致
                 if ((l*100/l1 - bean.getProgress() >= 20) && l != l1) {
@@ -72,14 +72,14 @@ public class UploadImageManager {
                     }
                 }
             });
-            if (resp==null) {
+            if (uploadValue==null) {
                 Log.d("UploadImageManager", filePath + "发布失败");
             }
-            else if (resp.isSuccessful()) {
+            else {
                 JSONObject jsonObject= null;
                 try {
                     // 上传成功
-                    jsonObject = new JSONObject(resp.body().string());
+                    jsonObject = new JSONObject(uploadValue);
                     String picUrl=jsonObject.getJSONObject("data").getString("picUrl");
                     Log.d("UploadImageManager", filePath + "发布成功:" + picUrl);
 
@@ -94,9 +94,6 @@ public class UploadImageManager {
                     e.printStackTrace();
                     Log.d("UploadImageManager", filePath + "发布失败");
                 }
-            }
-            else {
-                Log.d("UploadImageManager", filePath + "发布失败");
             }
 
             // 上传失败
@@ -143,7 +140,7 @@ public class UploadImageManager {
      * 取消一个任务
      * @param tag
      */
-    public synchronized void cancelTask(String tag) {
+    public void cancelTask(String tag) {
         if (tasks.containsKey(tag)) {
             tasks.remove(tag).cancel(true);
         }

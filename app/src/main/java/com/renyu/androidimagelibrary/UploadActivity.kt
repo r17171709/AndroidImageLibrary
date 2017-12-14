@@ -126,7 +126,7 @@ class UploadActivity: BaseActivity() {
             }
 
             override fun deletePic() {
-                upload.cancelTask("aizuna_"+File(path).name.substring(0, File(path).name.indexOf(".")))
+                upload.cancelTask(File(path).name.substring(0, File(path).name.indexOf(".")))
                 picPath.remove(path)
                 grid_pic.removeView(view)
                 if (picPath.size==9) {
