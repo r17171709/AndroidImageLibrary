@@ -155,7 +155,7 @@ class UploadActivity: BaseActivity() {
         params.rightMargin = SizeUtils.dp2px(4f)
         params.bottomMargin = SizeUtils.dp2px(4f)
         if (position != -1) {
-            grid_pic.addView(view, 0, params)
+            grid_pic.addView(view, position, params)
         }
         else {
             grid_pic.addView(view, params)
