@@ -31,7 +31,6 @@ import com.blankj.utilcode.util.ScreenUtils;
 import com.renyu.commonlibrary.basefrag.BaseFragment;
 import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.imagelibrary.R;
-import com.renyu.imagelibrary.params.CommonParams;
 
 import java.io.File;
 import java.io.FileNotFoundException;

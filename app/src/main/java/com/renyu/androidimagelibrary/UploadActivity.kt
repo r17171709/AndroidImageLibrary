@@ -101,7 +101,7 @@ class UploadActivity: BaseActivity() {
                                 filePaths.add(temp[i])
                             }
                         }
-                        if (filePaths==null) {
+                        if (filePaths.size == 0) {
                             return
                         }
                         grid_pic.removeView(grid_pic.getChildAt(grid_pic.childCount -1))
