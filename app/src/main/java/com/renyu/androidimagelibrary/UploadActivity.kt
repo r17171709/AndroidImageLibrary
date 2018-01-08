@@ -169,11 +169,11 @@ class UploadActivity: BaseActivity() {
     fun choicePic() {
         val view_clearmessage: View = LayoutInflater.from(this)
                 .inflate(R.layout.view_actionsheet_button_3, null, false)
-        val actionSheetFragment: ActionSheetFragment = ActionSheetFragment.build(supportFragmentManager)
+        val actionSheetFragment: ActionSheetFragment = ActionSheetFragment.build()
                 .setChoice(ActionSheetFragment.CHOICE.CUSTOMER)
                 .setTitle("设置图片")
                 .setCustomerView(view_clearmessage)
-                .show()
+                .show(this)
         val pop_three_choice1: TextView = view_clearmessage.findViewById(R.id.pop_three_choice1)
         pop_three_choice1.text = "拍照"
         pop_three_choice1.setOnClickListener {
