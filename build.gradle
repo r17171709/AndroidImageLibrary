@@ -22,8 +22,6 @@ allprojects {
     repositories {
         google()
         maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
-        maven { url 'https://dl.bintray.com/r17171709/AndroidCommonLibrary/'}
-        maven { url 'https://dl.bintray.com/r17171709/AndroidImageLibrary/'}
         jcenter()
         maven { url 'https://jitpack.io' }
     }
