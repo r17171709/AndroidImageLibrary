@@ -8,7 +8,7 @@ publish {
     userOrg = 'r17171709'
     groupId = 'com.github.renyu'
     artifactId = 'AndroidImageLibrary'
-    publishVersion = '1.4.1'
+    publishVersion = '1.4.2'
     desc = 'Image Library'
     website = 'https://github.com/r17171709'
     repoName = 'AndroidImageLibrary'
@@ -46,7 +46,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-    compile 'com.github.renyu:AndroidCommonLibrary:1.11.0'
+    compile 'com.github.renyu:AndroidCommonLibrary:1.11.1'
 //    compile 'com.github.r17171709:AndroidCommonLibrary:v1.9.12'
     // PhotoDraweeView  PhotoView For Fresco
     compile 'me.relex:photodraweeview:1.1.3'
