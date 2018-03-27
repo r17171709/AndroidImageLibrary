@@ -15,8 +15,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import okhttp3.Response;
-
 /**
  * Created by renyu on 2017/12/7.
  */
@@ -60,7 +58,7 @@ public class UploadImageManager {
 
             HashMap<String, File> fileHashMap=new HashMap<>();
             fileHashMap.put("fileData", new File(filePath));
-            String uploadValue=okHttpUtils.syncUpload(url, new HashMap<>(), fileHashMap, (l, l1) -> {
+            String uploadValue=okHttpUtils.syncUpload(url, null, fileHashMap, null, (l, l1) -> {
                 Log.d("UploadImageManager", "UploadImageManager " + l + " " + l1);
                 // 上传每20%进度刷新一次，上传完成不进行修改以防止与后续成功的回调不一致
                 if ((l*100/l1 - bean.getProgress() >= 20) && l != l1) {
