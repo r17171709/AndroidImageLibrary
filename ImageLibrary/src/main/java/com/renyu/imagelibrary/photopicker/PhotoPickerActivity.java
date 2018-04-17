@@ -390,7 +390,6 @@ public class PhotoPickerActivity extends BaseActivity {
         if (requestCode== CommonParams.RESULT_TAKECAMERA && resultCode==RESULT_OK) {
             String filePath=data.getExtras().getString("path");
             Utils.cropImage(filePath, PhotoPickerActivity.this, CommonParams.RESULT_CROP, 0);
-
         }
         else if (requestCode== CommonParams.RESULT_CROP && resultCode==RESULT_OK) {
             String filePath=data.getExtras().getString("path");

@@ -3,13 +3,15 @@ package com.renyu.androidimagelibrary;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 
 import com.renyu.commonlibrary.params.InitParams;
-import com.renyu.imagelibrary.commonutils.Utils;
+import com.renyu.imagelibrary.preview.ImagePreviewActivity;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import id.zelory.compressor.Compressor;
 
@@ -20,21 +22,20 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Utils.takePicture(this, 100);
+//        Utils.takePicture(this, 100);
 
-//        ArrayList<String> strings=new ArrayList<>();
-//        strings.add("http://7b1g8u.com1.z0.glb.clouddn.com/ccc.jpg");
-//        strings.add("http://img.sj33.cn/uploads/allimg/201302/1-130201105055.jpg");
-//        Intent intent=new Intent(this, ImagePreviewActivity.class);
-//        Bundle bundle=new Bundle();
-//        bundle.putBoolean("canDownload", false);
-//        bundle.putInt("position", 0);
-//        bundle.putBoolean("canEdit", false);
-//        bundle.putStringArrayList("urls", strings);
-//        bundle.putString("rightNav", "查看");
-//        bundle.putParcelable("rightNavClick", new RightNavClick());
-//        intent.putExtras(bundle);
-//        startActivity(intent);
+        ArrayList<String> strings=new ArrayList<>();
+        strings.add(Environment.getExternalStorageDirectory().getPath()+"/1.jpg");
+        Intent intent=new Intent(this, ImagePreviewActivity.class);
+        Bundle bundle=new Bundle();
+        bundle.putBoolean("canDownload", false);
+        bundle.putInt("position", 0);
+        bundle.putBoolean("canEdit", true);
+        bundle.putStringArrayList("urls", strings);
+        bundle.putString("rightNav", "查看");
+        bundle.putParcelable("rightNavClick", new RightNavClick());
+        intent.putExtras(bundle);
+        startActivity(intent);
 
 //        Utils.showLongPreview(this, "http://7b1g8u.com1.z0.glb.clouddn.com/ccc.jpg", Environment.getExternalStorageDirectory().getPath());
     }
