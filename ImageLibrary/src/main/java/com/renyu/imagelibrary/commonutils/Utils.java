@@ -16,10 +16,9 @@ import com.renyu.imagelibrary.preview.ImagePreviewActivity;
 import com.renyu.imagelibrary.preview.SubsamplingActivity;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
+
+import id.zelory.compressor.Compressor;
 
 /**
  * Created by renyu on 2017/1/3.
@@ -82,52 +81,30 @@ public class Utils {
     }
 
     /**
-     * 剪裁图片文件
+     * 图片剪裁
+     * @param context
      * @param filePath
-     * @param ratio 宽/高
+     * @param newFilePath
+     * @return
      */
-    public static void cropFile(String filePath, String newFilePath, float ratio) {
-        BitmapFactory.Options options=new BitmapFactory.Options();
-        options.inJustDecodeBounds=true;
+    private File compress(Context context, String filePath, String newFilePath) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(filePath, options);
-        float bmpWidth=options.outWidth;
-        float bmpHeight=options.outHeight;
-        int realWidth= (int) bmpWidth;
-        int realHeight= (int) bmpHeight;
-        int startX=0;
-        int startY=0;
-        // 宽度过大
-        if (bmpWidth/bmpHeight>ratio) {
-            realWidth= (int) (bmpHeight*ratio);
-            realHeight= (int) bmpHeight;
-            startX= (int) ((bmpWidth-realWidth)/2);
-            startY= 0;
-        }
-        // 高度过大
-        else if (bmpWidth/bmpHeight<ratio) {
-            realWidth= (int) bmpWidth;
-            realHeight= (int) (bmpWidth/ratio);
-            startX= 0;
-            startY= (int) ((bmpHeight-realHeight)/2);
-        }
-        BitmapFactory.Options newOpts=new BitmapFactory.Options();
-        newOpts.inJustDecodeBounds = false;
-        newOpts.inPreferredConfig = Bitmap.Config.RGB_565;
-        Bitmap bitmap=BitmapFactory.decodeFile(filePath, newOpts);
-        bitmap=Bitmap.createBitmap(bitmap, startX, startY, realWidth, realHeight);
-        //生成新图片
+
+        File cropFile = null;
         try {
-            FileOutputStream fos = new FileOutputStream(newFilePath);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 75, fos);
-            fos.flush();
-            if (!bitmap.isRecycled()) {
-                bitmap.recycle();
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+            cropFile = new Compressor(context)
+                    .setMaxWidth(options.outWidth/2)
+                    .setMaxHeight(options.outHeight/2)
+                    .setQuality(70)
+                    .setCompressFormat(Bitmap.CompressFormat.JPEG)
+                    .setDestinationDirectoryPath(newFilePath)
+                    .compressToFile(new File(filePath));
+        } catch (Exception e) {
             e.printStackTrace();
         }
+        return cropFile;
     }
 
     /**
