@@ -87,7 +87,7 @@ public class Utils {
      * @param newFilePath
      * @return
      */
-    private File compress(Context context, String filePath, String newFilePath) {
+    public File compress(Context context, String filePath, String newFilePath) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(filePath, options);
