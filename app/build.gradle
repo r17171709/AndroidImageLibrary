@@ -1,6 +1,8 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'com.hujiang.android-aspectjx'
 
 android {
     compileSdkVersion 27
@@ -34,6 +36,10 @@ android {
     }
 }
 
+kapt {
+    generateStubs = true
+}
+
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
@@ -41,6 +47,8 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    // AspectJ 每一个application和library都需要
+    implementation 'org.aspectj:aspectjrt:1.9.1'
     implementation project(':ImageLibrary')
 //    implementation 'com.github.renyu:AndroidImageLibrary:1.4.3'
     //    compile "com.github.r17171709:AndroidImageLibrary:v1.0.12"

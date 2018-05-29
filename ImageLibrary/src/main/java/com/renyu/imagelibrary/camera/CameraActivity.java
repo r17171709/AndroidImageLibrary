@@ -4,16 +4,15 @@ import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.renyu.commonlibrary.annotation.NeedPermission;
+import com.renyu.commonlibrary.annotation.PermissionDenied;
 import com.renyu.commonlibrary.baseact.BaseActivity;
 import com.renyu.commonlibrary.commonutils.BarUtils;
 import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.imagelibrary.R;
 import com.renyu.imagelibrary.commonutils.Utils;
-import com.renyu.imagelibrary.params.CommonParams;
 
 public class CameraActivity extends BaseActivity {
-
-    String[] permissions={Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA};
 
     @Override
     public void initParams() {
@@ -27,24 +26,20 @@ public class CameraActivity extends BaseActivity {
 
     @Override
     public void loadData() {
-        checkPermission(permissions, getResources().getString(R.string.permission_camera), new OnPermissionCheckedListener() {
-            @Override
-            public void checked(boolean flag) {
+        permissionApply();
+    }
 
-            }
+    @NeedPermission(permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA},
+            deniedDesp = "为了您可以正常使用照相机，\n请点击\"设置\"-\"权限\"-打开 \"存储空间\"与\"相机\" 权限。\n最后点击两次后退按钮，即可返回。")
+    public void permissionApply() {
+        if (getSupportFragmentManager().getFragments()==null || getSupportFragmentManager().getFragments().size()==0) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new CameraFragment()).commitAllowingStateLoss();
+        }
+    }
 
-            @Override
-            public void grant() {
-                if (getSupportFragmentManager().getFragments()==null || getSupportFragmentManager().getFragments().size()==0) {
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new CameraFragment()).commitAllowingStateLoss();
-                }
-            }
-
-            @Override
-            public void denied() {
-
-            }
-        });
+    @PermissionDenied(permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA})
+    public void permissionDenied() {
+        finish();
     }
 
     @Override

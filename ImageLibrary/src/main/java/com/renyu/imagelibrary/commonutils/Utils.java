@@ -28,6 +28,8 @@ public class Utils {
 
     /**
      * 选择调用系统相册
+     * @param activity
+     * @param requestCode
      */
     public static void chooseImage(Activity activity, int requestCode) {
         //调用调用系统相册
@@ -38,7 +40,9 @@ public class Utils {
     }
 
     /**
-     * 照相
+     * 拍照
+     * @param activity
+     * @param requestCode
      */
     public static void takePicture(Activity activity, int requestCode) {
         Intent intent=new Intent(activity, CameraActivity.class);
@@ -71,6 +75,9 @@ public class Utils {
 
     /**
      * 选择图片
+     * @param activity
+     * @param maxNum
+     * @param requestCode
      */
     public static void choicePic(Activity activity, int maxNum, int requestCode) {
         Intent intent=new Intent(activity, PhotoPickerActivity.class);
@@ -81,13 +88,13 @@ public class Utils {
     }
 
     /**
-     * 图片剪裁
+     * 图片压缩
      * @param context
      * @param filePath
      * @param newFilePath
      * @return
      */
-    public File compress(Context context, String filePath, String newFilePath) {
+    public static File compressPic(Context context, String filePath, String newFilePath) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(filePath, options);
@@ -109,17 +116,11 @@ public class Utils {
 
     /**
      * 拍照后刷新系统相册
-     *
      * @param context
      * @param newFile
+     * @param dirPath
      */
     public static void refreshAlbum(Context context, String newFile, String dirPath) {
-        //刷新文件夹
-        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.KITKAT) {
-            Intent scan_dir = new Intent(Intent.ACTION_MEDIA_MOUNTED);
-            scan_dir.setData(Uri.fromFile(new File(dirPath)));
-            context.sendBroadcast(scan_dir);
-        }
         //刷新文件
         Intent intent_scan = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
         intent_scan.setData(Uri.fromFile(new File(newFile)));
