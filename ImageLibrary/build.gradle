@@ -47,7 +47,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    api 'com.github.renyu:AndroidCommonLibrary:1.12.1'
+    api 'com.github.renyu:AndroidCommonLibrary:1.12.4'
 //    compile 'com.github.r17171709:AndroidCommonLibrary:v1.9.12'
     // PhotoDraweeView  PhotoView For Fresco
     api 'me.relex:photodraweeview:1.1.3'
