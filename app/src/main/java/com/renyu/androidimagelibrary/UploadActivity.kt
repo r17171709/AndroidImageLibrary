@@ -28,7 +28,7 @@ class UploadActivity: BaseActivity() {
     // 选择的本地图片文件路径集合
     val picPath = ArrayList<String>()
     // 远程上传完成的图片文件集合
-    val urlMaps = HashMap<String, String>()
+    private val urlMaps = HashMap<String, String>()
 
     val upload: UploadImageManager by lazy {
         UploadImageManager()
@@ -45,7 +45,7 @@ class UploadActivity: BaseActivity() {
     }
 
     // 刷新gridlayout
-    var handler: Handler = object : Handler() {
+    private var handler: Handler = object : Handler() {
         override fun handleMessage(msg: Message?) {
             super.handleMessage(msg)
 
@@ -109,7 +109,7 @@ class UploadActivity: BaseActivity() {
                         for (i in 0 until filePaths.size) {
                             addImage(filePaths[i], -1)
                         }
-                        if (picPath.size < 10) {
+                        if (picPath.size < 9) {
                             addImage("", -1)
                         }
                     }
@@ -129,7 +129,7 @@ class UploadActivity: BaseActivity() {
                 upload.cancelTask(File(path).name.substring(0, File(path).name.indexOf(".")))
                 picPath.remove(path)
                 grid_pic.removeView(view)
-                if (picPath.size==9) {
+                if (picPath.size==8) {
                     addImage("", -1)
                 }
             }
@@ -148,8 +148,8 @@ class UploadActivity: BaseActivity() {
         }
 
         val params = GridLayout.LayoutParams()
-        params.width = grid_pic.measuredWidth / 4 - SizeUtils.dp2px(8f)
-        params.height = SizeUtils.dp2px(80f)
+        params.width = grid_pic.measuredWidth / 3 - SizeUtils.dp2px(8f)
+        params.height = params.width
         params.leftMargin = SizeUtils.dp2px(4f)
         params.topMargin = SizeUtils.dp2px(4f)
         params.rightMargin = SizeUtils.dp2px(4f)
@@ -183,7 +183,7 @@ class UploadActivity: BaseActivity() {
         val pop_three_choice2: TextView= view_clearmessage.findViewById(R.id.pop_three_choice2)
         pop_three_choice2.text = "从相册获取"
         pop_three_choice2.setOnClickListener {
-            Utils.choicePic(this, 10-picPath.size, CommonParams.RESULT_ALUMNI)
+            Utils.choicePic(this, 9-picPath.size, CommonParams.RESULT_ALUMNI)
             actionSheetFragment.dismiss()
         }
         val pop_three_cancel: TextView = view_clearmessage.findViewById(R.id.pop_three_cancel)
@@ -203,7 +203,7 @@ class UploadActivity: BaseActivity() {
                     }
                     UploadTaskBean.UploadState.UPLOADSUCCESS -> {
                         (grid_pic.getChildAt(i) as UploadView).uploadSuccess()
-                        urlMaps.put(path, url)
+                        urlMaps[path] = url
                     }
                     else -> (grid_pic.getChildAt(i) as UploadView).uploadMaskPercent(percent)
                 }

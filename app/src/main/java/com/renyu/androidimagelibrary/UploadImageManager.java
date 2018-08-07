@@ -21,25 +21,25 @@ import java.util.concurrent.Future;
 
 public class UploadImageManager {
 
-    ExecutorService uploadService;
-    OKHttpUtils okHttpUtils;
+    private ExecutorService uploadService;
+    private OKHttpUtils okHttpUtils;
 
     // 上传状态回调
     public interface UpdateCallBack {
         void updateMap(UploadTaskBean bean);
     }
-    UpdateCallBack callBack;
+    private UpdateCallBack callBack;
 
     // 任务线程组
-    ConcurrentHashMap<String, Future> tasks;
+    private ConcurrentHashMap<String, Future> tasks;
     // 任务状态组
-    ConcurrentHashMap<String, UploadTaskBean> beans;
+    private ConcurrentHashMap<String, UploadTaskBean> beans;
 
     public UploadImageManager() {
         tasks = new ConcurrentHashMap<>();
         beans = new ConcurrentHashMap<>();
 
-        okHttpUtils=OKHttpHelper.getInstance().getOkHttpUtils();
+        okHttpUtils = OKHttpHelper.getInstance().getOkHttpUtils();
 
         uploadService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
@@ -47,6 +47,8 @@ public class UploadImageManager {
     /**
      * 添加任务
      * @param filePath
+     * @param url
+     * @param tag
      */
     public synchronized void addTask(String filePath, String url, String tag) {
         Runnable runnable = () -> {
@@ -70,15 +72,15 @@ public class UploadImageManager {
                     }
                 }
             });
-            if (uploadValue==null) {
+            if (uploadValue == null) {
                 Log.d("UploadImageManager", filePath + "发布失败");
             }
             else {
-                JSONObject jsonObject= null;
+                JSONObject jsonObject;
                 try {
                     // 上传成功
                     jsonObject = new JSONObject(uploadValue);
-                    String picUrl=jsonObject.getJSONObject("data").getString("picUrl");
+                    String picUrl = jsonObject.getJSONObject("data").getString("picUrl");
                     Log.d("UploadImageManager", filePath + "发布成功:" + picUrl);
 
                     bean.setProgress(100);

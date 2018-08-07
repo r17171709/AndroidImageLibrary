@@ -73,7 +73,7 @@ class UploadView : RelativeLayout {
             ImageRequestBuilder.newBuilderWithSource(Uri.parse(path))
         }
         else {
-            ImageRequestBuilder.newBuilderWithSource(Uri.parse("file://"+path))
+            ImageRequestBuilder.newBuilderWithSource(Uri.parse("file://$path"))
         }
         val imageRequest: ImageRequest? = requestBuilder?.setResizeOptions(ResizeOptions(SizeUtils.dp2px(90f), SizeUtils.dp2px(90f)))?.build()
         val draweeController: DraweeController = Fresco.newDraweeControllerBuilder()
@@ -83,7 +83,7 @@ class UploadView : RelativeLayout {
         tv_releasehousepic?.visibility = View.GONE
         iv_releasehousepic_delete?.visibility = View.VISIBLE
         // 设置标签
-        tag = "$path"
+        tag = path
     }
 
     /**
