@@ -148,7 +148,7 @@ class UploadActivity: BaseActivity() {
         }
 
         val params = GridLayout.LayoutParams()
-        params.width = grid_pic.measuredWidth / 3 - SizeUtils.dp2px(8f)
+        params.width = (grid_pic.measuredWidth - SizeUtils.dp2px(8f)*2) / 3
         params.height = params.width
         params.leftMargin = SizeUtils.dp2px(4f)
         params.topMargin = SizeUtils.dp2px(4f)
