@@ -92,10 +92,10 @@ public class Utils {
      * 图片压缩
      * @param context
      * @param filePath
-     * @param newFilePath
+     * @param destinationDirectoryPath
      * @return
      */
-    public static File compressPic(Context context, String filePath, String newFilePath) {
+    public static File compressPic(Context context, String filePath, String destinationDirectoryPath) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(filePath, options);
@@ -107,7 +107,7 @@ public class Utils {
                     .setMaxHeight(options.outHeight/2)
                     .setQuality(70)
                     .setCompressFormat(Bitmap.CompressFormat.JPEG)
-                    .setDestinationDirectoryPath(newFilePath)
+                    .setDestinationDirectoryPath(destinationDirectoryPath)
                     .compressToFile(new File(filePath));
         } catch (Exception e) {
             e.printStackTrace();

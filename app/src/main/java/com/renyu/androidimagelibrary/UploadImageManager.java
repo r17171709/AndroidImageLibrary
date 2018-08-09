@@ -1,10 +1,13 @@
 package com.renyu.androidimagelibrary;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.renyu.commonlibrary.network.OKHttpHelper;
 import com.renyu.commonlibrary.network.OKHttpUtils;
+import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.imagelibrary.bean.UploadTaskBean;
+import com.renyu.imagelibrary.commonutils.Utils;
 
 import org.json.JSONObject;
 
@@ -58,8 +61,11 @@ public class UploadImageManager {
             bean.setProgress(0);
             bean.setStatue(UploadTaskBean.UploadState.UPLOADING);
 
+            // 剪裁图片
+            File cropFile = Utils.compressPic(com.blankj.utilcode.util.Utils.getApp(), filePath, InitParams.CACHE_PATH);
+
             HashMap<String, File> fileHashMap=new HashMap<>();
-            fileHashMap.put("fileData", new File(filePath));
+            fileHashMap.put("fileData", cropFile);
             String uploadValue=okHttpUtils.syncUpload(url, null, fileHashMap, null, (l, l1) -> {
                 Log.d("UploadImageManager", "UploadImageManager " + l + " " + l1);
                 // 上传每20%进度刷新一次，上传完成不进行修改以防止与后续成功的回调不一致
@@ -81,15 +87,20 @@ public class UploadImageManager {
                     // 上传成功
                     jsonObject = new JSONObject(uploadValue);
                     String picUrl = jsonObject.getJSONObject("data").getString("picUrl");
-                    Log.d("UploadImageManager", filePath + "发布成功:" + picUrl);
-
-                    bean.setProgress(100);
-                    bean.setUrl(picUrl);
-                    bean.setStatue(UploadTaskBean.UploadState.UPLOADSUCCESS);
-                    if (callBack != null) {
-                        callBack.updateMap(bean);
+                    if (TextUtils.isEmpty(picUrl)) {
+                        Log.d("UploadImageManager", filePath + "发布失败");
                     }
-                    return;
+                    else {
+                        Log.d("UploadImageManager", filePath + "发布成功:" + picUrl);
+
+                        bean.setProgress(100);
+                        bean.setUrl(picUrl);
+                        bean.setStatue(UploadTaskBean.UploadState.UPLOADSUCCESS);
+                        if (callBack != null) {
+                            callBack.updateMap(bean);
+                        }
+                        return;
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                     Log.d("UploadImageManager", filePath + "发布失败");
