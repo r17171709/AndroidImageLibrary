@@ -20,8 +20,8 @@
         android:layout_height="match_parent"
         app:columnCount="3"
         android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp">
+        android:layout_marginEnd="4dp"
+        android:layout_marginStart="4dp">
 
     </android.support.v7.widget.GridLayout>
 </LinearLayout>
