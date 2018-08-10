@@ -97,8 +97,19 @@ class UploadActivity: BaseActivity() {
                     if (temp != null) {
                         for (i in 0 until temp.size) {
                             val file=File(temp[i])
+                            // 避免重复且出错的图片进行上传
                             if (file.exists() && file.length()>0) {
-                                filePaths.add(temp[i])
+                                var find = false
+                                for (filePath in filePaths) {
+                                    // 文件名称相同则跳过
+                                    if (File(filePath).name == file.name) {
+                                        find = true
+                                        break
+                                    }
+                                }
+                                if (!find) {
+                                    filePaths.add(temp[i])
+                                }
                             }
                         }
                         if (filePaths.size == 0) {
@@ -128,6 +139,7 @@ class UploadActivity: BaseActivity() {
             override fun deletePic() {
                 upload.cancelTask(File(path).name.substring(0, File(path).name.indexOf(".")))
                 picPath.remove(path)
+                urlMaps.remove(path)
                 grid_pic.removeView(view)
                 if (picPath.size==8) {
                     addImage("", -1)
