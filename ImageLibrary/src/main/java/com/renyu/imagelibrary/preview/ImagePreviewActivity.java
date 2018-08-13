@@ -5,13 +5,9 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -26,20 +22,18 @@ import com.renyu.imagelibrary.params.CommonParams;
 import com.renyu.imagelibrary.preview.impl.RightNavClickImpl;
 
 import java.io.File;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
 import me.relex.circleindicator.CircleIndicator;
 
 /**
  * Created by renyu on 16/1/31.
  */
-public class ImagePreviewActivity extends BaseActivity {
+public abstract class ImagePreviewActivity extends BaseActivity {
 
     MultiTouchViewPager imagepreview_viewpager;
     ViewPagerFragmentAdapter adapter;
@@ -54,8 +48,6 @@ public class ImagePreviewActivity extends BaseActivity {
     // 图片路径
     ArrayList<String> urls;
     ArrayList<Fragment> fragments;
-    //是否可以下载
-    boolean canDownload;
     //是否可以编辑
     boolean canEdit;
 
@@ -93,37 +85,28 @@ public class ImagePreviewActivity extends BaseActivity {
 
         point=new HashMap<>();
 
-        imagepreview_viewpager= (MultiTouchViewPager) findViewById(R.id.imagepreview_viewpager);
-        imagepreview_indicator= (CircleIndicator) findViewById(R.id.imagepreview_indicator);
-        layout_imagepreview_edit = (RelativeLayout) findViewById(R.id.layout_imagepreview_edit);
-        imagepreview_edit= (TextView) findViewById(R.id.imagepreview_edit);
-        tv_nav_title= (TextView) findViewById(R.id.tv_nav_title);
+        imagepreview_viewpager= findViewById(R.id.imagepreview_viewpager);
+        imagepreview_indicator= findViewById(R.id.imagepreview_indicator);
+        layout_imagepreview_edit = findViewById(R.id.layout_imagepreview_edit);
+        imagepreview_edit= findViewById(R.id.imagepreview_edit);
+        tv_nav_title= findViewById(R.id.tv_nav_title);
         tv_nav_title.setTextColor(Color.WHITE);
-        tv_nav_right= (TextView) findViewById(R.id.tv_nav_right);
+        tv_nav_right= findViewById(R.id.tv_nav_right);
         tv_nav_right.setTextColor(Color.WHITE);
         if (!TextUtils.isEmpty(getIntent().getExtras().getString("rightNav"))) {
             tv_nav_right.setText(getIntent().getExtras().getString("rightNav"));
-            tv_nav_right.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (getIntent().getExtras().getParcelable("rightNavClick")!=null) {
-                        ((RightNavClickImpl) getIntent().getExtras().getParcelable("rightNavClick")).click(ImagePreviewActivity.this);
-                    }
+            tv_nav_right.setOnClickListener(view -> {
+                if (getIntent().getExtras().getParcelable("rightNavClick")!=null) {
+                    ((RightNavClickImpl) getIntent().getExtras().getParcelable("rightNavClick")).click(ImagePreviewActivity.this);
                 }
             });
         }
-        ib_nav_left= (ImageButton) findViewById(R.id.ib_nav_left);
+        ib_nav_left= findViewById(R.id.ib_nav_left);
         ib_nav_left.setImageResource(R.mipmap.ic_arrow_write_left);
-        ib_nav_left.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onBackPressed();
-            }
-        });
+        ib_nav_left.setOnClickListener(view -> onBackPressed());
 
         position=getIntent().getExtras().getInt("position");
         urls=getIntent().getExtras().getStringArrayList("urls");
-        canDownload=getIntent().getExtras().getBoolean("canDownload");
         canEdit=getIntent().getExtras().getBoolean("canEdit");
         if (canEdit) {
             layout_imagepreview_edit.setVisibility(View.VISIBLE);
@@ -131,12 +114,9 @@ public class ImagePreviewActivity extends BaseActivity {
         fragments=new ArrayList<>();
         for (int i=0;i<urls.size();i++) {
             ImagePreviewFragment fragment= ImagePreviewFragment.newInstance(urls.get(i), i);
-            fragment.setOnPicChangedListener(new ImagePreviewFragment.OnPicChangedListener() {
-                @Override
-                public void picChanged(int position, ImageInfo imageInfo) {
-                    // 添加图片尺寸信息
-                    point.put(""+position, imageInfo);
-                }
+            fragment.setOnPicChangedListener((position, imageInfo) -> {
+                // 添加图片尺寸信息
+                point.put(""+position, imageInfo);
             });
             fragments.add(fragment);
         }
@@ -151,18 +131,15 @@ public class ImagePreviewActivity extends BaseActivity {
             @Override
             public void onPageSelected(final int position) {
                 Observable.timer(300, TimeUnit.MILLISECONDS).observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Consumer<Long>() {
-                    @Override
-                    public void accept(Long aLong) throws Exception {
-                        // 图片尺寸复原
-                        if (position-1>=0&&point.containsKey(""+(position-1))) {
-                            ((ImagePreviewFragment) fragments.get(position-1)).update(point.get(""+(position-1)).getWidth(), point.get(""+(position-1)).getHeight());
-                        }
-                        if (position+1<=urls.size()&&point.containsKey(""+(position+1))) {
-                            ((ImagePreviewFragment) fragments.get(position+1)).update(point.get(""+(position+1)).getWidth(), point.get(""+(position+1)).getHeight());
-                        }
-                    }
-                });
+                        .subscribe(aLong -> {
+                            // 图片尺寸复原
+                            if (position-1>=0&&point.containsKey(""+(position-1))) {
+                                ((ImagePreviewFragment) fragments.get(position-1)).update(point.get(""+(position-1)).getWidth(), point.get(""+(position-1)).getHeight());
+                            }
+                            if (position+1<=urls.size()&&point.containsKey(""+(position+1))) {
+                                ((ImagePreviewFragment) fragments.get(position+1)).update(point.get(""+(position+1)).getWidth(), point.get(""+(position+1)).getHeight());
+                            }
+                        });
                 tv_nav_title.setText((position+1)+"/"+urls.size());
             }
 
@@ -173,15 +150,12 @@ public class ImagePreviewActivity extends BaseActivity {
         });
         imagepreview_indicator.setViewPager(imagepreview_viewpager);
         imagepreview_viewpager.setCurrentItem(position);
-        imagepreview_edit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (urls.get(imagepreview_viewpager.getCurrentItem()).indexOf("http")!=-1) {
-                    Toast.makeText(ImagePreviewActivity.this, "网络图片不能修改", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                Utils.cropImage(urls.get(imagepreview_viewpager.getCurrentItem()), ImagePreviewActivity.this, CommonParams.RESULT_CROP, 0);
+        imagepreview_edit.setOnClickListener(v -> {
+            if (urls.get(imagepreview_viewpager.getCurrentItem()).indexOf("http")!=-1) {
+                Toast.makeText(ImagePreviewActivity.this, "网络图片不能修改", Toast.LENGTH_SHORT).show();
+                return;
             }
+            Utils.cropImage(urls.get(imagepreview_viewpager.getCurrentItem()), ImagePreviewActivity.this, CommonParams.RESULT_CROP, 0);
         });
         tv_nav_title.setText((position+1)+"/"+urls.size());
     }

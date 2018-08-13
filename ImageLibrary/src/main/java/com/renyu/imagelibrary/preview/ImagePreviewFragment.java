@@ -1,11 +1,8 @@
 package com.renyu.imagelibrary.preview;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.graphics.drawable.Animatable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
 
 import com.blankj.utilcode.util.SizeUtils;
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -18,7 +15,6 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.renyu.commonlibrary.basefrag.BaseFragment;
 import com.renyu.imagelibrary.R;
 
-import me.relex.photodraweeview.OnPhotoTapListener;
 import me.relex.photodraweeview.PhotoDraweeView;
 
 /**
@@ -73,26 +69,12 @@ public class ImagePreviewFragment extends BaseFragment {
             }
         });
         photoDraweeView.setController(controller.build());
-        photoDraweeView.setOnPhotoTapListener(new OnPhotoTapListener() {
-            @Override
-            public void onPhotoTap(View view, float x, float y) {
-                if (getActivity()!=null) {
-                    getActivity().finish();
-                }
+        photoDraweeView.setOnPhotoTapListener((view, x, y) -> {
+            if (getActivity()!=null) {
+                getActivity().finish();
             }
         });
-        photoDraweeView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                new AlertDialog.Builder(getActivity()).setItems(new String[]{"保存"}, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                }).show();
-                return true;
-            }
-        });
+        photoDraweeView.setOnLongClickListener(v -> true);
     }
 
     @Override
