@@ -119,9 +119,8 @@ public class Utils {
      * 拍照后刷新系统相册
      * @param context
      * @param newFile
-     * @param dirPath
      */
-    public static void refreshAlbum(Context context, String newFile, String dirPath) {
+    public static void refreshAlbum(Context context, String newFile) {
         //刷新文件
         Intent intent_scan = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
         intent_scan.setData(Uri.fromFile(new File(newFile)));
