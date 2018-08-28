@@ -1,18 +1,10 @@
 package com.renyu.androidimagelibrary;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 
-import com.renyu.commonlibrary.params.InitParams;
-
-import java.io.File;
-import java.io.IOException;
-
-import id.zelory.compressor.Compressor;
+import com.renyu.imagelibrary.commonutils.Utils;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,7 +13,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        Utils.takePicture(this, 100);
+        Utils.takePicture(this, 100);
 
 //        ArrayList<String> strings=new ArrayList<>();
 //        strings.add(Environment.getExternalStorageDirectory().getPath()+"/1.jpg");
@@ -38,21 +30,20 @@ public class MainActivity extends AppCompatActivity {
 
 //        Utils.showLongPreview(this, "http://7b1g8u.com1.z0.glb.clouddn.com/ccc.jpg", Environment.getExternalStorageDirectory().getPath());
 
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(Environment.getExternalStorageDirectory().getPath()+"/1.jpg", options);
-        File cropFile = null;
-        try {
-            cropFile = new Compressor(getApplicationContext())
-                    .setMaxWidth(options.outWidth/2)
-                    .setMaxHeight(options.outHeight/2)
-                    .setQuality(80)
-                    .setCompressFormat(Bitmap.CompressFormat.JPEG)
-                    .setDestinationDirectoryPath(InitParams.CACHE_PATH)
-                    .compressToFile(new File(Environment.getExternalStorageDirectory().getPath()+"/1.jpg"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        BitmapFactory.Options options = new BitmapFactory.Options();
+//        options.inJustDecodeBounds = true;
+//        BitmapFactory.decodeFile(Environment.getExternalStorageDirectory().getPath()+"/1.jpg", options);
+//        try {
+//            File cropFile = new Compressor(getApplicationContext())
+//                    .setMaxWidth(options.outWidth/2)
+//                    .setMaxHeight(options.outHeight/2)
+//                    .setQuality(80)
+//                    .setCompressFormat(Bitmap.CompressFormat.JPEG)
+//                    .setDestinationDirectoryPath(InitParams.CACHE_PATH)
+//                    .compressToFile(new File(Environment.getExternalStorageDirectory().getPath()+"/1.jpg"));
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Override

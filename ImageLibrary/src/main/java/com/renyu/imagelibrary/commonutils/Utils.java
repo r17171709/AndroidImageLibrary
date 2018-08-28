@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 
 import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.imagelibrary.camera.CameraActivity;
@@ -17,6 +18,7 @@ import com.renyu.imagelibrary.preview.ImagePreviewActivity;
 import com.renyu.imagelibrary.preview.SubsamplingActivity;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 import id.zelory.compressor.Compressor;
@@ -121,10 +123,13 @@ public class Utils {
      * @param newFile
      */
     public static void refreshAlbum(Context context, String newFile) {
-        //刷新文件
-        Intent intent_scan = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        intent_scan.setData(Uri.fromFile(new File(newFile)));
-        context.sendBroadcast(intent_scan);
+        if (new File(newFile).exists()) {
+            try {
+                MediaStore.Images.Media.insertImage(context.getContentResolver(), newFile, "", "");
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**

@@ -14,7 +14,6 @@ import android.support.v7.widget.ListPopupWindow;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -41,7 +40,6 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
 
 import static android.provider.BaseColumns._ID;
 import static android.provider.MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME;
@@ -115,27 +113,19 @@ public class PhotoPickerActivity extends BaseActivity {
         maxNum=getIntent().getExtras().getInt("maxNum");
 
         ib_nav_left.setImageResource(R.mipmap.icon_back_black);
-        ib_nav_left.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        ib_nav_left.setOnClickListener(v -> finish());
         tv_nav_title.setTextColor(Color.parseColor("#333333"));
         tv_nav_title.setText("图片");
         tv_nav_right.setText("完成");
         tv_nav_right.setTextColor(Color.parseColor("#999999"));
         tv_nav_right.setEnabled(false);
-        tv_nav_right.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent=new Intent();
-                Bundle bundle=new Bundle();
-                bundle.putStringArrayList("choiceImages", imagePaths);
-                intent.putExtras(bundle);
-                setResult(RESULT_OK, intent);
-                finish();
-            }
+        tv_nav_right.setOnClickListener(v -> {
+            Intent intent=new Intent();
+            Bundle bundle=new Bundle();
+            bundle.putStringArrayList("choiceImages", imagePaths);
+            intent.putExtras(bundle);
+            setResult(RESULT_OK, intent);
+            finish();
         });
         photopicker_rv.setHasFixedSize(true);
         photopicker_rv.setLayoutManager(new GridLayoutManager(this, 3));
@@ -192,31 +182,25 @@ public class PhotoPickerActivity extends BaseActivity {
             }
         });
         photopicker_rv.setAdapter(adapter);
-        photopicker_dict.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (popupWindow.isShowing()) {
-                    popupWindow.dismiss();
-                }
-                else if (!isFinishing()){
-                    adjustHeight();
-                    popupWindow.show();
-                }
+        photopicker_dict.setOnClickListener(v -> {
+            if (popupWindow.isShowing()) {
+                popupWindow.dismiss();
+            }
+            else if (!isFinishing()){
+                adjustHeight();
+                popupWindow.show();
             }
         });
-        photopicker_preview.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (imagePaths.size()>0) {
-                    Intent intent=new Intent(PhotoPickerActivity.this, ImagePreviewActivity.class);
-                    Bundle bundle=new Bundle();
-                    bundle.putBoolean("canDownload", false);
-                    bundle.putInt("position", 0);
-                    bundle.putBoolean("canEdit", true);
-                    bundle.putStringArrayList("urls", imagePaths);
-                    intent.putExtras(bundle);
-                    startActivityForResult(intent, CommonParams.RESULT_PREVIEW);
-                }
+        photopicker_preview.setOnClickListener(v -> {
+            if (imagePaths.size()>0) {
+                Intent intent=new Intent(PhotoPickerActivity.this, ImagePreviewActivity.class);
+                Bundle bundle=new Bundle();
+                bundle.putBoolean("canDownload", false);
+                bundle.putInt("position", 0);
+                bundle.putBoolean("canEdit", true);
+                bundle.putStringArrayList("urls", imagePaths);
+                intent.putExtras(bundle);
+                startActivityForResult(intent, CommonParams.RESULT_PREVIEW);
             }
         });
 
@@ -225,15 +209,12 @@ public class PhotoPickerActivity extends BaseActivity {
         popupWindow.setAnchorView(findViewById(R.id.photopicker_toollayout));
         popupWindow.setModal(true);
         popupWindow.setDropDownGravity(Gravity.BOTTOM);
-        popupWindow.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                popupWindow.dismiss();
-                PhotoDirectory directory = dictModels.get(position);
-                photopicker_dict.setText(directory.getName());
-                currentKey=bucketIds.get(position);
-                updateData(currentKey);
-            }
+        popupWindow.setOnItemClickListener((parent, view, position, id) -> {
+            popupWindow.dismiss();
+            PhotoDirectory directory = dictModels.get(position);
+            photopicker_dict.setText(directory.getName());
+            currentKey=bucketIds.get(position);
+            updateData(currentKey);
         });
     }
 
@@ -260,7 +241,7 @@ public class PhotoPickerActivity extends BaseActivity {
         private int space;
         private int column;
 
-        public SpaceItemDecoration(int space, int column) {
+        SpaceItemDecoration(int space, int column) {
             this.space = space;
             this.column = column;
         }
@@ -276,36 +257,30 @@ public class PhotoPickerActivity extends BaseActivity {
     }
 
     private void loadImages() {
-        Observable.create(new ObservableOnSubscribe<LinkedHashMap<String, PhotoDirectory>>() {
-            @Override
-            public void subscribe(ObservableEmitter<LinkedHashMap<String, PhotoDirectory>> e) throws Exception {
-                PhotoPickerActivity.this.observableEmitter=e;
-            }
-        }).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<LinkedHashMap<String, PhotoDirectory>>() {
-            @Override
-            public void accept(LinkedHashMap<String, PhotoDirectory> stringPhotoDirectoryLinkedHashMap) throws Exception {
-                PhotoPickerActivity.this.allHashMap=stringPhotoDirectoryLinkedHashMap;
-                if (stringPhotoDirectoryLinkedHashMap.containsKey("0")) {
-                    updateData(currentKey);
+        Observable.create((ObservableOnSubscribe<LinkedHashMap<String, PhotoDirectory>>) e -> PhotoPickerActivity.this.observableEmitter=e)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(stringPhotoDirectoryLinkedHashMap -> {
+                    PhotoPickerActivity.this.allHashMap=stringPhotoDirectoryLinkedHashMap;
+                    if (stringPhotoDirectoryLinkedHashMap.containsKey("0")) {
+                        updateData(currentKey);
 
-                    dictModels.clear();
-                    bucketIds.clear();
-                    Iterator iterator=stringPhotoDirectoryLinkedHashMap.entrySet().iterator();
-                    while (iterator.hasNext()) {
-                        Map.Entry entry= (Map.Entry) iterator.next();
-                        if (entry.getKey().toString().equals("0")) {
-                            continue;
+                        dictModels.clear();
+                        bucketIds.clear();
+                        Iterator iterator=stringPhotoDirectoryLinkedHashMap.entrySet().iterator();
+                        while (iterator.hasNext()) {
+                            Map.Entry entry= (Map.Entry) iterator.next();
+                            if (entry.getKey().toString().equals("0")) {
+                                continue;
+                            }
+                            dictModels.add((PhotoDirectory) entry.getValue());
+                            bucketIds.add((String) entry.getKey());
                         }
-                        dictModels.add((PhotoDirectory) entry.getValue());
-                        bucketIds.add((String) entry.getKey());
+                        dictModels.add(0, stringPhotoDirectoryLinkedHashMap.get("0"));
+                        bucketIds.add(0, "0");
+                        dictAdapter=new DictAdapter(PhotoPickerActivity.this, dictModels);
+                        popupWindow.setAdapter(dictAdapter);
                     }
-                    dictModels.add(0, stringPhotoDirectoryLinkedHashMap.get("0"));
-                    bucketIds.add(0, "0");
-                    dictAdapter=new DictAdapter(PhotoPickerActivity.this, dictModels);
-                    popupWindow.setAdapter(dictAdapter);
-                }
-            }
-        });
+                });
 
         Bundle bundle=new Bundle();
         bundle.putBoolean(CommonParams.EXTRA_SHOW_GIF, false);
@@ -317,7 +292,10 @@ public class PhotoPickerActivity extends BaseActivity {
 
             @Override
             public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-                if (data == null)  return;
+                if (data == null)  {
+                    getSupportLoaderManager().destroyLoader(0);
+                    return;
+                }
                 LinkedHashMap<String, PhotoDirectory> hashMap=new LinkedHashMap<>();
                 PhotoDirectory photoDirectoryAll = new PhotoDirectory();
                 photoDirectoryAll.setName("所有图片");
@@ -355,6 +333,8 @@ public class PhotoPickerActivity extends BaseActivity {
                 }
                 hashMap.put("0", photoDirectoryAll);
                 observableEmitter.onNext(hashMap);
+
+                getSupportLoaderManager().destroyLoader(0);
             }
 
             @Override
@@ -404,9 +384,7 @@ public class PhotoPickerActivity extends BaseActivity {
         }
         else if (requestCode== CommonParams.RESULT_PREVIEW && resultCode==RESULT_OK) {
             imagePaths.clear();
-            for (String url : data.getStringArrayListExtra("urls")) {
-                imagePaths.add(url);
-            }
+            imagePaths.addAll(data.getStringArrayListExtra("urls"));
             loadImages();
         }
     }

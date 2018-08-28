@@ -50,6 +50,6 @@ dependencies {
     // AspectJ 每一个application和library都需要
     implementation 'org.aspectj:aspectjrt:1.9.1'
     implementation project(':ImageLibrary')
-    //    implementation 'com.github.renyu:AndroidImageLibrary:1.4.3'
+//        implementation 'com.github.renyu:AndroidImageLibrary:1.4.11'
     //    compile "com.github.r17171709:AndroidImageLibrary:v1.0.12"
 }

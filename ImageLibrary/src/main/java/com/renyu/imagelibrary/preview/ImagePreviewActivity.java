@@ -21,7 +21,6 @@ import com.renyu.imagelibrary.commonutils.Utils;
 import com.renyu.imagelibrary.params.CommonParams;
 import com.renyu.imagelibrary.preview.impl.RightNavClickImpl;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
@@ -33,7 +32,7 @@ import me.relex.circleindicator.CircleIndicator;
 /**
  * Created by renyu on 16/1/31.
  */
-public abstract class ImagePreviewActivity extends BaseActivity {
+public class ImagePreviewActivity extends BaseActivity {
 
     MultiTouchViewPager imagepreview_viewpager;
     ViewPagerFragmentAdapter adapter;
@@ -44,12 +43,14 @@ public abstract class ImagePreviewActivity extends BaseActivity {
     TextView tv_nav_right;
     ImageButton ib_nav_left;
 
-    int position=0;
     // 图片路径
     ArrayList<String> urls;
     ArrayList<Fragment> fragments;
     //是否可以编辑
     boolean canEdit;
+
+    // 图片当前位置
+    int currentPosition=0;
 
     // 记录图片原始尺寸，比便于复原
     HashMap<String, ImageInfo> point;
@@ -105,7 +106,7 @@ public abstract class ImagePreviewActivity extends BaseActivity {
         ib_nav_left.setImageResource(R.mipmap.ic_arrow_write_left);
         ib_nav_left.setOnClickListener(view -> onBackPressed());
 
-        position=getIntent().getExtras().getInt("position");
+        int choicePosition = getIntent().getExtras().getInt("position");
         urls=getIntent().getExtras().getStringArrayList("urls");
         canEdit=getIntent().getExtras().getBoolean("canEdit");
         if (canEdit) {
@@ -130,6 +131,8 @@ public abstract class ImagePreviewActivity extends BaseActivity {
 
             @Override
             public void onPageSelected(final int position) {
+                currentPosition = position;
+
                 Observable.timer(300, TimeUnit.MILLISECONDS).observeOn(AndroidSchedulers.mainThread())
                         .subscribe(aLong -> {
                             // 图片尺寸复原
@@ -149,7 +152,7 @@ public abstract class ImagePreviewActivity extends BaseActivity {
             }
         });
         imagepreview_indicator.setViewPager(imagepreview_viewpager);
-        imagepreview_viewpager.setCurrentItem(position);
+        imagepreview_viewpager.setCurrentItem(choicePosition);
         imagepreview_edit.setOnClickListener(v -> {
             if (urls.get(imagepreview_viewpager.getCurrentItem()).indexOf("http")!=-1) {
                 Toast.makeText(ImagePreviewActivity.this, "网络图片不能修改", Toast.LENGTH_SHORT).show();
@@ -157,7 +160,7 @@ public abstract class ImagePreviewActivity extends BaseActivity {
             }
             Utils.cropImage(urls.get(imagepreview_viewpager.getCurrentItem()), ImagePreviewActivity.this, CommonParams.RESULT_CROP, 0);
         });
-        tv_nav_title.setText((position+1)+"/"+urls.size());
+        tv_nav_title.setText((choicePosition +1)+"/"+urls.size());
     }
 
     @Override
@@ -165,7 +168,7 @@ public abstract class ImagePreviewActivity extends BaseActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode== CommonParams.RESULT_CROP && resultCode==RESULT_OK) {
             String path=data.getExtras().getString("path");
-            Utils.refreshAlbum(this, path, new File(path).getParentFile().getPath());
+            Utils.refreshAlbum(this, path);
             int position=imagepreview_viewpager.getCurrentItem();
             urls.remove(position);
             urls.add(position, path);
@@ -184,5 +187,13 @@ public abstract class ImagePreviewActivity extends BaseActivity {
         intent.putStringArrayListExtra("urls", urls);
         setResult(RESULT_OK, intent);
         finish();
+    }
+
+    /**
+     * 获取当前选中的Position
+     * @return
+     */
+    public int getCurrentPosition() {
+        return currentPosition;
     }
 }
