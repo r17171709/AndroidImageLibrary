@@ -28,6 +28,7 @@ allprojects {
 //        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
         jcenter()
         maven { url 'https://jitpack.io' }
+        maven { url  "http://dl.bintray.com/piasy/maven" }
     }
 
     tasks.withType(Javadoc) {

@@ -6,10 +6,21 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application>
-        <activity android:name=".camera.CameraActivity" android:screenOrientation="portrait"></activity>
-        <activity android:name=".crop.CropUActivity" android:screenOrientation="portrait"></activity>
-        <activity android:name=".preview.ImagePreviewActivity" android:screenOrientation="portrait"></activity>
-        <activity android:name=".photopicker.PhotoPickerActivity" android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".camera.CameraActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".crop.CropUActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".preview.ImagePreviewActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".photopicker.PhotoPickerActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".preview.PreviewActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>
