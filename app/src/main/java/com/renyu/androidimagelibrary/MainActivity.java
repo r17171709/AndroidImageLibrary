@@ -28,8 +28,6 @@ public class MainActivity extends AppCompatActivity {
 //        intent.putExtras(bundle);
 //        startActivity(intent);
 
-//        Utils.showLongPreview(this, "http://7b1g8u.com1.z0.glb.clouddn.com/ccc.jpg", Environment.getExternalStorageDirectory().getPath());
-
 //        BitmapFactory.Options options = new BitmapFactory.Options();
 //        options.inJustDecodeBounds = true;
 //        BitmapFactory.decodeFile(Environment.getExternalStorageDirectory().getPath()+"/1.jpg", options);

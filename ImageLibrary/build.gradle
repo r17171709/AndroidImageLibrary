@@ -53,8 +53,6 @@ dependencies {
     api 'me.relex:photodraweeview:1.1.3'
     // uCrop  Image Cropping Library for Android
     api 'com.github.yalantis:ucrop:2.2.2'
-    // subsampling-scale-image-view  Highly configurable, easily extendable view with pan and zoom gestures for displaying huge images without loss of detail. Perfect for photo galleries, maps, building plans etc.
-    api 'com.davemorrissey.labs:subsampling-scale-image-view:3.10.0'
     // Compressor  An android image compression library.
     api('id.zelory:compressor:2.1.0') {
         exclude group: 'io.reactivex.rxjava2', module: 'rxjava'
