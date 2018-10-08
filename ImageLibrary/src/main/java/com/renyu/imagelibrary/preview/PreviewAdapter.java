@@ -32,6 +32,7 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+//        holder.setIsRecyclable(false);
         holder.bind(imageUrls.get(position));
     }
 
