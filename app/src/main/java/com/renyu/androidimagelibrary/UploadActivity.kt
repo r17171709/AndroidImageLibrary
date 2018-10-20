@@ -1,5 +1,6 @@
 package com.renyu.androidimagelibrary
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
@@ -14,6 +15,8 @@ import android.widget.TextView
 import com.blankj.utilcode.util.SizeUtils
 import com.renyu.androidimagelibrary.view.UploadView
 import com.renyu.commonlibrary.baseact.BaseActivity
+import com.renyu.commonlibrary.permission.annotation.NeedPermission
+import com.renyu.commonlibrary.permission.annotation.PermissionDenied
 import com.renyu.commonlibrary.views.actionsheet.ActionSheetFragment
 import com.renyu.imagelibrary.bean.UploadTaskBean
 import com.renyu.imagelibrary.commonutils.Utils
@@ -91,6 +94,15 @@ class UploadActivity: BaseActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
+                CommonParams.RESULT_TAKEPHOTO -> {
+                    val path=data?.extras?.getString("path")!!
+                    grid_pic.removeView(grid_pic.getChildAt(grid_pic.childCount -1))
+                    picPath.add(path)
+                    addImage(path, -1)
+                    if (picPath.size < 9) {
+                        addImage("", -1)
+                    }
+                }
                 CommonParams.RESULT_ALUMNI -> {
                     val temp=data?.extras?.getStringArrayList("choiceImages")
                     val filePaths=ArrayList<String>()
@@ -178,6 +190,7 @@ class UploadActivity: BaseActivity() {
         upload.addTask(path, "http://www.zksell.com/index.php?s=Api/Base/uploadpic", File(path).name.substring(0, File(path).name.indexOf(".")))
     }
 
+    @NeedPermission(permissions = [(Manifest.permission.READ_EXTERNAL_STORAGE), (Manifest.permission.WRITE_EXTERNAL_STORAGE)], deniedDesp = "请授予存储卡读取权限")
     fun choicePic() {
         val view_clearmessage: View = LayoutInflater.from(this)
                 .inflate(R.layout.view_actionsheet_button_3, null, false)
@@ -221,5 +234,10 @@ class UploadActivity: BaseActivity() {
                 }
             }
         }
+    }
+
+    @PermissionDenied(permissions = [(Manifest.permission.READ_EXTERNAL_STORAGE), (Manifest.permission.WRITE_EXTERNAL_STORAGE)])
+    fun denied() {
+
     }
 }

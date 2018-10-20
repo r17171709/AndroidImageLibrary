@@ -4,10 +4,10 @@ import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.renyu.commonlibrary.annotation.NeedPermission;
-import com.renyu.commonlibrary.annotation.PermissionDenied;
 import com.renyu.commonlibrary.baseact.BaseActivity;
 import com.renyu.commonlibrary.commonutils.BarUtils;
+import com.renyu.commonlibrary.permission.annotation.NeedPermission;
+import com.renyu.commonlibrary.permission.annotation.PermissionDenied;
 import com.renyu.imagelibrary.R;
 import com.renyu.imagelibrary.commonutils.Utils;
 
