@@ -6,7 +6,6 @@ buildscript {
         google()
         jcenter()
         mavenCentral()
-        maven { url 'https://novoda.bintray.com/snapshots' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.2.1'
@@ -17,7 +16,7 @@ buildscript {
         classpath 'com.hujiang.aspectjx:gradle-android-plugin-aspectjx:2.0.4'
 
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
-        classpath 'com.novoda:bintray-release:SNAPSHOT-10'
+        classpath 'com.novoda:bintray-release:0.9'
     }
 }
 
@@ -28,6 +27,7 @@ allprojects {
         jcenter()
         maven { url 'https://jitpack.io' }
         maven { url 'https://dl.bintray.com/r17171709/AndroidCommonLibrary' }
+        maven { url 'https://dl.bintray.com/r17171709/AndroidImageLibrary' }
     }
 
     // 不纠结Javadoc的问题了
