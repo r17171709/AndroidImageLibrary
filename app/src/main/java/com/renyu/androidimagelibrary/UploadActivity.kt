@@ -19,6 +19,7 @@ import com.renyu.commonlibrary.permission.annotation.NeedPermission
 import com.renyu.commonlibrary.permission.annotation.PermissionDenied
 import com.renyu.commonlibrary.views.actionsheet.ActionSheetFragment
 import com.renyu.imagelibrary.bean.UploadTaskBean
+import com.renyu.imagelibrary.camera.CameraPreviewActivity
 import com.renyu.imagelibrary.commonutils.Utils
 import kotlinx.android.synthetic.main.activity_upload.*
 import java.io.File
@@ -92,9 +93,18 @@ class UploadActivity: BaseActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_CANCELED && requestCode == CommonParams.RESULT_CAMERAPREVIEW) {
+            Utils.takePicture(this, CommonParams.RESULT_TAKEPHOTO)
+        }
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 CommonParams.RESULT_TAKEPHOTO -> {
+                    val path=data?.extras?.getString("path")!!
+                    val intent = Intent(this@UploadActivity, CameraPreviewActivity::class.java)
+                    intent.putExtra("path", path)
+                    startActivityForResult(intent, CommonParams.RESULT_CAMERAPREVIEW)
+                }
+                CommonParams.RESULT_CAMERAPREVIEW -> {
                     val path=data?.extras?.getString("path")!!
                     grid_pic.removeView(grid_pic.getChildAt(grid_pic.childCount -1))
                     picPath.add(path)
