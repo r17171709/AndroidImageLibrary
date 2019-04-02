@@ -1,10 +1,8 @@
 package com.renyu.imagelibrary.preview;
 
-import android.graphics.Color;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
-
 import com.github.piasy.biv.BigImageViewer;
 import com.github.piasy.biv.loader.fresco.FrescoImageLoader;
 import com.github.rubensousa.gravitysnaphelper.GravityPagerSnapHelper;
@@ -14,7 +12,6 @@ import com.renyu.imagelibrary.R;
 import java.util.ArrayList;
 
 public class PreviewActivity extends BaseActivity {
-
     // 图片路径
     ArrayList<String> urls;
 
@@ -62,11 +59,11 @@ public class PreviewActivity extends BaseActivity {
 
     @Override
     public int setStatusBarColor() {
-        return Color.BLACK;
+        return 0;
     }
 
     @Override
     public int setStatusBarTranslucent() {
-        return 0;
+        return 1;
     }
 }
