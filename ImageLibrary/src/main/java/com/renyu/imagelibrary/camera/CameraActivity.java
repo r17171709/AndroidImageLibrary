@@ -31,7 +31,7 @@ public class CameraActivity extends BaseActivity {
     @NeedPermission(permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA},
             deniedDesp = "为了您可以正常使用照相机，\n请点击\"设置\"-\"权限\"-打开 \"存储空间\"与\"相机\" 权限。\n最后点击两次后退按钮，即可返回。")
     public void permissionApply() {
-        if (getSupportFragmentManager().getFragments()==null || getSupportFragmentManager().getFragments().size()==0) {
+        if (getSupportFragmentManager().getFragments().size() == 0) {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new CameraFragment()).commitAllowingStateLoss();
         }
     }
@@ -61,8 +61,8 @@ public class CameraActivity extends BaseActivity {
         //刷新相册
         Utils.refreshAlbum(this, filePath);
         //返回上一级目录
-        Intent intent=getIntent();
-        Bundle bundle=new Bundle();
+        Intent intent = getIntent();
+        Bundle bundle = new Bundle();
         bundle.putString("path", filePath);
         intent.putExtras(bundle);
         setResult(RESULT_OK, intent);

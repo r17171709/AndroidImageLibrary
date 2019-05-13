@@ -1,8 +1,10 @@
 package com.renyu.imagelibrary.preview;
 
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.github.piasy.biv.BigImageViewer;
 import com.github.piasy.biv.loader.fresco.FrescoImageLoader;
 import com.github.rubensousa.gravitysnaphelper.GravityPagerSnapHelper;

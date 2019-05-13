@@ -14,7 +14,6 @@ import android.media.ExifInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.OrientationEventListener;
@@ -25,6 +24,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
 
 import com.blankj.utilcode.util.FileUtils;
 import com.blankj.utilcode.util.ScreenUtils;
@@ -41,25 +42,24 @@ import java.util.Collections;
 import java.util.List;
 
 public class CameraFragment extends BaseFragment implements SurfaceHolder.Callback, Camera.PictureCallback {
-
-    public static final String TAG = CameraFragment.class.getSimpleName();
-    public static final String CAMERA_ID_KEY = "camera_id";
-    public static final String CAMERA_FLASH_KEY = "flash_mode";
+    private static final String TAG = CameraFragment.class.getSimpleName();
+    private static final String CAMERA_ID_KEY = "camera_id";
+    private static final String CAMERA_FLASH_KEY = "flash_mode";
 
     private int mCameraID;
     private String mFlashMode;
     private Camera mCamera;
     private SquareCameraPreview mPreviewView;
     private SurfaceHolder mSurfaceHolder;
-    private ProgressBar progress=null;
-    private ImageView takePhotoBtn=null;
+    private ProgressBar progress = null;
+    private ImageView takePhotoBtn = null;
 
     private CameraOrientationListener mOrientationListener;
 
-    boolean isSurfaceDestory=false;
+    private boolean isSurfaceDestory = false;
 
-    String dirPath="";
-    byte[] data;
+    private String dirPath = "";
+    private byte[] data;
 
     @Override
     public void onAttach(Activity activity) {
@@ -86,7 +86,7 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         FileUtils.createOrExistsDir(InitParams.IMAGE_PATH);
-        dirPath=InitParams.IMAGE_PATH+"/"+System.currentTimeMillis()+".jpg";
+        dirPath = InitParams.IMAGE_PATH + "/" + System.currentTimeMillis() + ".jpg";
         FileUtils.createFileByDeleteOldFile(new File(dirPath));
         return super.onCreateView(inflater, container, savedInstanceState);
     }
@@ -105,58 +105,46 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
 
         mOrientationListener.enable();
 
-        mPreviewView = (SquareCameraPreview) view.findViewById(R.id.camera_preview_view);
+        mPreviewView = view.findViewById(R.id.camera_preview_view);
         mPreviewView.getHolder().addCallback(CameraFragment.this);
-        progress=(ProgressBar) view.findViewById(R.id.progress);
+        progress = view.findViewById(R.id.progress);
 
-        final ImageView swapCameraBtn = (ImageView) view.findViewById(R.id.change_camera);
-        PackageManager pm = getActivity().getPackageManager();
+        final ImageView swapCameraBtn = view.findViewById(R.id.change_camera);
+        PackageManager pm = context.getPackageManager();
         //同时拥有前后置摄像头才可以切换
         if (pm.hasSystemFeature(PackageManager.FEATURE_CAMERA) && pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT)) {
             swapCameraBtn.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             swapCameraBtn.setVisibility(View.GONE);
         }
-        swapCameraBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mCameraID == CameraInfo.CAMERA_FACING_FRONT) {
-                    mCameraID = getBackCameraID();
-                } else {
-                    mCameraID = getFrontCameraID();
-                }
-                restartPreview();
+        swapCameraBtn.setOnClickListener(v -> {
+            if (mCameraID == CameraInfo.CAMERA_FACING_FRONT) {
+                mCameraID = getBackCameraID();
+            } else {
+                mCameraID = getFrontCameraID();
             }
+            restartPreview();
         });
 
         final View changeCameraFlashModeBtn = view.findViewById(R.id.flash);
-        final TextView autoFlashIcon = (TextView) view.findViewById(R.id.auto_flash_icon);
-        changeCameraFlashModeBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mFlashMode.equalsIgnoreCase(Camera.Parameters.FLASH_MODE_AUTO)) {
-                    mFlashMode = Camera.Parameters.FLASH_MODE_ON;
-                    autoFlashIcon.setText("On");
-                } else if (mFlashMode.equalsIgnoreCase(Camera.Parameters.FLASH_MODE_ON)) {
-                    mFlashMode = Camera.Parameters.FLASH_MODE_OFF;
-                    autoFlashIcon.setText("Off");
-                } else if (mFlashMode.equalsIgnoreCase(Camera.Parameters.FLASH_MODE_OFF)) {
-                    mFlashMode = Camera.Parameters.FLASH_MODE_AUTO;
-                    autoFlashIcon.setText("Auto");
-                }
-
-                setupCamera();
+        final TextView autoFlashIcon = view.findViewById(R.id.auto_flash_icon);
+        changeCameraFlashModeBtn.setOnClickListener(v -> {
+            if (mFlashMode.equalsIgnoreCase(Camera.Parameters.FLASH_MODE_AUTO)) {
+                mFlashMode = Camera.Parameters.FLASH_MODE_ON;
+                autoFlashIcon.setText("On");
+            } else if (mFlashMode.equalsIgnoreCase(Camera.Parameters.FLASH_MODE_ON)) {
+                mFlashMode = Camera.Parameters.FLASH_MODE_OFF;
+                autoFlashIcon.setText("Off");
+            } else if (mFlashMode.equalsIgnoreCase(Camera.Parameters.FLASH_MODE_OFF)) {
+                mFlashMode = Camera.Parameters.FLASH_MODE_AUTO;
+                autoFlashIcon.setText("Auto");
             }
+
+            setupCamera();
         });
 
-        takePhotoBtn = (ImageView) view.findViewById(R.id.capture_image_button);
-        takePhotoBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                takePicture();
-            }
-        });
+        takePhotoBtn = view.findViewById(R.id.capture_image_button);
+        takePhotoBtn.setOnClickListener(v -> takePicture());
     }
 
     @Override
@@ -201,8 +189,8 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
     private void stopCameraPreview() {
         // Nulls out callbacks, stops face detection
         try {
-            if (mCamera!=null) {
-                mCamera.setPreviewCallback(null) ;
+            if (mCamera != null) {
+                mCamera.setPreviewCallback(null);
                 mCamera.stopPreview();
             }
         } catch (Exception e) {
@@ -219,7 +207,7 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
         CameraInfo cameraInfo = new CameraInfo();
         Camera.getCameraInfo(mCameraID, cameraInfo);
 
-        int rotation = getActivity().getWindowManager().getDefaultDisplay().getRotation();
+        int rotation = ((CameraActivity) context).getWindowManager().getDefaultDisplay().getRotation();
         int degrees = 0;
 
         switch (rotation) {
@@ -298,6 +286,7 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
 
     /**
      * 获得最接近屏幕宽度的尺寸
+     *
      * @param sizeList
      * @return
      */
@@ -309,22 +298,21 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
             for (Size size : sizeList) {
                 arry[temp++] = size.width - screenHeight;
             }
-            if (arry.length==0) {
+            if (arry.length == 0) {
                 return sizeList.get(0);
-            }
-            else {
+            } else {
                 Arrays.sort(arry, Collections.reverseOrder());
-                int last=0;
-                for (int i = 0; i < arry.length; i++)  {
-                    if (last>=arry[i]) {
-                        last=arry[i];
+                int last = 0;
+                for (int i = 0; i < arry.length; i++) {
+                    if (last >= arry[i]) {
+                        last = arry[i];
                         break;
                     }
                 }
-                int index=0;
+                int index = 0;
                 for (int i = 0; i < sizeList.size(); i++) {
-                    if (last== sizeList.get(i).width - screenHeight) {
-                        index=i;
+                    if (last == sizeList.get(i).width - screenHeight) {
+                        index = i;
                         break;
                     }
                 }
@@ -343,7 +331,7 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
     }
 
     private int getFrontCameraID() {
-        PackageManager pm = getActivity().getPackageManager();
+        PackageManager pm = context.getPackageManager();
         if (pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT)) {
             return CameraInfo.CAMERA_FACING_FRONT;
         }
@@ -392,12 +380,12 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
 
         // stop the preview
         stopCameraPreview();
-        if (mCamera!=null) {
+        if (mCamera != null) {
             mCamera.release();
         }
 
         // 没有拍照，直接删除
-        if (FileUtils.getFileLength(dirPath)==0) {
+        if (FileUtils.getFileLength(dirPath) == 0) {
             FileUtils.deleteFile(dirPath);
         }
     }
@@ -408,9 +396,8 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
 
         if (isSurfaceDestory) {
             restartPreview();
-            isSurfaceDestory=false;
-        }
-        else {
+            isSurfaceDestory = false;
+        } else {
             if (getCamera(mCameraID))
                 startCameraPreview();
         }
@@ -424,11 +411,12 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         // The surface is destroyed with the visibility of the SurfaceView is set to View.Invisible
-        isSurfaceDestory=true;
+        isSurfaceDestory = true;
     }
 
     /**
      * A picture has been taken
+     *
      * @param data
      * @param camera
      */
@@ -440,43 +428,43 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
         progress.setVisibility(View.GONE);
         takePhotoBtn.setVisibility(View.VISIBLE);
 
-        this.data=data;
+        this.data = data;
 
         new Thread(runnable).start();
     }
 
-    Handler handler=new Handler() {
+    Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
 
-            ((CameraActivity) getActivity()).backTo(msg.obj.toString());
+            ((CameraActivity) context).backTo(msg.obj.toString());
         }
     };
 
-    Runnable runnable=new Runnable() {
+    Runnable runnable = new Runnable() {
         @Override
         public void run() {
 
-            BitmapFactory.Options options=new BitmapFactory.Options();
-            options.inJustDecodeBounds=true;
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
             BitmapFactory.decodeByteArray(data, 0, data.length, options);
             //旋转情况
-            int orientation=mOrientationListener.getRememberedNormalOrientation();
-            options.inJustDecodeBounds=false;
-            Bitmap bmp= BitmapFactory.decodeByteArray(data, 0, data.length, options);
+            int orientation = mOrientationListener.getRememberedNormalOrientation();
+            options.inJustDecodeBounds = false;
+            Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length, options);
             //照片旋转检测
-            Matrix matrix=new Matrix();
+            Matrix matrix = new Matrix();
             if (orientation != ExifInterface.ORIENTATION_UNDEFINED) {
                 matrix.setRotate(orientation);
             }
-            bmp= Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, true);
+            bmp = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, true);
             try {
                 bmp.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(new File(dirPath)));
                 bmp.recycle();
 
-                Message m=new Message();
-                m.obj=dirPath;
+                Message m = new Message();
+                m.obj = dirPath;
                 handler.sendMessage(m);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -492,7 +480,7 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
         private int mCurrentNormalizedOrientation;
         private int mRememberedNormalOrientation;
 
-        public CameraOrientationListener(Context context) {
+        CameraOrientationListener(Context context) {
             super(context, SensorManager.SENSOR_DELAY_NORMAL);
         }
 
@@ -503,11 +491,11 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
             }
         }
 
-        public void rememberOrientation() {
+        void rememberOrientation() {
             mRememberedNormalOrientation = mCurrentNormalizedOrientation;
         }
 
-        public int getRememberedNormalOrientation() {
+        int getRememberedNormalOrientation() {
             return mRememberedNormalOrientation;
         }
     }

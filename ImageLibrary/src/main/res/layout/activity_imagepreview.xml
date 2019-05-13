@@ -2,39 +2,45 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
-	<RelativeLayout
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:layout_weight="1">
-		<com.renyu.imagelibrary.preview.MultiTouchViewPager
-			android:id="@+id/imagepreview_viewpager"
-			android:background="@android:color/black"
-			android:layout_width="match_parent"
-			android:layout_height="match_parent" />
-		<me.relex.circleindicator.CircleIndicator
-			android:id="@+id/imagepreview_indicator"
-			android:layout_alignParentBottom="true"
-			android:layout_marginBottom="16dp"
-			android:layout_width="match_parent"
-			android:layout_height="40dp"/>
-		<include layout="@layout/view_nav"></include>
-	</RelativeLayout>
-	<RelativeLayout
-		android:id="@+id/layout_imagepreview_edit"
-		android:visibility="gone"
-		android:background="#2e3335"
-		android:layout_width="match_parent"
-		android:layout_height="55dip">
-		<TextView
-			android:id="@+id/imagepreview_edit"
-			android:text="编辑"
-			android:textSize="14sp"
-			android:gravity="bottom"
-			android:textColor="#cfcfcf"
-			android:layout_centerVertical="true"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_marginStart="20dip"/>
-	</RelativeLayout>
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <com.renyu.imagelibrary.preview.MultiTouchViewPager
+            android:id="@+id/imagepreview_viewpager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/black" />
+
+        <me.relex.circleindicator.CircleIndicator
+            android:id="@+id/imagepreview_indicator"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="16dp" />
+
+        <include layout="@layout/view_nav" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_imagepreview_edit"
+        android:layout_width="match_parent"
+        android:layout_height="55dip"
+        android:background="#2e3335"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/imagepreview_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="20dip"
+            android:gravity="bottom"
+            android:text="编辑"
+            android:textColor="#cfcfcf"
+            android:textSize="14sp" />
+    </RelativeLayout>
 </LinearLayout>

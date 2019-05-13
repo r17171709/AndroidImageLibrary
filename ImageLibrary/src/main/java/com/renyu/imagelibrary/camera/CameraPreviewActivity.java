@@ -44,7 +44,7 @@ public class CameraPreviewActivity extends BaseActivity {
     @Override
     public void loadData() {
         String path = getIntent().getStringExtra("path");
-        ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse("file://"+path))
+        ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse("file://" + path))
                 .setResizeOptions(new ResizeOptions(ScreenUtils.getScreenWidth() / 2, ScreenUtils.getScreenHeight() / 2)).build();
         DraweeController draweeController = Fresco.newDraweeControllerBuilder()
                 .setImageRequest(request).setAutoPlayAnimations(true).build();

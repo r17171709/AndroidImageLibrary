@@ -16,8 +16,7 @@ import java.util.List;
  *
  */
 public class SquareCameraPreview extends SurfaceView {
-
-    public static final String TAG = SquareCameraPreview.class.getSimpleName();
+    private static final String TAG = SquareCameraPreview.class.getSimpleName();
 
     private static final int ZOOM_OUT = 0;
     private static final int ZOOM_IN = 1;
@@ -76,8 +75,7 @@ public class SquareCameraPreview extends SurfaceView {
 
         if (width > height * ASPECT_RATIO) {
             width = (int) (height * ASPECT_RATIO + 0.5);
-        }
-        else {
+        } else {
             height = (int) (width / ASPECT_RATIO + 0.5);
         }
 
@@ -160,11 +158,8 @@ public class SquareCameraPreview extends SurfaceView {
             params.setFocusAreas(mFocusAreas);
             params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
             mCamera.setParameters(params);
-            mCamera.autoFocus(new Camera.AutoFocusCallback() {
-                @Override
-                public void onAutoFocus(boolean success, Camera camera) {
-                    // Callback when the auto focus completes
-                }
+            mCamera.autoFocus((success, camera) -> {
+                // Callback when the auto focus completes
             });
         }
     }

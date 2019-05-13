@@ -6,13 +6,13 @@ package com.renyu.imagelibrary.bean;
 
 public class UploadTaskBean {
     // 原始文件
-    String filePath;
+    private String filePath;
     // 上传后的文件
-    String url;
+    private String url;
     // 上传进度
-    int progress;
+    private int progress;
     // 状态 准备中，上传中、出错、完成
-    UploadState statue;
+    private UploadState statue;
 
     public enum UploadState {
         UPLOADPREPARE, UPLOADING, UPLOADFAIL, UPLOADSUCCESS

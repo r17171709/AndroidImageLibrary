@@ -23,7 +23,6 @@ import java.util.concurrent.Future;
  */
 
 public class UploadImageManager {
-
     private ExecutorService uploadService;
     private OKHttpUtils okHttpUtils;
 
@@ -31,6 +30,7 @@ public class UploadImageManager {
     public interface UpdateCallBack {
         void updateMap(UploadTaskBean bean);
     }
+
     private UpdateCallBack callBack;
 
     // 任务线程组
@@ -49,6 +49,7 @@ public class UploadImageManager {
 
     /**
      * 添加任务
+     *
      * @param filePath
      * @param url
      * @param tag
@@ -64,14 +65,14 @@ public class UploadImageManager {
             // 剪裁图片
             File cropFile = Utils.compressPic(com.blankj.utilcode.util.Utils.getApp(), filePath, InitParams.CACHE_PATH);
 
-            HashMap<String, File> fileHashMap=new HashMap<>();
+            HashMap<String, File> fileHashMap = new HashMap<>();
             fileHashMap.put("fileData", cropFile);
-            String uploadValue=okHttpUtils.syncUpload(url, null, fileHashMap, null, (l, l1) -> {
+            String uploadValue = okHttpUtils.syncUpload(url, null, fileHashMap, null, (l, l1) -> {
                 Log.d("UploadImageManager", "UploadImageManager " + l + " " + l1);
                 // 上传每20%进度刷新一次，上传完成不进行修改以防止与后续成功的回调不一致
-                if ((l*100/l1 - bean.getProgress() >= 20) && l != l1) {
+                if ((l * 100 / l1 - bean.getProgress() >= 20) && l != l1) {
                     bean.setUrl("");
-                    bean.setProgress((int) (l*100/l1));
+                    bean.setProgress((int) (l * 100 / l1));
                     bean.setStatue(UploadTaskBean.UploadState.UPLOADING);
                     if (callBack != null) {
                         callBack.updateMap(bean);
@@ -80,8 +81,7 @@ public class UploadImageManager {
             });
             if (uploadValue == null) {
                 Log.d("UploadImageManager", filePath + "发布失败");
-            }
-            else {
+            } else {
                 JSONObject jsonObject;
                 try {
                     // 上传成功
@@ -89,8 +89,7 @@ public class UploadImageManager {
                     String picUrl = jsonObject.getJSONObject("data").getString("picUrl");
                     if (TextUtils.isEmpty(picUrl)) {
                         Log.d("UploadImageManager", filePath + "发布失败");
-                    }
-                    else {
+                    } else {
                         Log.d("UploadImageManager", filePath + "发布成功:" + picUrl);
 
                         bean.setProgress(100);
@@ -149,6 +148,7 @@ public class UploadImageManager {
 
     /**
      * 取消一个任务
+     *
      * @param tag
      */
     public void cancelTask(String tag) {

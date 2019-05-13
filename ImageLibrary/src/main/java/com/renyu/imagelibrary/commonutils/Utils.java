@@ -27,15 +27,15 @@ import id.zelory.compressor.Compressor;
  */
 
 public class Utils {
-
     /**
      * 选择调用系统相册
+     *
      * @param activity
      * @param requestCode
      */
     public static void chooseImage(Activity activity, int requestCode) {
         //调用调用系统相册
-        Intent intent=new Intent(Intent.ACTION_GET_CONTENT);
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("image/*");
         activity.startActivityForResult(intent, requestCode);
@@ -43,29 +43,30 @@ public class Utils {
 
     /**
      * 拍照
+     *
      * @param activity
      * @param requestCode
      */
     public static void takePicture(Activity activity, int requestCode) {
-        Intent intent=new Intent(activity, CameraActivity.class);
+        Intent intent = new Intent(activity, CameraActivity.class);
         activity.startActivityForResult(intent, requestCode);
     }
 
     /**
      * UCrop剪裁
+     *
      * @param sourcePath
      * @param activity
      * @param requestCode
-     * @param ratio 宽/高
+     * @param ratio       宽/高
      */
     public static void cropImage(String sourcePath, Activity activity, int requestCode, float ratio) {
-        String destinationPath=InitParams.IMAGE_PATH+"/"+System.currentTimeMillis()+".jpg";
+        String destinationPath = InitParams.IMAGE_PATH + "/" + System.currentTimeMillis() + ".jpg";
         UCrop uCrop = UCrop.of(Uri.fromFile(new File(sourcePath)), Uri.fromFile(new File(destinationPath)));
         UCrop.Options options = new UCrop.Options();
-        if (ratio!=0) {
+        if (ratio != 0) {
             options.withAspectRatio(ratio, 1);
-        }
-        else {
+        } else {
             options.setFreeStyleCropEnabled(true);
         }
         options.setCompressionFormat(Bitmap.CompressFormat.JPEG);
@@ -77,13 +78,14 @@ public class Utils {
 
     /**
      * 选择图片
+     *
      * @param activity
      * @param maxNum
      * @param requestCode
      */
     public static void choicePic(Activity activity, int maxNum, int requestCode) {
-        Intent intent=new Intent(activity, PhotoPickerActivity.class);
-        Bundle bundle=new Bundle();
+        Intent intent = new Intent(activity, PhotoPickerActivity.class);
+        Bundle bundle = new Bundle();
         bundle.putInt("maxNum", maxNum);
         intent.putExtras(bundle);
         activity.startActivityForResult(intent, requestCode);
@@ -91,6 +93,7 @@ public class Utils {
 
     /**
      * 图片压缩
+     *
      * @param context
      * @param filePath
      * @param destinationDirectoryPath
@@ -104,8 +107,8 @@ public class Utils {
         File cropFile = null;
         try {
             cropFile = new Compressor(context)
-                    .setMaxWidth(options.outWidth/2)
-                    .setMaxHeight(options.outHeight/2)
+                    .setMaxWidth(options.outWidth / 2)
+                    .setMaxHeight(options.outHeight / 2)
                     .setQuality(70)
                     .setCompressFormat(Bitmap.CompressFormat.JPEG)
                     .setDestinationDirectoryPath(destinationDirectoryPath)
@@ -118,6 +121,7 @@ public class Utils {
 
     /**
      * 拍照后刷新系统相册
+     *
      * @param context
      * @param newFile
      */
@@ -133,6 +137,7 @@ public class Utils {
 
     /**
      * 相册预览
+     *
      * @param context
      * @param canDownload
      * @param position
@@ -140,8 +145,8 @@ public class Utils {
      * @param urls
      */
     public static void showPreview(Context context, boolean canDownload, int position, boolean canEdit, ArrayList<String> urls) {
-        Intent intent=new Intent(context, ImagePreviewActivity.class);
-        Bundle bundle=new Bundle();
+        Intent intent = new Intent(context, ImagePreviewActivity.class);
+        Bundle bundle = new Bundle();
         bundle.putBoolean("canDownload", canDownload);
         bundle.putInt("position", position);
         bundle.putBoolean("canEdit", canEdit);

@@ -1,10 +1,11 @@
 package com.renyu.imagelibrary.preview;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+
+import androidx.annotation.NonNull;
+import androidx.viewpager.widget.ViewPager;
 
 public class MultiTouchViewPager extends ViewPager {
 
@@ -18,12 +19,14 @@ public class MultiTouchViewPager extends ViewPager {
 
     private boolean mIsDisallowIntercept = false;
 
-    @Override public void requestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+    @Override
+    public void requestDisallowInterceptTouchEvent(boolean disallowIntercept) {
         mIsDisallowIntercept = disallowIntercept;
         super.requestDisallowInterceptTouchEvent(disallowIntercept);
     }
 
-    @Override public boolean dispatchTouchEvent(@NonNull MotionEvent ev) {
+    @Override
+    public boolean dispatchTouchEvent(@NonNull MotionEvent ev) {
         if (ev.getPointerCount() > 1 && mIsDisallowIntercept) {
             requestDisallowInterceptTouchEvent(false);
             boolean handled = super.dispatchTouchEvent(ev);

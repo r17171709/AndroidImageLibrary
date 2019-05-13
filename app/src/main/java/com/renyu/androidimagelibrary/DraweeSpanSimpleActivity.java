@@ -15,7 +15,6 @@ import com.facebook.drawee.span.SimpleDraweeSpanTextView;
 import com.renyu.commonlibrary.baseact.BaseActivity;
 
 public class DraweeSpanSimpleActivity extends BaseActivity {
-
     private SimpleDraweeSpanTextView mDraweeSpanTextView;
     private Uri mInlineImageUri;
     private Uri mInlineAnimatedImageUri;

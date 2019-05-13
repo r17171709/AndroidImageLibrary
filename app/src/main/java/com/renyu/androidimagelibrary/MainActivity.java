@@ -2,14 +2,14 @@ package com.renyu.androidimagelibrary;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.renyu.imagelibrary.preview.PreviewActivity;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
 //        intent.putExtras(bundle);
 //        startActivity(intent);
 
-        ArrayList<String> strings=new ArrayList<>();
+        ArrayList<String> strings = new ArrayList<>();
         strings.add(
                 "http://a.hiphotos.baidu.com/image/pic/item/377adab44aed2e73c3dc082b8a01a18b87d6fa84.jpg");
         strings.add(
@@ -51,8 +51,8 @@ public class MainActivity extends AppCompatActivity {
                 "https://ww1.sinaimg.cn/mw690/005Fj2RDgw1f9mvl4pivvj30c82ougw3.jpg");
         strings.add(
                 "http://a.hiphotos.baidu.com/image/pic/item/b2de9c82d158ccbfc471743b14d8bc3eb03541e6.jpg");
-        Intent intent=new Intent(this, PreviewActivity.class);
-        Bundle bundle=new Bundle();
+        Intent intent = new Intent(this, PreviewActivity.class);
+        Bundle bundle = new Bundle();
         bundle.putStringArrayList("urls", strings);
         bundle.putInt("position", 0);
         intent.putExtras(bundle);

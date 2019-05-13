@@ -5,13 +5,14 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 
 import com.renyu.commonlibrary.baseact.BaseActivity;
 import com.renyu.imagelibrary.R;
@@ -32,7 +33,6 @@ import java.util.ArrayList;
  */
 
 public class CropUActivity extends BaseActivity {
-
     RelativeLayout nav_layout;
     ImageButton ib_nav_left;
     TextView tv_nav_right;
@@ -90,8 +90,8 @@ public class CropUActivity extends BaseActivity {
         mGestureCropImageView.cropAndSaveImage(mCompressFormat, mCompressQuality, new BitmapCropCallback() {
             @Override
             public void onBitmapCropped(@NonNull Uri resultUri, int offsetX, int offsetY, int imageWidth, int imageHeight) {
-                Intent intent=getIntent();
-                Bundle bundle=new Bundle();
+                Intent intent = getIntent();
+                Bundle bundle = new Bundle();
                 bundle.putString("path", resultUri.getPath());
                 intent.putExtras(bundle);
                 setResult(RESULT_OK, intent);

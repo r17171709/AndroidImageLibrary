@@ -7,11 +7,11 @@ import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
-import android.support.v7.widget.GridLayout
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
+import androidx.gridlayout.widget.GridLayout
 import com.blankj.utilcode.util.SizeUtils
 import com.renyu.androidimagelibrary.view.UploadView
 import com.renyu.commonlibrary.baseact.BaseActivity
@@ -27,8 +27,7 @@ import java.io.File
 /**
  * Created by renyu on 2017/12/7.
  */
-class UploadActivity: BaseActivity() {
-
+class UploadActivity : BaseActivity() {
     // 选择的本地图片文件路径集合
     val picPath = ArrayList<String>()
     // 远程上传完成的图片文件集合
@@ -99,14 +98,14 @@ class UploadActivity: BaseActivity() {
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 CommonParams.RESULT_TAKEPHOTO -> {
-                    val path=data?.extras?.getString("path")!!
+                    val path = data?.extras?.getString("path")!!
                     val intent = Intent(this@UploadActivity, CameraPreviewActivity::class.java)
                     intent.putExtra("path", path)
                     startActivityForResult(intent, CommonParams.RESULT_CAMERAPREVIEW)
                 }
                 CommonParams.RESULT_CAMERAPREVIEW -> {
-                    val path=data?.extras?.getString("path")!!
-                    grid_pic.removeView(grid_pic.getChildAt(grid_pic.childCount -1))
+                    val path = data?.extras?.getString("path")!!
+                    grid_pic.removeView(grid_pic.getChildAt(grid_pic.childCount - 1))
                     picPath.add(path)
                     addImage(path, -1)
                     if (picPath.size < 9) {
@@ -114,13 +113,13 @@ class UploadActivity: BaseActivity() {
                     }
                 }
                 CommonParams.RESULT_ALUMNI -> {
-                    val temp=data?.extras?.getStringArrayList("choiceImages")
-                    val filePaths=ArrayList<String>()
+                    val temp = data?.extras?.getStringArrayList("choiceImages")
+                    val filePaths = ArrayList<String>()
                     if (temp != null) {
                         for (i in 0 until temp.size) {
-                            val file=File(temp[i])
+                            val file = File(temp[i])
                             // 避免重复且出错的图片进行上传
-                            if (file.exists() && file.length()>0) {
+                            if (file.exists() && file.length() > 0) {
                                 var find = false
                                 for (filePath in filePaths) {
                                     // 文件名称相同则跳过
@@ -137,7 +136,7 @@ class UploadActivity: BaseActivity() {
                         if (filePaths.size == 0) {
                             return
                         }
-                        grid_pic.removeView(grid_pic.getChildAt(grid_pic.childCount -1))
+                        grid_pic.removeView(grid_pic.getChildAt(grid_pic.childCount - 1))
                         picPath.addAll(filePaths)
                         for (i in 0 until filePaths.size) {
                             addImage(filePaths[i], -1)
@@ -163,7 +162,7 @@ class UploadActivity: BaseActivity() {
                 picPath.remove(path)
                 urlMaps.remove(path)
                 grid_pic.removeView(view)
-                if (picPath.size==8) {
+                if (picPath.size == 8) {
                     addImage("", -1)
                 }
             }
@@ -190,8 +189,7 @@ class UploadActivity: BaseActivity() {
         params.bottomMargin = SizeUtils.dp2px(4f)
         if (position != -1) {
             grid_pic.addView(view, position, params)
-        }
-        else {
+        } else {
             grid_pic.addView(view, params)
         }
     }
@@ -215,10 +213,10 @@ class UploadActivity: BaseActivity() {
             Utils.takePicture(this, CommonParams.RESULT_TAKEPHOTO)
             actionSheetFragment.dismiss()
         }
-        val pop_three_choice2: TextView= view_clearmessage.findViewById(R.id.pop_three_choice2)
+        val pop_three_choice2: TextView = view_clearmessage.findViewById(R.id.pop_three_choice2)
         pop_three_choice2.text = "从相册获取"
         pop_three_choice2.setOnClickListener {
-            Utils.choicePic(this, 9-picPath.size, CommonParams.RESULT_ALUMNI)
+            Utils.choicePic(this, 9 - picPath.size, CommonParams.RESULT_ALUMNI)
             actionSheetFragment.dismiss()
         }
         val pop_three_cancel: TextView = view_clearmessage.findViewById(R.id.pop_three_cancel)

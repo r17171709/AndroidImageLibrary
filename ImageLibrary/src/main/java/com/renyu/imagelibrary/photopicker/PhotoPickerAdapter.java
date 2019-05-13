@@ -2,13 +2,14 @@ package com.renyu.imagelibrary.photopicker;
 
 import android.content.Context;
 import android.net.Uri;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.blankj.utilcode.util.SizeUtils;
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -35,8 +36,11 @@ public class PhotoPickerAdapter extends RecyclerView.Adapter<PhotoPickerAdapter.
 
     public interface OperImageListener {
         void add(String path);
+
         void remove(String path);
+
         void show(String path);
+
         void takePic();
     }
 
@@ -48,7 +52,7 @@ public class PhotoPickerAdapter extends RecyclerView.Adapter<PhotoPickerAdapter.
 
     @Override
     public PhotoPickerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view= LayoutInflater.from(context).inflate(R.layout.adapter_photopicker, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.adapter_photopicker, parent, false);
         return new PhotoPickerViewHolder(view);
     }
 
@@ -64,13 +68,12 @@ public class PhotoPickerAdapter extends RecyclerView.Adapter<PhotoPickerAdapter.
             });
             holder.photopicker_image.setVisibility(View.GONE);
             holder.photopicker_choice.setVisibility(View.GONE);
-        }
-        else {
+        } else {
             holder.camera_image.setVisibility(View.GONE);
             holder.photopicker_image.setVisibility(View.VISIBLE);
             holder.photopicker_choice.setVisibility(View.VISIBLE);
         }
-        ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse("file://"+models.get(position).getPath()))
+        ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse("file://" + models.get(position).getPath()))
                 .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(118), SizeUtils.dp2px(118))).build();
         DraweeController draweeController = Fresco.newDraweeControllerBuilder()
                 .setImageRequest(request).setAutoPlayAnimations(true).build();
@@ -84,22 +87,21 @@ public class PhotoPickerAdapter extends RecyclerView.Adapter<PhotoPickerAdapter.
         holder.photopicker_image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean flag=models.get(position).isSelect();
-                if (((PhotoPickerActivity) context).imagePaths.size()==((PhotoPickerActivity) context).maxNum && !flag) {
+                boolean flag = models.get(position).isSelect();
+                if (((PhotoPickerActivity) context).imagePaths.size() == ((PhotoPickerActivity) context).maxNum && !flag) {
                     Toast.makeText(context, "您最多只能选择" + ((PhotoPickerActivity) context).maxNum + "张图片", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 models.get(position).setSelect(!flag);
-                holder.photopicker_choice.setImageResource(!flag? ResourceUtils.getMipmapId(context, "ic_choice_select"):ResourceUtils.getMipmapId(context, "ic_choice_normal"));
+                holder.photopicker_choice.setImageResource(!flag ? ResourceUtils.getMipmapId(context, "ic_choice_select") : ResourceUtils.getMipmapId(context, "ic_choice_normal"));
                 if (!flag) {
                     listener.add(models.get(position).getPath());
-                }
-                else {
+                } else {
                     listener.remove(models.get(position).getPath());
                 }
             }
         });
-        holder.photopicker_choice.setImageResource(models.get(position).isSelect()?ResourceUtils.getMipmapId(context, "ic_choice_select"):ResourceUtils.getMipmapId(context, "ic_choice_normal"));
+        holder.photopicker_choice.setImageResource(models.get(position).isSelect() ? ResourceUtils.getMipmapId(context, "ic_choice_select") : ResourceUtils.getMipmapId(context, "ic_choice_normal"));
     }
 
     @Override
@@ -116,9 +118,9 @@ public class PhotoPickerAdapter extends RecyclerView.Adapter<PhotoPickerAdapter.
         public PhotoPickerViewHolder(View itemView) {
             super(itemView);
 
-            photopicker_image= (SimpleDraweeView) itemView.findViewById(R.id.photopicker_image);
-            photopicker_choice= (ImageView) itemView.findViewById(R.id.photopicker_choice);
-            camera_image= (LinearLayout) itemView.findViewById(R.id.camera_image);
+            photopicker_image = (SimpleDraweeView) itemView.findViewById(R.id.photopicker_image);
+            photopicker_choice = (ImageView) itemView.findViewById(R.id.photopicker_choice);
+            camera_image = (LinearLayout) itemView.findViewById(R.id.camera_image);
         }
     }
 }
