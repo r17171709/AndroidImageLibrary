@@ -3,7 +3,6 @@ package com.renyu.imagelibrary.camera;
 import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
-
 import com.renyu.commonlibrary.baseact.BaseActivity;
 import com.renyu.commonlibrary.commonutils.BarUtils;
 import com.renyu.commonlibrary.permission.annotation.NeedPermission;
@@ -11,8 +10,7 @@ import com.renyu.commonlibrary.permission.annotation.PermissionDenied;
 import com.renyu.imagelibrary.R;
 import com.renyu.imagelibrary.commonutils.Utils;
 
-public class CameraActivity extends BaseActivity {
-
+public class CameraActivity extends BaseActivity implements CameraFragment.TakenCompleteListener {
     @Override
     public void initParams() {
 
@@ -57,7 +55,8 @@ public class CameraActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
     }
 
-    public void backTo(String filePath) {
+    @Override
+    public void getPath(String filePath) {
         //刷新相册
         Utils.refreshAlbum(this, filePath);
         //返回上一级目录

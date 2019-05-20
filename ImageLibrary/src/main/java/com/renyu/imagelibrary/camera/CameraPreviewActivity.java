@@ -49,7 +49,6 @@ public class CameraPreviewActivity extends BaseActivity {
         DraweeController draweeController = Fresco.newDraweeControllerBuilder()
                 .setImageRequest(request).setAutoPlayAnimations(true).build();
         iv_camerapreview.setController(draweeController);
-        iv_camerapreview.setTag(path);
     }
 
     @Override

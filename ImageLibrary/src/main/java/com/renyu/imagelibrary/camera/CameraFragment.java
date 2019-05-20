@@ -15,18 +15,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.OrientationEventListener;
-import android.view.Surface;
-import android.view.SurfaceHolder;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
 import androidx.annotation.Nullable;
-
 import com.blankj.utilcode.util.FileUtils;
 import com.blankj.utilcode.util.ScreenUtils;
 import com.renyu.commonlibrary.basefrag.BaseFragment;
@@ -58,13 +51,21 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
 
     private boolean isSurfaceDestory = false;
 
+    // 拍摄成功之后回调
+    private TakenCompleteListener takenCompleteListener = null;
+
     private String dirPath = "";
     private byte[] data;
+
+    public interface TakenCompleteListener {
+        void getPath(String filePath);
+    }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mOrientationListener = new CameraOrientationListener(activity);
+        takenCompleteListener = (TakenCompleteListener) activity;
     }
 
     @Override
@@ -207,7 +208,7 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
         CameraInfo cameraInfo = new CameraInfo();
         Camera.getCameraInfo(mCameraID, cameraInfo);
 
-        int rotation = ((CameraActivity) context).getWindowManager().getDefaultDisplay().getRotation();
+        int rotation = ((Activity) context).getWindowManager().getDefaultDisplay().getRotation();
         int degrees = 0;
 
         switch (rotation) {
@@ -433,16 +434,17 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
         new Thread(runnable).start();
     }
 
-    Handler handler = new Handler() {
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-
-            ((CameraActivity) context).backTo(msg.obj.toString());
+            if (takenCompleteListener != null) {
+                takenCompleteListener.getPath(msg.obj.toString());
+            }
         }
     };
 
-    Runnable runnable = new Runnable() {
+    private Runnable runnable = new Runnable() {
         @Override
         public void run() {
 
