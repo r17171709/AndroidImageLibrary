@@ -2,6 +2,7 @@ package com.renyu.imagelibrary.camera;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,27 +15,65 @@ import android.media.ExifInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.*;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import androidx.annotation.Nullable;
+
 import com.blankj.utilcode.util.FileUtils;
 import com.blankj.utilcode.util.ScreenUtils;
+import com.blankj.utilcode.util.SizeUtils;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.renyu.commonlibrary.basefrag.BaseFragment;
 import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.imagelibrary.R;
+import com.renyu.imagelibrary.commonutils.Utils;
+import com.renyu.imagelibrary.params.CommonParams;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class CameraFragment extends BaseFragment implements SurfaceHolder.Callback, Camera.PictureCallback {
+    // 相机可用小功能
+    enum CameraFunction {
+        // 切换镜头
+        ChangeCamera,
+        // 闪光灯
+        Flash,
+        // 相册
+        PhotoPicker
+    }
+
+    public static CameraFragment getInstance(ArrayList<CameraFunction> functions) {
+        CameraFragment cameraFragment = new CameraFragment();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("cameraFunctions", functions);
+        cameraFragment.setArguments(bundle);
+        return cameraFragment;
+    }
+
+    public static CameraFragment getInstance() {
+        ArrayList<CameraFunction> functions = new ArrayList<>();
+        functions.add(CameraFunction.ChangeCamera);
+        functions.add(CameraFunction.Flash);
+        CameraFragment cameraFragment = new CameraFragment();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("cameraFunctions", functions);
+        cameraFragment.setArguments(bundle);
+        return cameraFragment;
+    }
+
     private static final String TAG = CameraFragment.class.getSimpleName();
     private static final String CAMERA_ID_KEY = "camera_id";
     private static final String CAMERA_FLASH_KEY = "flash_mode";
@@ -46,6 +85,8 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
     private SurfaceHolder mSurfaceHolder;
     private ProgressBar progress = null;
     private ImageView takePhotoBtn = null;
+    private RelativeLayout layout_camera_func1 = null;
+    private RelativeLayout layout_camera_func2 = null;
 
     private CameraOrientationListener mOrientationListener;
 
@@ -110,6 +151,47 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
         mPreviewView.getHolder().addCallback(CameraFragment.this);
         progress = view.findViewById(R.id.progress);
 
+        layout_camera_func1 = view.findViewById(R.id.layout_camera_func1);
+        layout_camera_func2 = view.findViewById(R.id.layout_camera_func2);
+        try {
+            ArrayList<CameraFunction> functionArrayList = ((ArrayList<CameraFunction>) getArguments().getSerializable("cameraFunctions"));
+            addFunctionViews(functionArrayList.get(0), layout_camera_func1);
+            addFunctionViews(functionArrayList.get(1), layout_camera_func2);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        takePhotoBtn = view.findViewById(R.id.capture_image_button);
+        takePhotoBtn.setOnClickListener(v -> takePicture());
+    }
+
+    /**
+     * 添加小功能
+     *
+     * @param cameraFunction
+     * @param viewGroup
+     */
+    private void addFunctionViews(CameraFunction cameraFunction, ViewGroup viewGroup) {
+        View view = null;
+        if (cameraFunction == CameraFunction.ChangeCamera) {
+            view = LayoutInflater.from(context).inflate(R.layout.view_changecamera, null, false);
+            initChangeCamera(view);
+        } else if (cameraFunction == CameraFunction.Flash) {
+            view = LayoutInflater.from(context).inflate(R.layout.view_flash, null, false);
+            initFlash(view);
+        } else if (cameraFunction == CameraFunction.PhotoPicker) {
+            String path = Utils.getLatestPhoto(context);
+            if (!TextUtils.isEmpty(path)) {
+                view = LayoutInflater.from(context).inflate(R.layout.view_photopicker, null, false);
+                initPhotoPicker(view, "file://" + path);
+            }
+        }
+        if (view != null) {
+            viewGroup.addView(view);
+        }
+    }
+
+    private void initChangeCamera(View view) {
         final ImageView swapCameraBtn = view.findViewById(R.id.change_camera);
         PackageManager pm = context.getPackageManager();
         //同时拥有前后置摄像头才可以切换
@@ -126,7 +208,9 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
             }
             restartPreview();
         });
+    }
 
+    private void initFlash(View view) {
         final View changeCameraFlashModeBtn = view.findViewById(R.id.flash);
         final TextView autoFlashIcon = view.findViewById(R.id.auto_flash_icon);
         changeCameraFlashModeBtn.setOnClickListener(v -> {
@@ -140,12 +224,16 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
                 mFlashMode = Camera.Parameters.FLASH_MODE_AUTO;
                 autoFlashIcon.setText("Auto");
             }
-
             setupCamera();
         });
+    }
 
-        takePhotoBtn = view.findViewById(R.id.capture_image_button);
-        takePhotoBtn.setOnClickListener(v -> takePicture());
+    private void initPhotoPicker(View view, String path) {
+        SimpleDraweeView iv_camera_photopicker = view.findViewById(R.id.iv_camera_photopicker);
+        Utils.loadFresco(path, SizeUtils.dp2px(45), SizeUtils.dp2px(45), iv_camera_photopicker);
+        iv_camera_photopicker.setOnClickListener((v -> {
+            Utils.choicePic(CameraFragment.this, 1, CommonParams.RESULT_PHOTOPICKER);
+        }));
     }
 
     @Override
@@ -153,6 +241,17 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
         outState.putInt(CAMERA_ID_KEY, mCameraID);
         outState.putString(CAMERA_FLASH_KEY, mFlashMode);
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CommonParams.RESULT_PHOTOPICKER && resultCode == Activity.RESULT_OK) {
+            ArrayList<String> temp = data.getExtras().getStringArrayList("choiceImages");
+            if (temp.size() > 0) {
+                takenCompleteListener.getPath(temp.get(0));
+            }
+        }
     }
 
     private boolean getCamera(int cameraID) {
@@ -258,19 +357,22 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
         parameters.setPreviewSize(bestPreviewSize.width, bestPreviewSize.height);
         parameters.setPictureSize(bestPictureSize.width, bestPictureSize.height);
 
-
         // Set continuous picture focus, if it's supported
         if (parameters.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
             parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
         }
 
-        final View changeCameraFlashModeBtn = getView().findViewById(R.id.flash);
         List<String> flashModes = parameters.getSupportedFlashModes();
         if (flashModes != null && flashModes.contains(mFlashMode)) {
             parameters.setFlashMode(mFlashMode);
-            changeCameraFlashModeBtn.setVisibility(View.VISIBLE);
         } else {
-            changeCameraFlashModeBtn.setVisibility(View.INVISIBLE);
+            // 闪光灯条件不满足要求，则不显示该功能
+            ArrayList<CameraFunction> functionArrayList = ((ArrayList<CameraFunction>) getArguments().getSerializable("cameraFunctions"));
+            if (functionArrayList.get(0) == CameraFunction.Flash) {
+                layout_camera_func1.removeAllViews();
+            } else if (functionArrayList.get(1) == CameraFunction.Flash) {
+                layout_camera_func2.removeAllViews();
+            }
         }
 
         // Lock in the changes

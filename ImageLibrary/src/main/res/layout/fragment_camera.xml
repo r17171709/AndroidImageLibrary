@@ -5,9 +5,8 @@
 
     <com.renyu.imagelibrary.camera.SquareCameraPreview
         android:id="@+id/camera_preview_view"
-		android:layout_centerHorizontal="true"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 
     <LinearLayout
         android:id="@+id/camera_tools_view"
@@ -15,59 +14,45 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_marginTop="10dp"
-        android:padding="10dp"
+        android:gravity="center"
         android:orientation="horizontal"
-        android:gravity="center">
-
-        <ImageView
-            android:id="@+id/change_camera"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:src="@mipmap/icon_camera"
-            android:layout_weight="1"/>
-		<RelativeLayout 
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1">
-		    <ImageView
-	            android:id="@+id/capture_image_button"
-	            android:layout_centerInParent="true"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:src="@drawable/capture_photo_button"/>
-		    <ProgressBar
-	            android:id="@+id/progress"
-	            android:visibility="gone"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:layout_centerInParent="true"/>
-		</RelativeLayout>
-        
+        android:padding="10dp">
 
         <RelativeLayout
-            android:id="@+id/flash"
+            android:id="@+id/layout_camera_func1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal">
+            android:gravity="center_horizontal">
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
 
             <ImageView
-                android:id="@+id/flash_icon"
+                android:id="@+id/capture_image_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@mipmap/icon_toggle_flash" />
+                android:layout_centerInParent="true"
+                android:src="@drawable/capture_photo_button" />
 
-            <TextView
-                android:id="@+id/auto_flash_icon"
+            <ProgressBar
+                android:id="@+id/progress"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:layout_toEndOf="@id/flash_icon"
-                android:layout_centerVertical="true"
-                android:text="Auto"
-                android:textColor="@android:color/white"
-                android:textSize="14sp"/>
+                android:layout_centerInParent="true"
+                android:visibility="gone" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/layout_camera_func2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal">
 
         </RelativeLayout>
     </LinearLayout>

@@ -3,13 +3,24 @@ package com.renyu.imagelibrary.commonutils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 
+import androidx.fragment.app.Fragment;
+
+import com.blankj.utilcode.util.SizeUtils;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.interfaces.DraweeController;
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.common.ResizeOptions;
+import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.imagelibrary.camera.CameraActivity;
 import com.renyu.imagelibrary.crop.UCrop;
@@ -92,6 +103,21 @@ public class Utils {
     }
 
     /**
+     * 选择图片
+     *
+     * @param fragment
+     * @param maxNum
+     * @param requestCode
+     */
+    public static void choicePic(Fragment fragment, int maxNum, int requestCode) {
+        Intent intent = new Intent(fragment.getContext(), PhotoPickerActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putInt("maxNum", maxNum);
+        intent.putExtras(bundle);
+        fragment.startActivityForResult(intent, requestCode);
+    }
+
+    /**
      * 图片压缩
      *
      * @param context
@@ -133,6 +159,53 @@ public class Utils {
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * 获取相册中最新一张图片
+     *
+     * @param context
+     * @return
+     */
+    public static String getLatestPhoto(Context context) {
+        // 拍摄照片的地址
+        String CAMERA_IMAGE_BUCKET_NAME = Environment.getExternalStorageDirectory().toString() + "/DCIM/Camera";
+        // 拍摄照片的地址ID
+        String CAMERA_IMAGE_BUCKET_ID = getBucketId(CAMERA_IMAGE_BUCKET_NAME);
+        // 查询路径和修改时间
+        String[] projection = {MediaStore.Images.Media.DATA,
+                MediaStore.Images.Media.DATE_MODIFIED};
+        //
+        String selection = MediaStore.Images.Media.BUCKET_ID + " = ?";
+        //
+        String[] selectionArgs = {CAMERA_IMAGE_BUCKET_ID};
+        // 遍历camera文件夹
+        String imagePath = "";
+        Cursor cursor = context.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                selection,
+                selectionArgs,
+                MediaStore.Files.FileColumns.DATE_MODIFIED + " DESC");
+        if (cursor.moveToFirst()) {
+            imagePath = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+        }
+        if (!cursor.isClosed()) {
+            cursor.close();
+        }
+        return imagePath;
+    }
+
+    private static String getBucketId(String path) {
+        return String.valueOf(path.toLowerCase().hashCode());
+    }
+
+    public static void loadFresco(String path, float width, float height, SimpleDraweeView simpleDraweeView) {
+        ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(path))
+                .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(width), SizeUtils.dp2px(height))).build();
+        DraweeController draweeController = Fresco.newDraweeControllerBuilder()
+                .setImageRequest(request).setAutoPlayAnimations(true).build();
+        simpleDraweeView.setController(draweeController);
+        simpleDraweeView.setTag(path);
     }
 
     /**
