@@ -9,7 +9,7 @@ publish {
     userOrg = 'r17171709'
     groupId = 'com.github.renyu'
     artifactId = 'AndroidImageLibrary'
-    publishVersion = '3.0.2'
+    publishVersion = '3.0.3'
     desc = 'Image Library'
     website = 'https://github.com/r17171709'
     repoName = 'AndroidImageLibrary'

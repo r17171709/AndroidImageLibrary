@@ -11,9 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-
 import androidx.fragment.app.Fragment;
-
 import com.blankj.utilcode.util.SizeUtils;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
@@ -23,15 +21,15 @@ import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.imagelibrary.camera.CameraActivity;
+import com.renyu.imagelibrary.camera.CameraFragment;
 import com.renyu.imagelibrary.crop.UCrop;
 import com.renyu.imagelibrary.photopicker.PhotoPickerActivity;
 import com.renyu.imagelibrary.preview.ImagePreviewActivity;
+import id.zelory.compressor.Compressor;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-
-import id.zelory.compressor.Compressor;
 
 /**
  * Created by renyu on 2017/1/3.
@@ -60,6 +58,18 @@ public class Utils {
      */
     public static void takePicture(Activity activity, int requestCode) {
         Intent intent = new Intent(activity, CameraActivity.class);
+        activity.startActivityForResult(intent, requestCode);
+    }
+
+    /**
+     * 自定义小功能组件的拍照
+     *
+     * @param activity
+     * @param requestCode
+     */
+    public static void takePicture2(Activity activity, int requestCode, ArrayList<CameraFragment.CameraFunction> lists) {
+        Intent intent = new Intent(activity, CameraActivity.class);
+        intent.putExtra("cameraFunctions", lists);
         activity.startActivityForResult(intent, requestCode);
     }
 

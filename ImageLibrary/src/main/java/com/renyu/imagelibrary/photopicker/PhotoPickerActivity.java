@@ -9,7 +9,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.ListPopupWindow;
 import androidx.core.content.ContextCompat;
@@ -17,30 +16,23 @@ import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.blankj.utilcode.util.SizeUtils;
 import com.renyu.commonlibrary.baseact.BaseActivity;
 import com.renyu.commonlibrary.commonutils.BarUtils;
 import com.renyu.imagelibrary.R;
 import com.renyu.imagelibrary.bean.Photo;
 import com.renyu.imagelibrary.bean.PhotoDirectory;
-import com.renyu.imagelibrary.camera.CameraActivity;
 import com.renyu.imagelibrary.commonutils.PhotoDirectoryLoader;
 import com.renyu.imagelibrary.commonutils.Utils;
 import com.renyu.imagelibrary.params.CommonParams;
 import com.renyu.imagelibrary.preview.ImagePreviewActivity;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+
+import java.io.File;
+import java.util.*;
 
 import static android.provider.BaseColumns._ID;
 import static android.provider.MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME;
@@ -177,8 +169,7 @@ public class PhotoPickerActivity extends BaseActivity {
 
             @Override
             public void takePic() {
-                Intent intent = new Intent(PhotoPickerActivity.this, CameraActivity.class);
-                startActivityForResult(intent, CommonParams.RESULT_TAKECAMERA);
+                Utils.takePicture(PhotoPickerActivity.this, CommonParams.RESULT_TAKECAMERA);
             }
         });
         photopicker_rv.setAdapter(adapter);

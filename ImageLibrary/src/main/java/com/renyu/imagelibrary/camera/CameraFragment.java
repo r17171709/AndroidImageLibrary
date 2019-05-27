@@ -46,7 +46,7 @@ import java.util.List;
 
 public class CameraFragment extends BaseFragment implements SurfaceHolder.Callback, Camera.PictureCallback {
     // 相机可用小功能
-    enum CameraFunction {
+    public enum CameraFunction {
         // 切换镜头
         ChangeCamera,
         // 闪光灯

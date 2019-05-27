@@ -3,7 +3,6 @@ package com.renyu.imagelibrary.camera;
 import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
-
 import com.renyu.commonlibrary.baseact.BaseActivity;
 import com.renyu.commonlibrary.commonutils.BarUtils;
 import com.renyu.commonlibrary.permission.annotation.NeedPermission;
@@ -32,11 +31,14 @@ public class CameraActivity extends BaseActivity implements CameraFragment.Taken
             deniedDesp = "为了您可以正常使用照相机，\n请点击\"设置\"-\"权限\"-打开 \"存储空间\"与\"相机\" 权限。\n最后点击两次后退按钮，即可返回。")
     public void permissionApply() {
         if (getSupportFragmentManager().getFragments().size() == 0) {
-            ArrayList<CameraFragment.CameraFunction> lists = new ArrayList<>();
-            lists.add(CameraFragment.CameraFunction.PhotoPicker);
-            lists.add(CameraFragment.CameraFunction.ChangeCamera);
+            CameraFragment cameraFragment;
+            if (getIntent().getSerializableExtra("cameraFunctions") != null) {
+                cameraFragment = CameraFragment.getInstance((ArrayList<CameraFragment.CameraFunction>) getIntent().getSerializableExtra("cameraFunctions"));
+            } else {
+                cameraFragment = CameraFragment.getInstance();
+            }
             getSupportFragmentManager().beginTransaction().replace(
-                    R.id.fragment_container, CameraFragment.getInstance(lists)).commitAllowingStateLoss();
+                    R.id.fragment_container, cameraFragment).commitAllowingStateLoss();
         }
     }
 

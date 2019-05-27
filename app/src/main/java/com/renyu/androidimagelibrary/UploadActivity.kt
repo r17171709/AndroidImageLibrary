@@ -19,10 +19,12 @@ import com.renyu.commonlibrary.permission.annotation.NeedPermission
 import com.renyu.commonlibrary.permission.annotation.PermissionDenied
 import com.renyu.commonlibrary.views.actionsheet.ActionSheetFragment
 import com.renyu.imagelibrary.bean.UploadTaskBean
+import com.renyu.imagelibrary.camera.CameraFragment
 import com.renyu.imagelibrary.camera.CameraPreviewActivity
 import com.renyu.imagelibrary.commonutils.Utils
 import kotlinx.android.synthetic.main.activity_upload.*
 import java.io.File
+
 
 /**
  * Created by renyu on 2017/12/7.
@@ -35,6 +37,11 @@ class UploadActivity : BaseActivity() {
 
     val upload: UploadImageManager by lazy {
         UploadImageManager()
+    }
+
+    // 相机小功能
+    private val lists: ArrayList<CameraFragment.CameraFunction> by lazy {
+        ArrayList<CameraFragment.CameraFunction>()
     }
 
     override fun setStatusBarColor() = Color.BLACK
@@ -63,6 +70,9 @@ class UploadActivity : BaseActivity() {
     }
 
     override fun initParams() {
+        lists.add(CameraFragment.CameraFunction.PhotoPicker)
+        lists.add(CameraFragment.CameraFunction.ChangeCamera)
+
         upload.addListener {
             println("${it.url}   ${it.statue}   ${it.progress}")
             val message = Message()
@@ -93,7 +103,7 @@ class UploadActivity : BaseActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_CANCELED && requestCode == CommonParams.RESULT_CAMERAPREVIEW) {
-            Utils.takePicture(this, CommonParams.RESULT_TAKEPHOTO)
+            Utils.takePicture2(this, CommonParams.RESULT_TAKEPHOTO, lists)
         }
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
@@ -176,7 +186,11 @@ class UploadActivity : BaseActivity() {
         view.loadPic(path)
         if (!TextUtils.isEmpty(path)) {
             view.post {
-                upload.addTask(path, "http://www.zksell.com/index.php?s=Api/Base/uploadpic", File(path).name.substring(0, File(path).name.indexOf(".")))
+                upload.addTask(
+                    path,
+                    "http://www.zksell.com/index.php?s=Api/Base/uploadpic",
+                    File(path).name.substring(0, File(path).name.indexOf("."))
+                )
             }
         }
 
@@ -195,22 +209,29 @@ class UploadActivity : BaseActivity() {
     }
 
     fun retryPic(path: String) {
-        upload.addTask(path, "http://www.zksell.com/index.php?s=Api/Base/uploadpic", File(path).name.substring(0, File(path).name.indexOf(".")))
+        upload.addTask(
+            path,
+            "http://www.zksell.com/index.php?s=Api/Base/uploadpic",
+            File(path).name.substring(0, File(path).name.indexOf("."))
+        )
     }
 
-    @NeedPermission(permissions = [(Manifest.permission.READ_EXTERNAL_STORAGE), (Manifest.permission.WRITE_EXTERNAL_STORAGE)], deniedDesp = "请授予存储卡读取权限")
+    @NeedPermission(
+        permissions = [(Manifest.permission.READ_EXTERNAL_STORAGE), (Manifest.permission.WRITE_EXTERNAL_STORAGE)],
+        deniedDesp = "请授予存储卡读取权限"
+    )
     fun choicePic() {
         val view_clearmessage: View = LayoutInflater.from(this)
-                .inflate(R.layout.view_actionsheet_button_3, null, false)
+            .inflate(R.layout.view_actionsheet_button_3, null, false)
         val actionSheetFragment: ActionSheetFragment = ActionSheetFragment.build()
-                .setChoice(ActionSheetFragment.CHOICE.CUSTOMER)
-                .setTitle("设置图片")
-                .setCustomerView(view_clearmessage)
-                .show(this)
+            .setChoice(ActionSheetFragment.CHOICE.CUSTOMER)
+            .setTitle("设置图片")
+            .setCustomerView(view_clearmessage)
+            .show(this)
         val pop_three_choice1: TextView = view_clearmessage.findViewById(R.id.pop_three_choice1)
         pop_three_choice1.text = "拍照"
         pop_three_choice1.setOnClickListener {
-            Utils.takePicture(this, CommonParams.RESULT_TAKEPHOTO)
+            Utils.takePicture2(this, CommonParams.RESULT_TAKEPHOTO, lists)
             actionSheetFragment.dismiss()
         }
         val pop_three_choice2: TextView = view_clearmessage.findViewById(R.id.pop_three_choice2)
