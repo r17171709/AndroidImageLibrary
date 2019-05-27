@@ -5,6 +5,7 @@
 
     <com.renyu.imagelibrary.camera.SquareCameraPreview
         android:id="@+id/camera_preview_view"
+        android:layout_centerHorizontal="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
