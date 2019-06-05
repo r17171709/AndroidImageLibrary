@@ -5,9 +5,9 @@
 
     <com.renyu.imagelibrary.camera.SquareCameraPreview
         android:id="@+id/camera_preview_view"
-        android:layout_centerHorizontal="true"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true" />
 
     <LinearLayout
         android:id="@+id/camera_tools_view"
@@ -30,7 +30,7 @@
 
         <RelativeLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="69dip"
             android:layout_weight="1">
 
             <ImageView
