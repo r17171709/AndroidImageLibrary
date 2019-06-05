@@ -11,10 +11,7 @@ import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Size;
 import android.hardware.SensorManager;
-import android.media.ExifInterface;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.*;
@@ -22,10 +19,10 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import androidx.annotation.Nullable;
-
+import androidx.exifinterface.media.ExifInterface;
 import com.blankj.utilcode.util.FileUtils;
+import com.blankj.utilcode.util.ImageUtils;
 import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -34,10 +31,13 @@ import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.imagelibrary.R;
 import com.renyu.imagelibrary.commonutils.Utils;
 import com.renyu.imagelibrary.params.CommonParams;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -96,7 +96,6 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
     private TakenCompleteListener takenCompleteListener = null;
 
     private String dirPath = "";
-    private byte[] data;
 
     public interface TakenCompleteListener {
         void getPath(String filePath);
@@ -531,25 +530,7 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
         progress.setVisibility(View.GONE);
         takePhotoBtn.setVisibility(View.VISIBLE);
 
-        this.data = data;
-
-        new Thread(runnable).start();
-    }
-
-    private Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            if (takenCompleteListener != null) {
-                takenCompleteListener.getPath(msg.obj.toString());
-            }
-        }
-    };
-
-    private Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-
+        Observable.just(data).map(bytes -> {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
             BitmapFactory.decodeByteArray(data, 0, data.length, options);
@@ -563,18 +544,34 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
                 matrix.setRotate(orientation);
             }
             bmp = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, true);
-            try {
-                bmp.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(new File(dirPath)));
-                bmp.recycle();
+            return ImageUtils.save(bmp, dirPath, Bitmap.CompressFormat.JPEG, true);
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Boolean>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
 
-                Message m = new Message();
-                m.obj = dirPath;
-                handler.sendMessage(m);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
-    };
+                    }
+
+                    @Override
+                    public void onNext(Boolean aBoolean) {
+                        if (aBoolean && takenCompleteListener != null) {
+                            takenCompleteListener.getPath(dirPath);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        if (takenCompleteListener != null) {
+                            takenCompleteListener.getPath(null);
+                        }
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
 
     /**
      * When orientation changes, onOrientationChanged(int) of the listener will be called
