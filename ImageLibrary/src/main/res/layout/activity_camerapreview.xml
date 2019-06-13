@@ -9,9 +9,9 @@
         android:id="@+id/iv_camerapreview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:actualImageScaleType="centerCrop"
-        app:failureImageScaleType="centerCrop"
-        app:placeholderImageScaleType="centerCrop" />
+        app:actualImageScaleType="fitCenter"
+        app:failureImageScaleType="fitCenter"
+        app:placeholderImageScaleType="fitCenter" />
 
     <RelativeLayout
         android:layout_width="match_parent"
