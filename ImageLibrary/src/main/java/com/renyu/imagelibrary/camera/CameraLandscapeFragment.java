@@ -14,13 +14,20 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.OrientationEventListener;
+import android.view.Surface;
+import android.view.SurfaceHolder;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import androidx.annotation.Nullable;
 import androidx.exifinterface.media.ExifInterface;
+
 import com.blankj.utilcode.util.FileUtils;
 import com.blankj.utilcode.util.ImageUtils;
 import com.blankj.utilcode.util.ScreenUtils;
@@ -31,11 +38,6 @@ import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.imagelibrary.R;
 import com.renyu.imagelibrary.commonutils.Utils;
 import com.renyu.imagelibrary.params.CommonParams;
-import io.reactivex.Observable;
-import io.reactivex.Observer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,7 +46,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class CameraFragment extends BaseFragment implements SurfaceHolder.Callback, Camera.PictureCallback {
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+import me.jessyan.autosize.internal.CancelAdapt;
+
+public class CameraLandscapeFragment extends BaseFragment implements SurfaceHolder.Callback, Camera.PictureCallback, CancelAdapt {
     // 相机可用小功能
     public enum CameraFunction {
         // 切换镜头
@@ -55,33 +64,33 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
         PhotoPicker
     }
 
-    public static CameraFragment getInstance(ArrayList<CameraFunction> functions) {
-        CameraFragment cameraFragment = new CameraFragment();
+    public static CameraLandscapeFragment getInstance(ArrayList<CameraFunction> functions) {
+        CameraLandscapeFragment cameraFragment = new CameraLandscapeFragment();
         Bundle bundle = new Bundle();
         bundle.putSerializable("cameraFunctions", functions);
         cameraFragment.setArguments(bundle);
         return cameraFragment;
     }
 
-    public static CameraFragment getInstance() {
+    public static CameraLandscapeFragment getInstance() {
         ArrayList<CameraFunction> functions = new ArrayList<>();
         functions.add(CameraFunction.ChangeCamera);
         functions.add(CameraFunction.Flash);
-        CameraFragment cameraFragment = new CameraFragment();
+        CameraLandscapeFragment cameraFragment = new CameraLandscapeFragment();
         Bundle bundle = new Bundle();
         bundle.putSerializable("cameraFunctions", functions);
         cameraFragment.setArguments(bundle);
         return cameraFragment;
     }
 
-    private static final String TAG = CameraFragment.class.getSimpleName();
+    private static final String TAG = CameraLandscapeFragment.class.getSimpleName();
     private static final String CAMERA_ID_KEY = "camera_id";
     private static final String CAMERA_FLASH_KEY = "flash_mode";
 
     private int mCameraID;
     private String mFlashMode;
     private Camera mCamera;
-    private SquareCameraPreview mPreviewView;
+    private SquareCameraLandscapePreview mPreviewView;
     private SurfaceHolder mSurfaceHolder;
     private ProgressBar progress = null;
     private ImageView takePhotoBtn = null;
@@ -115,7 +124,7 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
 
     @Override
     public int initViews() {
-        return R.layout.fragment_camera;
+        return R.layout.fragment_landscapecamera;
     }
 
     @Override
@@ -146,8 +155,8 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
 
         mOrientationListener.enable();
 
-        mPreviewView = view.findViewById(R.id.camera_preview_view);
-        mPreviewView.getHolder().addCallback(CameraFragment.this);
+        mPreviewView = view.findViewById(R.id.camera_landscapepreview_view);
+        mPreviewView.getHolder().addCallback(CameraLandscapeFragment.this);
         progress = view.findViewById(R.id.progress);
 
         layout_camera_func1 = view.findViewById(R.id.layout_camera_func1);
@@ -231,7 +240,7 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
         SimpleDraweeView iv_camera_photopicker = view.findViewById(R.id.iv_camera_photopicker);
         Utils.loadFresco(path, SizeUtils.dp2px(45), SizeUtils.dp2px(45), iv_camera_photopicker);
         iv_camera_photopicker.setOnClickListener((v -> {
-            Utils.choicePic(CameraFragment.this, 1, CommonParams.RESULT_PHOTOPICKER);
+            Utils.choicePic(CameraLandscapeFragment.this, 1, CommonParams.RESULT_PHOTOPICKER);
         }));
     }
 
@@ -387,14 +396,14 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
     }
 
     /**
-     * 获得最接近屏幕高度的尺寸
+     * 获得最接近屏幕宽度的尺寸
      *
      * @param sizeList
      * @return
      */
     private Size getCurrentScreenSize(List<Size> sizeList) {
         if (sizeList != null && sizeList.size() > 0) {
-            int screenHeight = ScreenUtils.getScreenHeight();
+            int screenWidth = ScreenUtils.getScreenWidth();
             Integer[] arry = new Integer[sizeList.size()];
             int temp = 0;
             for (Size size : sizeList) {
@@ -403,8 +412,8 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
             Arrays.sort(arry, Collections.reverseOrder());
             int last = 0;
             for (int i = 0; i < arry.length; i++) {
-                if (arry[i] >= screenHeight) {
-                    if (last > arry[i] && last > screenHeight) {
+                if (arry[i] >= screenWidth) {
+                    if (last > arry[i] && last > screenWidth) {
                         last = arry[i];
                     } else if (last == 0) {
                         last = arry[i];

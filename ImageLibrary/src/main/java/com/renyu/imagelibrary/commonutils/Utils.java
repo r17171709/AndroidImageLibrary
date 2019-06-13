@@ -22,6 +22,8 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.imagelibrary.camera.CameraActivity;
 import com.renyu.imagelibrary.camera.CameraFragment;
+import com.renyu.imagelibrary.camera.CameraLandscapeActivity;
+import com.renyu.imagelibrary.camera.CameraLandscapeFragment;
 import com.renyu.imagelibrary.crop.UCrop;
 import com.renyu.imagelibrary.photopicker.PhotoPickerActivity;
 import com.renyu.imagelibrary.preview.ImagePreviewActivity;
@@ -69,6 +71,29 @@ public class Utils {
      */
     public static void takePicture2(Activity activity, int requestCode, ArrayList<CameraFragment.CameraFunction> lists) {
         Intent intent = new Intent(activity, CameraActivity.class);
+        intent.putExtra("cameraFunctions", lists);
+        activity.startActivityForResult(intent, requestCode);
+    }
+
+    /**
+     * 拍照
+     *
+     * @param activity
+     * @param requestCode
+     */
+    public static void takeLandscapePicture(Activity activity, int requestCode) {
+        Intent intent = new Intent(activity, CameraLandscapeActivity.class);
+        activity.startActivityForResult(intent, requestCode);
+    }
+
+    /**
+     * 自定义小功能组件的拍照
+     *
+     * @param activity
+     * @param requestCode
+     */
+    public static void takeLandscapePicture2(Activity activity, int requestCode, ArrayList<CameraLandscapeFragment.CameraFunction> lists) {
+        Intent intent = new Intent(activity, CameraLandscapeActivity.class);
         intent.putExtra("cameraFunctions", lists);
         activity.startActivityForResult(intent, requestCode);
     }
