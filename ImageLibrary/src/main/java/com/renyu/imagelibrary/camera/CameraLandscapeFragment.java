@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
@@ -298,8 +299,8 @@ public class CameraLandscapeFragment extends BaseFragment implements SurfaceHold
         // Nulls out callbacks, stops face detection
         try {
             if (mCamera != null) {
-                mCamera.setPreviewCallback(null);
                 mCamera.stopPreview();
+                mCamera.setPreviewCallback(null);
             }
         } catch (Exception e) {
 
@@ -381,6 +382,12 @@ public class CameraLandscapeFragment extends BaseFragment implements SurfaceHold
             } else if (functionArrayList.get(1) == CameraFunction.Flash) {
                 layout_camera_func2.removeAllViews();
             }
+        }
+
+        if (isSupportedPictureFormats(parameters.getSupportedPictureFormats(),
+                ImageFormat.JPEG)) {
+            parameters.setPictureFormat(ImageFormat.JPEG);
+            parameters.setJpegQuality(100);
         }
 
         // Lock in the changes
@@ -492,6 +499,7 @@ public class CameraLandscapeFragment extends BaseFragment implements SurfaceHold
         stopCameraPreview();
         if (mCamera != null) {
             mCamera.release();
+            mCamera = null;
         }
 
         // 没有拍照，直接删除
@@ -550,6 +558,9 @@ public class CameraLandscapeFragment extends BaseFragment implements SurfaceHold
             Matrix matrix = new Matrix();
             if (orientation != ExifInterface.ORIENTATION_UNDEFINED) {
                 matrix.setRotate(orientation);
+                if (mCameraID == CameraInfo.CAMERA_FACING_FRONT) {
+                    matrix.postScale(-1, 1);
+                }
             }
             bmp = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, true);
             return ImageUtils.save(bmp, dirPath, Bitmap.CompressFormat.JPEG, true);
@@ -623,5 +634,14 @@ public class CameraLandscapeFragment extends BaseFragment implements SurfaceHold
         }
 
         return rotation;
+    }
+
+    private boolean isSupportedPictureFormats(List<Integer> supportedPictureFormats, int jpeg) {
+        for (int i = 0; i < supportedPictureFormats.size(); i++) {
+            if (jpeg == supportedPictureFormats.get(i)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
