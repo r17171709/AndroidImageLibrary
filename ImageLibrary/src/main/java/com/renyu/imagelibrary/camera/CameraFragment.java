@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.hardware.Camera;
@@ -22,7 +21,6 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -37,7 +35,6 @@ import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.renyu.commonlibrary.basefrag.BaseFragment;
-import com.renyu.commonlibrary.commonutils.BarUtils;
 import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.imagelibrary.R;
 import com.renyu.imagelibrary.commonutils.Utils;
@@ -174,16 +171,6 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
 
         takePhotoBtn = view.findViewById(R.id.capture_image_button);
         takePhotoBtn.setOnClickListener(v -> takePicture());
-
-        View view_nav_line = view.findViewById(R.id.view_nav_line);
-        view_nav_line.setVisibility(View.GONE);
-        ImageButton ib_nav_left = view.findViewById(R.id.ib_nav_left);
-        ib_nav_left.setImageResource(R.mipmap.ic_arrow_write_left);
-        ib_nav_left.setOnClickListener(v -> ((Activity) context).finish());
-        RelativeLayout nav_layout = view.findViewById(R.id.nav_layout);
-        nav_layout.post(() -> {
-            BarUtils.adjustStatusBar((Activity) context, ((ViewGroup) (nav_layout.getParent())), Color.TRANSPARENT);
-        });
     }
 
     /**

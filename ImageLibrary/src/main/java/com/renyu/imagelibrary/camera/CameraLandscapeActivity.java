@@ -2,7 +2,12 @@ package com.renyu.imagelibrary.camera;
 
 import android.Manifest;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 
 import com.renyu.commonlibrary.baseact.BaseActivity;
 import com.renyu.commonlibrary.commonutils.BarUtils;
@@ -17,7 +22,13 @@ import me.jessyan.autosize.internal.CancelAdapt;
 public class CameraLandscapeActivity extends BaseActivity implements CameraLandscapeFragment.TakenCompleteListener, CancelAdapt {
     @Override
     public void initParams() {
-
+        View view_nav_line = findViewById(R.id.view_nav_line);
+        view_nav_line.setVisibility(View.GONE);
+        ImageButton ib_nav_left = findViewById(R.id.ib_nav_left);
+        ib_nav_left.setImageResource(R.mipmap.ic_arrow_write_left);
+        ib_nav_left.setOnClickListener(v -> finish());
+        RelativeLayout nav_layout = findViewById(R.id.nav_layout);
+        nav_layout.post(() -> BarUtils.adjustStatusBar(this, ((ViewGroup) (nav_layout.getParent())), Color.TRANSPARENT));
     }
 
     @Override
