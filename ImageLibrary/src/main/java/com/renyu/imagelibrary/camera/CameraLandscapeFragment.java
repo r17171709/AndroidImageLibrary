@@ -15,23 +15,15 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.OrientationEventListener;
-import android.view.Surface;
-import android.view.SurfaceHolder;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import androidx.annotation.Nullable;
 import androidx.exifinterface.media.ExifInterface;
-
 import com.blankj.utilcode.util.FileUtils;
 import com.blankj.utilcode.util.ImageUtils;
-import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.renyu.commonlibrary.basefrag.BaseFragment;
@@ -39,20 +31,17 @@ import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.imagelibrary.R;
 import com.renyu.imagelibrary.commonutils.Utils;
 import com.renyu.imagelibrary.params.CommonParams;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import me.jessyan.autosize.internal.CancelAdapt;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CameraLandscapeFragment extends BaseFragment implements SurfaceHolder.Callback, Camera.PictureCallback, CancelAdapt {
     // 相机可用小功能
@@ -395,48 +384,11 @@ public class CameraLandscapeFragment extends BaseFragment implements SurfaceHold
     }
 
     private Size determineBestPreviewSize(Camera.Parameters parameters) {
-        return getCurrentScreenSize(parameters.getSupportedPreviewSizes());
+        return Utils.getCurrentScreenSize(parameters.getSupportedPreviewSizes());
     }
 
     private Size determineBestPictureSize(Camera.Parameters parameters) {
-        return getCurrentScreenSize(parameters.getSupportedPictureSizes());
-    }
-
-    /**
-     * 获得最接近屏幕宽度的尺寸
-     *
-     * @param sizeList
-     * @return
-     */
-    private Size getCurrentScreenSize(List<Size> sizeList) {
-        if (sizeList != null && sizeList.size() > 0) {
-            int screenWidth = ScreenUtils.getScreenWidth();
-            Integer[] arry = new Integer[sizeList.size()];
-            int temp = 0;
-            for (Size size : sizeList) {
-                arry[temp++] = size.width;
-            }
-            Arrays.sort(arry, Collections.reverseOrder());
-            int last = 0;
-            for (int i = 0; i < arry.length; i++) {
-                if (arry[i] >= screenWidth) {
-                    if (last > arry[i] && last > screenWidth) {
-                        last = arry[i];
-                    } else if (last == 0) {
-                        last = arry[i];
-                    }
-                }
-            }
-            int index = 0;
-            for (int i = 0; i < sizeList.size(); i++) {
-                if (last == sizeList.get(i).width) {
-                    index = i;
-                    break;
-                }
-            }
-            return sizeList.get(index);
-        }
-        return null;
+        return Utils.getCurrentScreenSize(parameters.getSupportedPictureSizes());
     }
 
     private void restartPreview() {

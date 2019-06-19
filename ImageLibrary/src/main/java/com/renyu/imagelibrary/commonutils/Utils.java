@@ -7,11 +7,13 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import androidx.fragment.app.Fragment;
+import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
@@ -20,6 +22,7 @@ import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.renyu.commonlibrary.params.InitParams;
+import com.renyu.imagelibrary.bean.ChoiceSizeBean;
 import com.renyu.imagelibrary.camera.CameraActivity;
 import com.renyu.imagelibrary.camera.CameraFragment;
 import com.renyu.imagelibrary.camera.CameraLandscapeActivity;
@@ -32,6 +35,9 @@ import id.zelory.compressor.Compressor;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by renyu on 2017/1/3.
@@ -295,5 +301,45 @@ public class Utils {
     private static int getSingleMixtureWhite(int color, int alpha) {
         int newColor = color * alpha / 255 + 255 - alpha;
         return newColor > 255 ? 255 : newColor;
+    }
+
+    /**
+     * 获得最接近屏幕的尺寸
+     *
+     * @param sizeList
+     * @return
+     */
+    public static Camera.Size getCurrentScreenSize(List<Camera.Size> sizeList) {
+        if (sizeList != null && sizeList.size() > 0) {
+            int screenHeight = ScreenUtils.getScreenHeight();
+            int screenWidth = ScreenUtils.getScreenWidth();
+            if (ScreenUtils.isLandscape()) {
+                screenHeight = ScreenUtils.getScreenWidth();
+                screenWidth = ScreenUtils.getScreenHeight();
+            }
+            ChoiceSizeBean[] arry = new ChoiceSizeBean[sizeList.size()];
+            int temp = 0;
+            for (Camera.Size size : sizeList) {
+                arry[temp++] = new ChoiceSizeBean(size.height, size.width);
+            }
+            Arrays.sort(arry, Collections.reverseOrder());
+            ChoiceSizeBean last = arry[arry.length - 1];
+            for (int i = 0; i < arry.length; i++) {
+                if (screenWidth >= arry[i].getHeight() && screenHeight >= arry[i].getWidth()) {
+                    if (arry[i].compareTo(last) > 0) {
+                        last = arry[i];
+                    }
+                }
+            }
+            if (last == null) {
+                return null;
+            }
+            for (Camera.Size size : sizeList) {
+                if (size.width == last.getWidth() && size.height == last.getHeight()) {
+                    return size;
+                }
+            }
+        }
+        return null;
     }
 }
