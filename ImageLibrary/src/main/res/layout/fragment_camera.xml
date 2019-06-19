@@ -57,4 +57,12 @@
 
         </RelativeLayout>
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <include layout="@layout/view_nav" />
+    </LinearLayout>
 </RelativeLayout>
