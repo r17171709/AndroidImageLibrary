@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import androidx.fragment.app.Fragment;
 import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.SizeUtils;
@@ -323,17 +324,51 @@ public class Utils {
                 arry[temp++] = new ChoiceSizeBean(size.height, size.width);
             }
             Arrays.sort(arry, Collections.reverseOrder());
-            ChoiceSizeBean last = arry[arry.length - 1];
+            // 选择比例接近的尺寸
+            ArrayList<ChoiceSizeBean> tmp = new ArrayList<>();
             for (int i = 0; i < arry.length; i++) {
-                if (screenWidth >= arry[i].getHeight() && screenHeight >= arry[i].getWidth()) {
-                    if (arry[i].compareTo(last) > 0) {
-                        last = arry[i];
+                // 排除比例不同的
+                Log.d("CameraUtils", arry[i].getHeight() + " " + arry[i].getWidth() + " " + arry[i].getWidth() * 1.0f / arry[i].getHeight());
+                // 比例差值不能太大
+                if (Math.abs(arry[i].getWidth() * 1.0f / arry[i].getHeight() - 16f / 9) > 0.1) {
+                    continue;
+                }
+                tmp.add(arry[i]);
+            }
+            if (tmp.size() == 0) {
+                return null;
+            }
+            // 根据屏幕尺寸进行筛选
+            ChoiceSizeBean largeLast = tmp.get(0);
+            for (ChoiceSizeBean choiceSizeBean : tmp) {
+                if (screenWidth <= choiceSizeBean.getHeight() && screenHeight <= choiceSizeBean.getWidth()) {
+                    if (choiceSizeBean.compareTo(largeLast) <= 0) {
+                        largeLast = choiceSizeBean;
                     }
                 }
             }
-            if (last == null) {
-                return null;
+            ChoiceSizeBean smallLast = tmp.get(tmp.size() - 1);
+            for (ChoiceSizeBean choiceSizeBean : tmp) {
+                if (screenWidth >= choiceSizeBean.getHeight() && screenHeight >= choiceSizeBean.getWidth()) {
+                    if (choiceSizeBean.compareTo(smallLast) >= 0) {
+                        smallLast = choiceSizeBean;
+                    }
+                }
             }
+            // 最终选择
+            ChoiceSizeBean last = null;
+            if (largeLast != null) {
+                // 判断最大的尺寸是不是超过2倍屏幕
+                if (largeLast.getWidth() > 2 * screenHeight || largeLast.getHeight() >= 2 * screenWidth) {
+                    largeLast = null;
+                } else {
+                    last = largeLast;
+                }
+            }
+            if (largeLast == null) {
+                last = smallLast;
+            }
+
             for (Camera.Size size : sizeList) {
                 if (size.width == last.getWidth() && size.height == last.getHeight()) {
                     return size;
