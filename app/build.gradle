@@ -50,5 +50,5 @@ dependencies {
     implementation 'com.github.renyu:ActionSheetLibrary:2.0.2'
     implementation 'com.github.renyu:AndroidNetworkLibrary:2.0.2'
     implementation project(':ImageLibrary')
-//    implementation 'com.github.renyu:AndroidImageLibrary:3.0.9'
+//    implementation 'com.github.renyu:AndroidImageLibrary:3.0.10'
 }
