@@ -169,7 +169,7 @@ public class PhotoPickerActivity extends BaseActivity {
 
             @Override
             public void takePic() {
-                Utils.takePicture(PhotoPickerActivity.this, CommonParams.RESULT_TAKECAMERA);
+                Utils.takePicture(PhotoPickerActivity.this, CommonParams.RESULT_TAKECAMERA, false);
             }
         });
         photopicker_rv.setAdapter(adapter);

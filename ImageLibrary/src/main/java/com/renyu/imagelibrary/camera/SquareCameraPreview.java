@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.SurfaceView;
+import com.blankj.utilcode.util.ScreenUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,10 +74,18 @@ public class SquareCameraPreview extends SurfaceView {
         int height = MeasureSpec.getSize(heightMeasureSpec);
         int width = MeasureSpec.getSize(widthMeasureSpec);
 
-        if (width > height * ASPECT_RATIO) {
-            width = (int) (height * ASPECT_RATIO + 0.5);
+        if (ScreenUtils.isLandscape()) {
+            if (height > width * ASPECT_RATIO) {
+                height = (int) (width * ASPECT_RATIO + 0.5);
+            } else {
+                width = (int) (height / ASPECT_RATIO + 0.5);
+            }
         } else {
-            height = (int) (width / ASPECT_RATIO + 0.5);
+            if (width > height * ASPECT_RATIO) {
+                width = (int) (height * ASPECT_RATIO + 0.5);
+            } else {
+                height = (int) (width / ASPECT_RATIO + 0.5);
+            }
         }
 
         setMeasuredDimension(width, height);

@@ -103,7 +103,7 @@ class UploadActivity : BaseActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_CANCELED && requestCode == CommonParams.RESULT_CAMERAPREVIEW) {
-            Utils.takePicture2(this, CommonParams.RESULT_TAKEPHOTO, lists)
+            Utils.takePicture2(this, CommonParams.RESULT_TAKEPHOTO, lists, false)
         }
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
@@ -231,7 +231,7 @@ class UploadActivity : BaseActivity() {
         val pop_three_choice1: TextView = view_clearmessage.findViewById(R.id.pop_three_choice1)
         pop_three_choice1.text = "拍照"
         pop_three_choice1.setOnClickListener {
-            Utils.takePicture2(this, CommonParams.RESULT_TAKEPHOTO, lists)
+            Utils.takePicture2(this, CommonParams.RESULT_TAKEPHOTO, lists, false)
             actionSheetFragment.dismiss()
         }
         val pop_three_choice2: TextView = view_clearmessage.findViewById(R.id.pop_three_choice2)

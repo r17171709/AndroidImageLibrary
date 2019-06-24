@@ -36,13 +36,14 @@ import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import me.jessyan.autosize.internal.CancelAdapt;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CameraFragment extends BaseFragment implements SurfaceHolder.Callback, Camera.PictureCallback {
+public class CameraFragment extends BaseFragment implements SurfaceHolder.Callback, Camera.PictureCallback, CancelAdapt {
     // 相机可用小功能
     public enum CameraFunction {
         // 切换镜头

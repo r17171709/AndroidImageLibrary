@@ -17,7 +17,9 @@ import com.renyu.imagelibrary.R;
 
 import java.util.ArrayList;
 
-public class CameraActivity extends BaseActivity implements CameraFragment.TakenCompleteListener {
+import me.jessyan.autosize.internal.CancelAdapt;
+
+public class CameraActivity extends BaseActivity implements CameraFragment.TakenCompleteListener, CancelAdapt {
     @Override
     public void initParams() {
         View view_nav_line = findViewById(R.id.view_nav_line);

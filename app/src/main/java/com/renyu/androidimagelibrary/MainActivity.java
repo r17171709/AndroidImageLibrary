@@ -2,13 +2,9 @@ package com.renyu.androidimagelibrary;
 
 import android.content.Intent;
 import android.os.Bundle;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.renyu.imagelibrary.camera.CameraFragment;
-import com.renyu.imagelibrary.camera.CameraLandscapeFragment;
 import com.renyu.imagelibrary.commonutils.Utils;
-import com.renyu.imagelibrary.preview.PreviewActivity;
 
 import java.util.ArrayList;
 
@@ -18,10 +14,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ArrayList<CameraLandscapeFragment.CameraFunction> lists = new ArrayList<>();
-        lists.add(CameraLandscapeFragment.CameraFunction.PhotoPicker);
-        lists.add(CameraLandscapeFragment.CameraFunction.ChangeCamera);
-        Utils.takeLandscapePicture2(this, 100, lists);
+        ArrayList<CameraFragment.CameraFunction> lists = new ArrayList<>();
+        lists.add(CameraFragment.CameraFunction.PhotoPicker);
+        lists.add(CameraFragment.CameraFunction.ChangeCamera);
+        Utils.takePicture2(this, 100, lists, true);
 
 //        ArrayList<String> strings=new ArrayList<>();
 //        strings.add(Environment.getExternalStorageDirectory().getPath()+"/1.jpg");
