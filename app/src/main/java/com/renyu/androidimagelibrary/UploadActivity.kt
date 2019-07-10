@@ -17,7 +17,7 @@ import com.renyu.androidimagelibrary.view.UploadView
 import com.renyu.commonlibrary.baseact.BaseActivity
 import com.renyu.commonlibrary.permission.annotation.NeedPermission
 import com.renyu.commonlibrary.permission.annotation.PermissionDenied
-import com.renyu.commonlibrary.views.actionsheet.ActionSheetFragment
+import com.renyu.commonlibrary.views.actionsheet.ActionSheetFactory
 import com.renyu.imagelibrary.bean.UploadTaskBean
 import com.renyu.imagelibrary.camera.CameraFragment
 import com.renyu.imagelibrary.camera.CameraPreviewActivity
@@ -223,11 +223,20 @@ class UploadActivity : BaseActivity() {
     fun choicePic() {
         val view_clearmessage: View = LayoutInflater.from(this)
             .inflate(R.layout.view_actionsheet_button_3, null, false)
-        val actionSheetFragment: ActionSheetFragment = ActionSheetFragment.build()
-            .setChoice(ActionSheetFragment.CHOICE.CUSTOMER)
-            .setTitle("设置图片")
-            .setCustomerView(view_clearmessage)
-            .show(this)
+        val actionSheetFragment = ActionSheetFactory.createCustomActionSheetFragment(
+            this,
+            "",
+            "设置图片",
+            -1,
+            "",
+            -1,
+            "",
+            -1,
+            true,
+            view_clearmessage,
+            null,
+            null
+        )
         val pop_three_choice1: TextView = view_clearmessage.findViewById(R.id.pop_three_choice1)
         pop_three_choice1.text = "拍照"
         pop_three_choice1.setOnClickListener {
