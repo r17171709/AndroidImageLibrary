@@ -14,6 +14,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.blankj.utilcode.util.ScreenUtils;
@@ -232,21 +233,17 @@ public class Utils {
     /**
      * 相册预览
      *
-     * @param context
-     * @param canDownload
+     * @param activity
      * @param position
-     * @param canEdit
      * @param urls
      */
-    public static void showPreview(Context context, boolean canDownload, int position, boolean canEdit, ArrayList<String> urls) {
-        Intent intent = new Intent(context, ImagePreviewActivity.class);
+    public static void showPreview(AppCompatActivity activity, int position, ArrayList<String> urls, int requestCode) {
+        Intent intent = new Intent(activity, ImagePreviewActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putBoolean("canDownload", canDownload);
         bundle.putInt("position", position);
-        bundle.putBoolean("canEdit", canEdit);
         bundle.putStringArrayList("urls", urls);
         intent.putExtras(bundle);
-        context.startActivity(intent);
+        activity.startActivityForResult(intent, requestCode);
     }
 
     //用于微信分享时用白色替换bitmap中的透明色

@@ -8,9 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.blankj.utilcode.util.SizeUtils;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
@@ -28,44 +27,37 @@ import java.util.ArrayList;
  * Created by Clevo on 2016/9/1.
  */
 public class PhotoPickerAdapter extends RecyclerView.Adapter<PhotoPickerAdapter.PhotoPickerViewHolder> {
+    private Context context;
+    private ArrayList<Photo> models;
 
-    Context context;
-    ArrayList<Photo> models;
-
-    OperImageListener listener;
+    private OperImageListener listener;
 
     public interface OperImageListener {
         void add(String path);
 
         void remove(String path);
 
-        void show(String path);
-
         void takePic();
     }
 
-    public PhotoPickerAdapter(Context context, ArrayList<Photo> models, OperImageListener listener) {
+    PhotoPickerAdapter(Context context, ArrayList<Photo> models, OperImageListener listener) {
         this.context = context;
         this.models = models;
         this.listener = listener;
     }
 
+    @NonNull
     @Override
-    public PhotoPickerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public PhotoPickerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.adapter_photopicker, parent, false);
         return new PhotoPickerViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(final PhotoPickerViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final PhotoPickerViewHolder holder, final int position) {
         if (models.get(position).getPath().equals("")) {
             holder.camera_image.setVisibility(View.VISIBLE);
-            holder.camera_image.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    listener.takePic();
-                }
-            });
+            holder.camera_image.setOnClickListener(v -> listener.takePic());
             holder.photopicker_image.setVisibility(View.GONE);
             holder.photopicker_choice.setVisibility(View.GONE);
         } else {
@@ -78,27 +70,18 @@ public class PhotoPickerAdapter extends RecyclerView.Adapter<PhotoPickerAdapter.
         DraweeController draweeController = Fresco.newDraweeControllerBuilder()
                 .setImageRequest(request).setAutoPlayAnimations(true).build();
         holder.photopicker_image.setController(draweeController);
-        holder.photopicker_image.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listener.show(models.get(position).getPath());
+        holder.photopicker_image.setOnClickListener(v -> {
+            boolean flag = models.get(position).isSelect();
+            if (((PhotoPickerActivity) context).imagePaths.size() == ((PhotoPickerActivity) context).maxNum && !flag) {
+                Toast.makeText(context, "您最多只能选择" + ((PhotoPickerActivity) context).maxNum + "张图片", Toast.LENGTH_SHORT).show();
+                return;
             }
-        });
-        holder.photopicker_image.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean flag = models.get(position).isSelect();
-                if (((PhotoPickerActivity) context).imagePaths.size() == ((PhotoPickerActivity) context).maxNum && !flag) {
-                    Toast.makeText(context, "您最多只能选择" + ((PhotoPickerActivity) context).maxNum + "张图片", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                models.get(position).setSelect(!flag);
-                holder.photopicker_choice.setImageResource(!flag ? ResourceUtils.getMipmapId(context, "ic_choice_select") : ResourceUtils.getMipmapId(context, "ic_choice_normal"));
-                if (!flag) {
-                    listener.add(models.get(position).getPath());
-                } else {
-                    listener.remove(models.get(position).getPath());
-                }
+            models.get(position).setSelect(!flag);
+            holder.photopicker_choice.setImageResource(!flag ? ResourceUtils.getMipmapId(context, "ic_choice_select") : ResourceUtils.getMipmapId(context, "ic_choice_normal"));
+            if (!flag) {
+                listener.add(models.get(position).getPath());
+            } else {
+                listener.remove(models.get(position).getPath());
             }
         });
         holder.photopicker_choice.setImageResource(models.get(position).isSelect() ? ResourceUtils.getMipmapId(context, "ic_choice_select") : ResourceUtils.getMipmapId(context, "ic_choice_normal"));
@@ -109,18 +92,17 @@ public class PhotoPickerAdapter extends RecyclerView.Adapter<PhotoPickerAdapter.
         return models.size();
     }
 
-    public class PhotoPickerViewHolder extends RecyclerView.ViewHolder {
+    class PhotoPickerViewHolder extends RecyclerView.ViewHolder {
+        private SimpleDraweeView photopicker_image;
+        private ImageView photopicker_choice;
+        private LinearLayout camera_image;
 
-        SimpleDraweeView photopicker_image;
-        ImageView photopicker_choice;
-        LinearLayout camera_image;
-
-        public PhotoPickerViewHolder(View itemView) {
+        PhotoPickerViewHolder(View itemView) {
             super(itemView);
 
-            photopicker_image = (SimpleDraweeView) itemView.findViewById(R.id.photopicker_image);
-            photopicker_choice = (ImageView) itemView.findViewById(R.id.photopicker_choice);
-            camera_image = (LinearLayout) itemView.findViewById(R.id.camera_image);
+            photopicker_image = itemView.findViewById(R.id.photopicker_image);
+            photopicker_choice = itemView.findViewById(R.id.photopicker_choice);
+            camera_image = itemView.findViewById(R.id.camera_image);
         }
     }
 }

@@ -4,11 +4,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.ImageButton;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -37,17 +34,14 @@ public class ImagePreviewActivity extends BaseActivity {
     MultiTouchViewPager imagepreview_viewpager;
     ViewPagerFragmentAdapter adapter;
     CircleIndicator imagepreview_indicator;
-    RelativeLayout layout_imagepreview_edit;
-    TextView imagepreview_edit;
     TextView tv_nav_title;
     TextView tv_nav_right;
+    ImageButton ib_nav_right;
     ImageButton ib_nav_left;
 
     // 图片路径
     ArrayList<String> urls;
     ArrayList<Fragment> fragments;
-    //是否可以编辑
-    boolean canEdit;
 
     // 图片当前位置
     int currentPosition = 0;
@@ -88,30 +82,35 @@ public class ImagePreviewActivity extends BaseActivity {
 
         imagepreview_viewpager = findViewById(R.id.imagepreview_viewpager);
         imagepreview_indicator = findViewById(R.id.imagepreview_indicator);
-        layout_imagepreview_edit = findViewById(R.id.layout_imagepreview_edit);
-        imagepreview_edit = findViewById(R.id.imagepreview_edit);
         tv_nav_title = findViewById(R.id.tv_nav_title);
         tv_nav_title.setTextColor(Color.WHITE);
+        ib_nav_left = findViewById(R.id.ib_nav_left);
+        ib_nav_left.setImageResource(R.mipmap.ic_arrow_write_left);
+        ib_nav_left.setOnClickListener(view -> onBackPressed());
+        // 右侧文字点击事件
         tv_nav_right = findViewById(R.id.tv_nav_right);
         tv_nav_right.setTextColor(Color.WHITE);
-        if (!TextUtils.isEmpty(getIntent().getExtras().getString("rightNav"))) {
-            tv_nav_right.setText(getIntent().getExtras().getString("rightNav"));
+        if (!TextUtils.isEmpty(getIntent().getExtras().getString("rightNavText"))) {
+            tv_nav_right.setText(getIntent().getExtras().getString("rightNavText"));
             tv_nav_right.setOnClickListener(view -> {
                 if (getIntent().getExtras().getParcelable("rightNavClick") != null) {
                     ((RightNavClickImpl) getIntent().getExtras().getParcelable("rightNavClick")).click(ImagePreviewActivity.this);
                 }
             });
         }
-        ib_nav_left = findViewById(R.id.ib_nav_left);
-        ib_nav_left.setImageResource(R.mipmap.ic_arrow_write_left);
-        ib_nav_left.setOnClickListener(view -> onBackPressed());
+        // 右侧图标点击事件
+        ib_nav_right = findViewById(R.id.ib_nav_right);
+        if (getIntent().getExtras().getInt("rightNavImage", -1) != -1) {
+            ib_nav_right.setImageResource(getIntent().getExtras().getInt("rightNavImage", -1));
+            ib_nav_right.setOnClickListener(view -> {
+                if (getIntent().getExtras().getParcelable("rightNavClick") != null) {
+                    ((RightNavClickImpl) getIntent().getExtras().getParcelable("rightNavClick")).click(ImagePreviewActivity.this);
+                }
+            });
+        }
 
         int choicePosition = getIntent().getExtras().getInt("position");
         urls = getIntent().getExtras().getStringArrayList("urls");
-        canEdit = getIntent().getExtras().getBoolean("canEdit");
-        if (canEdit) {
-            layout_imagepreview_edit.setVisibility(View.VISIBLE);
-        }
         fragments = new ArrayList<>();
         for (int i = 0; i < urls.size(); i++) {
             ImagePreviewFragment fragment = ImagePreviewFragment.newInstance(urls.get(i), i);
@@ -153,13 +152,6 @@ public class ImagePreviewActivity extends BaseActivity {
         });
         imagepreview_indicator.setViewPager(imagepreview_viewpager);
         imagepreview_viewpager.setCurrentItem(choicePosition);
-        imagepreview_edit.setOnClickListener(v -> {
-            if (urls.get(imagepreview_viewpager.getCurrentItem()).indexOf("http") != -1) {
-                Toast.makeText(ImagePreviewActivity.this, "网络图片不能修改", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            Utils.cropImage(urls.get(imagepreview_viewpager.getCurrentItem()), ImagePreviewActivity.this, CommonParams.RESULT_CROP, 0);
-        });
         tv_nav_title.setText((choicePosition + 1) + "/" + urls.size());
     }
 

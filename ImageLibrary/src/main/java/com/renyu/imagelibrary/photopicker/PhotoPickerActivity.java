@@ -25,7 +25,6 @@ import com.renyu.imagelibrary.bean.PhotoDirectory;
 import com.renyu.imagelibrary.commonutils.PhotoDirectoryLoader;
 import com.renyu.imagelibrary.commonutils.Utils;
 import com.renyu.imagelibrary.params.CommonParams;
-import com.renyu.imagelibrary.preview.ImagePreviewActivity;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -44,7 +43,6 @@ import static android.provider.MediaStore.MediaColumns.DATE_ADDED;
  * Created by Clevo on 2016/8/31.
  */
 public class PhotoPickerActivity extends BaseActivity {
-
     ImageView ib_nav_left;
     TextView tv_nav_title;
     TextView tv_nav_right;
@@ -154,20 +152,6 @@ public class PhotoPickerActivity extends BaseActivity {
             }
 
             @Override
-            public void show(String path) {
-                Intent intent = new Intent(PhotoPickerActivity.this, ImagePreviewActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putBoolean("canDownload", false);
-                bundle.putInt("position", 0);
-                bundle.putBoolean("canEdit", false);
-                ArrayList<String> urls = new ArrayList<>();
-                urls.add(path);
-                bundle.putStringArrayList("urls", urls);
-                intent.putExtras(bundle);
-                startActivity(intent);
-            }
-
-            @Override
             public void takePic() {
                 Utils.takePicture(PhotoPickerActivity.this, CommonParams.RESULT_TAKECAMERA, false);
             }
@@ -183,14 +167,7 @@ public class PhotoPickerActivity extends BaseActivity {
         });
         photopicker_preview.setOnClickListener(v -> {
             if (imagePaths.size() > 0) {
-                Intent intent = new Intent(PhotoPickerActivity.this, ImagePreviewActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putBoolean("canDownload", false);
-                bundle.putInt("position", 0);
-                bundle.putBoolean("canEdit", true);
-                bundle.putStringArrayList("urls", imagePaths);
-                intent.putExtras(bundle);
-                startActivityForResult(intent, CommonParams.RESULT_PREVIEW);
+                Utils.showPreview(PhotoPickerActivity.this, 0, imagePaths, CommonParams.RESULT_PREVIEW);
             }
         });
 
