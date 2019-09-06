@@ -189,7 +189,7 @@ class UploadActivity : BaseActivity() {
                 upload.addTask(
                     path,
                     "http://www.zksell.com/index.php?s=Api/Base/uploadpic",
-                    File(path).name.substring(0, File(path).name.indexOf("."))
+                    File(path).name.substring(0, File(path).name.lastIndexOf("."))
                 )
             }
         }
@@ -212,7 +212,7 @@ class UploadActivity : BaseActivity() {
         upload.addTask(
             path,
             "http://www.zksell.com/index.php?s=Api/Base/uploadpic",
-            File(path).name.substring(0, File(path).name.indexOf("."))
+            File(path).name.substring(0, File(path).name.lastIndexOf("."))
         )
     }
 
