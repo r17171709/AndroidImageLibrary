@@ -54,21 +54,6 @@ class UploadActivity : BaseActivity() {
         }
     }
 
-    // 刷新gridlayout
-    private var handler: Handler = object : Handler() {
-        override fun handleMessage(msg: Message?) {
-            super.handleMessage(msg)
-
-            if (msg != null && msg.data != null) {
-                val path = msg.data.getString("path")
-                val percent = msg.data.getInt("percent")
-                val statue = msg.data.getSerializable("statue") as UploadTaskBean.UploadState
-                val url = msg.data.getString("url")
-                refreshPic(path, percent, statue, url)
-            }
-        }
-    }
-
     override fun initParams() {
         lists.add(CameraFragment.CameraFunction.PhotoPicker)
         lists.add(CameraFragment.CameraFunction.ChangeCamera)
@@ -161,7 +146,8 @@ class UploadActivity : BaseActivity() {
     }
 
     fun addImage(path: String, position: Int) {
-        val view: UploadView = LayoutInflater.from(this).inflate(R.layout.view_upload, null, false) as UploadView
+        val view: UploadView =
+            LayoutInflater.from(this).inflate(R.layout.view_upload, null, false) as UploadView
         view.listener = object : UploadView.OnUIControllListener {
             override fun retryUploadPic() {
                 retryPic(path)
@@ -216,6 +202,21 @@ class UploadActivity : BaseActivity() {
         )
     }
 
+    private var handler: Handler = object : Handler() {
+        override fun handleMessage(msg: Message?) {
+            super.handleMessage(msg)
+
+            if (msg != null && msg.data != null) {
+                val path = msg.data.getString("path")
+                val percent = msg.data.getInt("percent")
+                val statue = msg.data.getSerializable("statue") as UploadTaskBean.UploadState
+                val url = msg.data.getString("url")
+                // 刷新gridlayout中的上传视图组件
+                refreshPic(path, percent, statue, url)
+            }
+        }
+    }
+
     @NeedPermission(
         permissions = [(Manifest.permission.READ_EXTERNAL_STORAGE), (Manifest.permission.WRITE_EXTERNAL_STORAGE)],
         deniedDesp = "请授予存储卡读取权限"
@@ -257,19 +258,17 @@ class UploadActivity : BaseActivity() {
     }
 
     fun refreshPic(path: String, percent: Int, statue: UploadTaskBean.UploadState, url: String) {
-        for (i in 0 until grid_pic.childCount) {
-            val tag = grid_pic.getChildAt(i).tag
-            if (tag != null && grid_pic.getChildAt(i).tag == path) {
-                when (statue) {
-                    UploadTaskBean.UploadState.UPLOADFAIL -> {
-                        (grid_pic.getChildAt(i) as UploadView).uploadError()
-                    }
-                    UploadTaskBean.UploadState.UPLOADSUCCESS -> {
-                        (grid_pic.getChildAt(i) as UploadView).uploadSuccess()
-                        urlMaps[path] = url
-                    }
-                    else -> (grid_pic.getChildAt(i) as UploadView).uploadMaskPercent(percent)
+        val uploadView = grid_pic.findViewWithTag<UploadView>(path)
+        if (uploadView != null) {
+            when (statue) {
+                UploadTaskBean.UploadState.UPLOADFAIL -> {
+                    uploadView.uploadError()
                 }
+                UploadTaskBean.UploadState.UPLOADSUCCESS -> {
+                    uploadView.uploadSuccess()
+                    urlMaps[path] = url
+                }
+                else -> uploadView.uploadMaskPercent(percent)
             }
         }
     }

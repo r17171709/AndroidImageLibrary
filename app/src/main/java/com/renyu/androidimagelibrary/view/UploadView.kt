@@ -21,13 +21,12 @@ import com.renyu.androidimagelibrary.R
  * Created by renyu on 2017/12/11.
  */
 class UploadView : RelativeLayout {
-
-    var view_mask: View? = null
-    var iv_releasehousepic: SimpleDraweeView? = null
-    var tv_releasehousepic: TextView? = null
-    var iv_releasehousepic_delete: ImageView? = null
-    var iv_releasehousepic_cover: TextView? = null
-    var tv_uploadretry: TextView? = null
+    private var view_mask: View? = null
+    private var iv_releasehousepic: SimpleDraweeView? = null
+    private var tv_releasehousepic: TextView? = null
+    private var iv_releasehousepic_delete: ImageView? = null
+    private var iv_releasehousepic_cover: TextView? = null
+    private var tv_uploadretry: TextView? = null
 
     interface OnUIControllListener {
         fun deletePic()
