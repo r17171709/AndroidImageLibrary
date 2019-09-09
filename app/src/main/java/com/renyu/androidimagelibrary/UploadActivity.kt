@@ -108,37 +108,30 @@ class UploadActivity : BaseActivity() {
                     }
                 }
                 CommonParams.RESULT_ALUMNI -> {
+                    // 本地已添加图片Tags
+                    val tags = ArrayList<String>()
+                    for (i in 0 until grid_pic.childCount) {
+                        if (grid_pic.getChildAt(i).tag != null) {
+                            tags.add(grid_pic.getChildAt(i).tag.toString())
+                        }
+                    }
                     val temp = data?.extras?.getStringArrayList("choiceImages")
                     val filePaths = ArrayList<String>()
-                    if (temp != null) {
-                        for (i in 0 until temp.size) {
-                            val file = File(temp[i])
-                            // 避免重复且出错的图片进行上传
-                            if (file.exists() && file.length() > 0) {
-                                var find = false
-                                for (filePath in filePaths) {
-                                    // 文件名称相同则跳过
-                                    if (File(filePath).name == file.name) {
-                                        find = true
-                                        break
-                                    }
-                                }
-                                if (!find) {
-                                    filePaths.add(temp[i])
-                                }
-                            }
+                    temp?.forEach {
+                        if (!tags.contains(it)) {
+                            filePaths.add(it)
                         }
-                        if (filePaths.size == 0) {
-                            return
-                        }
-                        grid_pic.removeView(grid_pic.getChildAt(grid_pic.childCount - 1))
-                        picPath.addAll(filePaths)
-                        for (i in 0 until filePaths.size) {
-                            addImage(filePaths[i], -1)
-                        }
-                        if (picPath.size < 9) {
-                            addImage("", -1)
-                        }
+                    }
+                    if (filePaths.size == 0) {
+                        return
+                    }
+                    grid_pic.removeView(grid_pic.getChildAt(grid_pic.childCount - 1))
+                    picPath.addAll(filePaths)
+                    for (i in 0 until filePaths.size) {
+                        addImage(filePaths[i], -1)
+                    }
+                    if (picPath.size < 9) {
+                        addImage("", -1)
                     }
                 }
             }
