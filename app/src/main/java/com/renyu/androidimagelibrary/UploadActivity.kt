@@ -205,7 +205,7 @@ class UploadActivity : BaseActivity() {
                 val statue = msg.data.getSerializable("statue") as UploadTaskBean.UploadState
                 val url = msg.data.getString("url")
                 // 刷新gridlayout中的上传视图组件
-                refreshPic(path, percent, statue, url)
+                refreshPic(path!!, percent, statue, url!!)
             }
         }
     }

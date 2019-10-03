@@ -1,25 +1,22 @@
 package com.renyu.imagelibrary.photopicker;
 
 import android.content.Context;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.blankj.utilcode.util.SizeUtils;
-import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.facebook.imagepipeline.common.ResizeOptions;
-import com.facebook.imagepipeline.request.ImageRequest;
-import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.renyu.commonlibrary.commonutils.ResourceUtils;
 import com.renyu.imagelibrary.R;
 import com.renyu.imagelibrary.bean.Photo;
+import com.renyu.imagelibrary.commonutils.Utils;
 
 import java.util.ArrayList;
 
@@ -65,11 +62,7 @@ public class PhotoPickerAdapter extends RecyclerView.Adapter<PhotoPickerAdapter.
             holder.photopicker_image.setVisibility(View.VISIBLE);
             holder.photopicker_choice.setVisibility(View.VISIBLE);
         }
-        ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse("file://" + models.get(position).getPath()))
-                .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(118), SizeUtils.dp2px(118))).build();
-        DraweeController draweeController = Fresco.newDraweeControllerBuilder()
-                .setImageRequest(request).setAutoPlayAnimations(true).build();
-        holder.photopicker_image.setController(draweeController);
+        Utils.loadFresco("file://" + models.get(position).getPath(), SizeUtils.dp2px(118), SizeUtils.dp2px(118), holder.photopicker_image);
         holder.photopicker_image.setOnClickListener(v -> {
             boolean flag = models.get(position).isSelect();
             if (((PhotoPickerActivity) context).imagePaths.size() == ((PhotoPickerActivity) context).maxNum && !flag) {
