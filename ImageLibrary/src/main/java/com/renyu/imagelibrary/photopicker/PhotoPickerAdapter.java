@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -33,8 +32,6 @@ public class PhotoPickerAdapter extends RecyclerView.Adapter<PhotoPickerAdapter.
         void add(String path);
 
         void remove(String path);
-
-        void takePic();
     }
 
     PhotoPickerAdapter(Context context, ArrayList<Photo> models, OperImageListener listener) {
@@ -52,16 +49,6 @@ public class PhotoPickerAdapter extends RecyclerView.Adapter<PhotoPickerAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull final PhotoPickerViewHolder holder, final int position) {
-        if (models.get(position).getPath().equals("")) {
-            holder.camera_image.setVisibility(View.VISIBLE);
-            holder.camera_image.setOnClickListener(v -> listener.takePic());
-            holder.photopicker_image.setVisibility(View.GONE);
-            holder.photopicker_choice.setVisibility(View.GONE);
-        } else {
-            holder.camera_image.setVisibility(View.GONE);
-            holder.photopicker_image.setVisibility(View.VISIBLE);
-            holder.photopicker_choice.setVisibility(View.VISIBLE);
-        }
         Utils.loadFresco("file://" + models.get(position).getPath(), SizeUtils.dp2px(118), SizeUtils.dp2px(118), holder.photopicker_image);
         holder.photopicker_image.setOnClickListener(v -> {
             boolean flag = models.get(position).isSelect();
@@ -88,14 +75,12 @@ public class PhotoPickerAdapter extends RecyclerView.Adapter<PhotoPickerAdapter.
     class PhotoPickerViewHolder extends RecyclerView.ViewHolder {
         private SimpleDraweeView photopicker_image;
         private ImageView photopicker_choice;
-        private LinearLayout camera_image;
 
         PhotoPickerViewHolder(View itemView) {
             super(itemView);
 
             photopicker_image = itemView.findViewById(R.id.photopicker_image);
             photopicker_choice = itemView.findViewById(R.id.photopicker_choice);
-            camera_image = itemView.findViewById(R.id.camera_image);
         }
     }
 }

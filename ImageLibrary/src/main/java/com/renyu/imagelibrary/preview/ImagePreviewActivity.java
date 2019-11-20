@@ -15,8 +15,6 @@ import com.facebook.imagepipeline.image.ImageInfo;
 import com.renyu.commonlibrary.adapter.ViewPagerFragmentAdapter;
 import com.renyu.commonlibrary.baseact.BaseActivity;
 import com.renyu.imagelibrary.R;
-import com.renyu.imagelibrary.commonutils.Utils;
-import com.renyu.imagelibrary.params.CommonParams;
 import com.renyu.imagelibrary.preview.impl.RightNavClickImpl;
 
 import java.util.ArrayList;
@@ -153,24 +151,6 @@ public class ImagePreviewActivity extends BaseActivity {
         imagepreview_indicator.setViewPager(imagepreview_viewpager);
         imagepreview_viewpager.setCurrentItem(choicePosition);
         tv_nav_title.setText((choicePosition + 1) + "/" + urls.size());
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CommonParams.RESULT_CROP && resultCode == RESULT_OK) {
-            String path = data.getExtras().getString("path");
-            Utils.refreshAlbum(this, path);
-            int position = imagepreview_viewpager.getCurrentItem();
-            urls.remove(position);
-            urls.add(position, path);
-            fragments.clear();
-            point.clear();
-            for (int i = 0; i < urls.size(); i++) {
-                fragments.add(ImagePreviewFragment.newInstance(urls.get(i), i));
-            }
-            adapter.notifyDataSetChanged();
-        }
     }
 
     @Override

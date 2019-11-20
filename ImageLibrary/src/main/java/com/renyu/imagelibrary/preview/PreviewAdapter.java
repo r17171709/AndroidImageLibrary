@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
@@ -16,7 +17,6 @@ import com.renyu.imagelibrary.R;
 import java.util.List;
 
 public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ViewHolder> {
-
     private List<String> imageUrls;
     private ImageViewFactory viewFactory = new FrescoImageViewFactory();
 
@@ -24,6 +24,7 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ViewHold
         this.imageUrls = imageUrls;
     }
 
+    @NonNull
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
@@ -43,13 +44,13 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ViewHold
     }
 
     @Override
-    public void onViewRecycled(ViewHolder holder) {
+    public void onViewRecycled(@NonNull ViewHolder holder) {
         super.onViewRecycled(holder);
         holder.clear();
     }
 
     @Override
-    public void onViewAttachedToWindow(ViewHolder holder) {
+    public void onViewAttachedToWindow(@NonNull ViewHolder holder) {
         super.onViewAttachedToWindow(holder);
         if (holder.hasNoImage()) {
             holder.rebind();

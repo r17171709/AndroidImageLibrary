@@ -2,7 +2,8 @@ package com.renyu.androidimagelibrary
 
 import androidx.multidex.MultiDexApplication
 import com.blankj.utilcode.util.Utils
-import com.facebook.drawee.backends.pipeline.Fresco
+import com.github.piasy.biv.BigImageViewer
+import com.github.piasy.biv.loader.fresco.FrescoImageLoader
 import me.jessyan.autosize.AutoSizeConfig
 
 /**
@@ -12,7 +13,8 @@ class MyApplication : MultiDexApplication() {
     override fun onCreate() {
         super.onCreate()
         Utils.init(this)
-        Fresco.initialize(this)
+
+        BigImageViewer.initialize(FrescoImageLoader.with(this))
 
         AutoSizeConfig.getInstance().isCustomFragment = true
     }

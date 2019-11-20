@@ -157,11 +157,6 @@ public class PhotoPickerActivity extends BaseActivity {
                     photopicker_preview.setText("预览(" + imagePaths.size() + ")");
                 }
             }
-
-            @Override
-            public void takePic() {
-                Utils.takePicture(PhotoPickerActivity.this, CommonParams.RESULT_TAKECAMERA, false);
-            }
         });
         photopicker_rv.setAdapter(adapter);
         photopicker_dict.setOnClickListener(v -> {
@@ -339,20 +334,7 @@ public class PhotoPickerActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CommonParams.RESULT_TAKECAMERA && resultCode == RESULT_OK) {
-            String filePath = data.getExtras().getString("path");
-            Utils.cropImage(filePath, PhotoPickerActivity.this, CommonParams.RESULT_CROP, 0);
-        } else if (requestCode == CommonParams.RESULT_CROP && resultCode == RESULT_OK) {
-            String filePath = data.getExtras().getString("path");
-            Intent intent = new Intent();
-            Bundle bundle = new Bundle();
-            ArrayList<String> strings = new ArrayList<>();
-            strings.add(filePath);
-            bundle.putStringArrayList("choiceImages", strings);
-            intent.putExtras(bundle);
-            setResult(RESULT_OK, intent);
-            finish();
-        } else if (requestCode == CommonParams.RESULT_PREVIEW && resultCode == RESULT_OK) {
+        if (requestCode == CommonParams.RESULT_PREVIEW && resultCode == RESULT_OK) {
             imagePaths.clear();
             imagePaths.addAll(data.getStringArrayListExtra("urls"));
             loadImages();
