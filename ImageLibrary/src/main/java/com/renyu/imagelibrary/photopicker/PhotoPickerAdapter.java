@@ -1,6 +1,7 @@
 package com.renyu.imagelibrary.photopicker;
 
 import android.content.Context;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,9 +30,9 @@ public class PhotoPickerAdapter extends RecyclerView.Adapter<PhotoPickerAdapter.
     private OperImageListener listener;
 
     public interface OperImageListener {
-        void add(String path);
+        void add(Uri path);
 
-        void remove(String path);
+        void remove(Uri path);
     }
 
     PhotoPickerAdapter(Context context, ArrayList<Photo> models, OperImageListener listener) {
@@ -49,7 +50,7 @@ public class PhotoPickerAdapter extends RecyclerView.Adapter<PhotoPickerAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull final PhotoPickerViewHolder holder, final int position) {
-        Utils.loadFresco("file://" + models.get(position).getPath(), SizeUtils.dp2px(118), SizeUtils.dp2px(118), holder.photopicker_image);
+        Utils.loadFresco(models.get(position).getPath(), SizeUtils.dp2px(118), SizeUtils.dp2px(118), holder.photopicker_image);
         holder.photopicker_image.setOnClickListener(v -> {
             boolean flag = models.get(position).isSelect();
             if (((PhotoPickerActivity) context).imagePaths.size() == ((PhotoPickerActivity) context).maxNum && !flag) {

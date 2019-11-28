@@ -1,5 +1,7 @@
 package com.renyu.imagelibrary.bean;
 
+import android.net.Uri;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,9 +10,9 @@ import java.util.List;
  */
 public class PhotoDirectory {
     private String id;
-    private String coverPath;
+    private Uri coverPath;
     private String name;
-    private long   dateAdded;
+    private long dateAdded;
     private List<Photo> photos = new ArrayList<>();
 
     public String getId() {
@@ -21,11 +23,11 @@ public class PhotoDirectory {
         this.id = id;
     }
 
-    public String getCoverPath() {
+    public Uri getCoverPath() {
         return coverPath;
     }
 
-    public void setCoverPath(String coverPath) {
+    public void setCoverPath(Uri coverPath) {
         this.coverPath = coverPath;
     }
 
@@ -53,11 +55,11 @@ public class PhotoDirectory {
         this.photos = photos;
     }
 
-    public void addPhoto(int id, String path) {
+    public void addPhoto(int id, Uri path) {
         photos.add(new Photo(id, path));
     }
 
-    public void addPhoto(int index, int id, String path) {
+    public void addPhoto(int index, int id, Uri path) {
         photos.add(index, new Photo(id, path));
     }
 }

@@ -1,7 +1,7 @@
 package com.renyu.imagelibrary.preview;
 
-import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.ImageButton;
@@ -38,7 +38,7 @@ public class ImagePreviewActivity extends BaseActivity {
     ImageButton ib_nav_left;
 
     // 图片路径
-    ArrayList<String> urls;
+    ArrayList<Uri> urls;
     ArrayList<Fragment> fragments;
 
     // 图片当前位置
@@ -108,7 +108,7 @@ public class ImagePreviewActivity extends BaseActivity {
         }
 
         int choicePosition = getIntent().getExtras().getInt("position");
-        urls = getIntent().getExtras().getStringArrayList("urls");
+        urls = getIntent().getExtras().getParcelableArrayList("urls");
         fragments = new ArrayList<>();
         for (int i = 0; i < urls.size(); i++) {
             ImagePreviewFragment fragment = ImagePreviewFragment.newInstance(urls.get(i), i);
@@ -151,14 +151,6 @@ public class ImagePreviewActivity extends BaseActivity {
         imagepreview_indicator.setViewPager(imagepreview_viewpager);
         imagepreview_viewpager.setCurrentItem(choicePosition);
         tv_nav_title.setText((choicePosition + 1) + "/" + urls.size());
-    }
-
-    @Override
-    public void onBackPressed() {
-        Intent intent = new Intent();
-        intent.putStringArrayListExtra("urls", urls);
-        setResult(RESULT_OK, intent);
-        finish();
     }
 
     /**

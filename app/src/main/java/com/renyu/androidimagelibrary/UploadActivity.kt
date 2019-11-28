@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
@@ -115,11 +116,22 @@ class UploadActivity : BaseActivity() {
                             tags.add(grid_pic.getChildAt(i).tag.toString())
                         }
                     }
-                    val temp = data?.extras?.getStringArrayList("choiceImages")
+                    val temp = data?.extras?.getParcelableArrayList<Uri>("choiceImages")
                     val filePaths = ArrayList<String>()
                     temp?.forEach {
-                        if (!tags.contains(it)) {
-                            filePaths.add(it)
+                        val extension = when (contentResolver.getType(it)) {
+                            "image/png" -> ".png"
+                            "image/jpeg" -> ".jpg"
+                            "image/gif" -> ".gif"
+                            else -> ""
+                        }
+                        if (!TextUtils.isEmpty(extension)) {
+                            val path =
+                                externalCacheDir!!.path + File.separator + System.currentTimeMillis() + extension
+                            Utils.copyFile(it, File(path))
+                            if (File(path).length() > 0 && !tags.contains(path)) {
+                                filePaths.add(path)
+                            }
                         }
                     }
                     if (filePaths.size == 0) {

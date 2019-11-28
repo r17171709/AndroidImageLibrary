@@ -1,5 +1,6 @@
 package com.renyu.imagelibrary.preview;
 
+import android.net.Uri;
 import android.view.Gravity;
 
 import androidx.annotation.NonNull;
@@ -14,13 +15,13 @@ import java.util.ArrayList;
 
 public class PreviewActivity extends BaseActivity {
     // 图片路径
-    ArrayList<String> urls;
+    ArrayList<Uri> urls;
 
     RecyclerView rv_preview;
 
     @Override
     public void initParams() {
-        urls = getIntent().getExtras().getStringArrayList("urls");
+        urls = getIntent().getExtras().getParcelableArrayList("urls");
         int choicePosition = getIntent().getExtras().getInt("position");
 
         rv_preview = findViewById(R.id.rv_preview);

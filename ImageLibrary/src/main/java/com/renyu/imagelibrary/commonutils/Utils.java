@@ -1,6 +1,7 @@
 package com.renyu.imagelibrary.commonutils;
 
 import android.app.Activity;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -9,9 +10,11 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.hardware.Camera;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -36,12 +39,18 @@ import com.renyu.imagelibrary.preview.ImagePreviewActivity;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import id.zelory.compressor.Compressor;
+
+import static android.provider.BaseColumns._ID;
 
 /**
  * Created by renyu on 2017/1/3.
@@ -189,32 +198,58 @@ public class Utils {
      * @param context
      * @return
      */
-    public static String getLatestPhoto(Context context) {
-        // 拍摄照片的地址
-        String CAMERA_IMAGE_BUCKET_NAME = Environment.getExternalStorageDirectory().toString() + "/DCIM/Camera";
-        // 拍摄照片的地址ID
-        String CAMERA_IMAGE_BUCKET_ID = getBucketId(CAMERA_IMAGE_BUCKET_NAME);
-        // 查询路径和修改时间
-        String[] projection = {MediaStore.Images.Media.DATA,
-                MediaStore.Images.Media.DATE_MODIFIED};
-        //
-        String selection = MediaStore.Images.Media.BUCKET_ID + " = ?";
-        //
-        String[] selectionArgs = {CAMERA_IMAGE_BUCKET_ID};
-        // 遍历camera文件夹
-        String imagePath = "";
-        Cursor cursor = context.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                projection,
-                selection,
-                selectionArgs,
-                MediaStore.Files.FileColumns.DATE_MODIFIED + " DESC");
-        if (cursor.moveToFirst()) {
-            imagePath = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+    public static Uri getLatestPhoto(Context context) {
+        if (Build.VERSION_CODES.Q > Build.VERSION.SDK_INT) {
+            // 照片文件夹路径ID
+            String CAMERA_IMAGE_BUCKET_ID = getBucketId(Environment.getExternalStorageDirectory().toString() + "/DCIM/Camera");
+            // 查询路径和修改时间
+            String[] projection = {MediaStore.Images.Media.DATA,
+                    MediaStore.Images.Media.DATE_MODIFIED};
+            //
+            String selection = MediaStore.Images.Media.BUCKET_ID + " = ?";
+            //
+            String[] selectionArgs = {CAMERA_IMAGE_BUCKET_ID};
+            // 遍历camera文件夹
+            String imagePath = "";
+            Cursor cursor = context.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    projection,
+                    selection,
+                    selectionArgs,
+                    MediaStore.Files.FileColumns.DATE_MODIFIED + " DESC");
+            if (cursor.moveToFirst()) {
+                imagePath = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+            }
+            if (!cursor.isClosed()) {
+                cursor.close();
+            }
+            if (TextUtils.isEmpty(imagePath)) {
+                return null;
+            } else {
+                return Uri.parse("file://" + imagePath);
+            }
+        } else {
+            // 查询路径和修改时间
+            String[] projection = {MediaStore.Images.Media._ID,
+                    MediaStore.Images.Media.DATE_MODIFIED};
+            //
+            String selection = MediaStore.Images.Media.RELATIVE_PATH + " = ?";
+            //
+            String[] selectionArgs = {"DCIM/Camera/"};
+            Cursor cursor = context.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    projection,
+                    selection,
+                    selectionArgs,
+                    MediaStore.Files.FileColumns.DATE_MODIFIED + " DESC");
+            Uri uri = null;
+            if (cursor.moveToFirst()) {
+                uri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                        cursor.getLong(cursor.getColumnIndex(_ID)));
+            }
+            if (!cursor.isClosed()) {
+                cursor.close();
+            }
+            return uri;
         }
-        if (!cursor.isClosed()) {
-            cursor.close();
-        }
-        return imagePath;
     }
 
     private static String getBucketId(String path) {
@@ -230,6 +265,15 @@ public class Utils {
         simpleDraweeView.setTag(path);
     }
 
+    public static void loadFresco(Uri path, float width, float height, SimpleDraweeView simpleDraweeView) {
+        ImageRequest request = ImageRequestBuilder.newBuilderWithSource(path)
+                .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(width), SizeUtils.dp2px(height))).build();
+        DraweeController draweeController = Fresco.newDraweeControllerBuilder()
+                .setImageRequest(request).setAutoPlayAnimations(true).build();
+        simpleDraweeView.setController(draweeController);
+        simpleDraweeView.setTag(path);
+    }
+
     /**
      * 相册预览
      *
@@ -237,13 +281,13 @@ public class Utils {
      * @param position
      * @param urls
      */
-    public static void showPreview(AppCompatActivity activity, int position, ArrayList<String> urls, int requestCode) {
+    public static void showPreview(AppCompatActivity activity, int position, ArrayList<Uri> urls) {
         Intent intent = new Intent(activity, ImagePreviewActivity.class);
         Bundle bundle = new Bundle();
         bundle.putInt("position", position);
-        bundle.putStringArrayList("urls", urls);
+        bundle.putParcelableArrayList("urls", urls);
         intent.putExtras(bundle);
-        activity.startActivityForResult(intent, requestCode);
+        activity.startActivity(intent);
     }
 
     //用于微信分享时用白色替换bitmap中的透明色
@@ -352,5 +396,29 @@ public class Utils {
             }
         }
         return null;
+    }
+
+    public static void copyFile(Uri srcUri, File dstFile) {
+        try {
+            InputStream inputStream = com.blankj.utilcode.util.Utils.getApp().getContentResolver().openInputStream(srcUri);
+            if (inputStream == null) return;
+            OutputStream outputStream = new FileOutputStream(dstFile);
+            copyStream(inputStream, outputStream);
+            inputStream.close();
+            outputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void copyStream(InputStream input, OutputStream output) throws IOException {
+        copyStream(input, output, new byte[1024]);
+    }
+
+    public static void copyStream(InputStream input, OutputStream output, byte[] buffer) throws IOException {
+        int bytesRead;
+        while ((bytesRead = input.read(buffer)) != -1) {
+            output.write(buffer, 0, bytesRead);
+        }
     }
 }

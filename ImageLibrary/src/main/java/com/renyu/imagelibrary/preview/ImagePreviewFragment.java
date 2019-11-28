@@ -34,10 +34,10 @@ public class ImagePreviewFragment extends BaseFragment {
         this.onPicChangedListener = onPicChangedListener;
     }
 
-    public static ImagePreviewFragment newInstance(String url, int position) {
+    public static ImagePreviewFragment newInstance(Uri url, int position) {
         ImagePreviewFragment fragment = new ImagePreviewFragment();
         Bundle bundle = new Bundle();
-        bundle.putString("url", url);
+        bundle.putParcelable("url", url);
         bundle.putInt("position", position);
         fragment.setArguments(bundle);
         return fragment;
@@ -47,9 +47,9 @@ public class ImagePreviewFragment extends BaseFragment {
     public void initParams() {
         photoDraweeView = view.findViewById(R.id.photo_view);
 
-        String url = getArguments().getString("url");
+        Uri url = getArguments().getParcelable("url");
         PipelineDraweeControllerBuilder controller = Fresco.newDraweeControllerBuilder();
-        ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(url.indexOf("http") != -1 ? url : "file://" + url))
+        ImageRequest request = ImageRequestBuilder.newBuilderWithSource(url)
                 .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(180), SizeUtils.dp2px(320))).build();
         controller.setImageRequest(request);
         controller.setOldController(photoDraweeView.getController());

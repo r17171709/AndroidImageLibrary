@@ -17,10 +17,10 @@ import com.renyu.imagelibrary.R;
 import java.util.List;
 
 public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ViewHolder> {
-    private List<String> imageUrls;
+    private List<Uri> imageUrls;
     private ImageViewFactory viewFactory = new FrescoImageViewFactory();
 
-    PreviewAdapter(List<String> imageUrls) {
+    PreviewAdapter(List<Uri> imageUrls) {
         this.imageUrls = imageUrls;
     }
 
@@ -60,7 +60,7 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ViewHold
     class ViewHolder extends RecyclerView.ViewHolder {
 
         private BigImageView itemImage;
-        private String imageUrl;
+        private Uri imageUrl;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -70,13 +70,13 @@ public class PreviewAdapter extends RecyclerView.Adapter<PreviewAdapter.ViewHold
             itemImage.setImageViewFactory(viewFactory);
         }
 
-        void bind(String imageUrl) {
+        void bind(Uri imageUrl) {
             this.imageUrl = imageUrl;
-            itemImage.showImage(Uri.EMPTY, Uri.parse(imageUrl));
+            itemImage.showImage(Uri.EMPTY, imageUrl);
         }
 
         void rebind() {
-            itemImage.showImage(Uri.parse(imageUrl));
+            itemImage.showImage(imageUrl);
         }
 
         void clear() {

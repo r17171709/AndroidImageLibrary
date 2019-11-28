@@ -55,7 +55,7 @@ public class DictAdapter extends BaseAdapter {
         } else {
             holder = (DictHolder) convertView.getTag();
         }
-        Utils.loadFresco("file://" + models.get(position).getCoverPath(), SizeUtils.dp2px(70), SizeUtils.dp2px(70), holder.adapter_dict_cover);
+        Utils.loadFresco(models.get(position).getCoverPath(), SizeUtils.dp2px(70), SizeUtils.dp2px(70), holder.adapter_dict_cover);
         holder.adapter_dict_name.setText(models.get(position).getName());
         holder.adapter_dict_count.setText(models.get(position).getPhotos().size() + "张");
         return convertView;

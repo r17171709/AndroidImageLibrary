@@ -12,16 +12,23 @@ import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Size;
 import android.hardware.SensorManager;
+import android.net.Uri;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.OrientationEventListener;
+import android.view.Surface;
+import android.view.SurfaceHolder;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import androidx.annotation.Nullable;
 import androidx.exifinterface.media.ExifInterface;
+
 import com.blankj.utilcode.util.FileUtils;
 import com.blankj.utilcode.util.ImageUtils;
 import com.blankj.utilcode.util.SizeUtils;
@@ -31,17 +38,18 @@ import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.imagelibrary.R;
 import com.renyu.imagelibrary.commonutils.Utils;
 import com.renyu.imagelibrary.params.CommonParams;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import me.jessyan.autosize.internal.CancelAdapt;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class CameraFragment extends BaseFragment implements SurfaceHolder.Callback, Camera.PictureCallback, CancelAdapt {
     // 相机可用小功能
@@ -178,10 +186,10 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
             view = LayoutInflater.from(context).inflate(R.layout.view_flash, null, false);
             initFlash(view);
         } else if (cameraFunction == CameraFunction.PhotoPicker) {
-            String path = Utils.getLatestPhoto(context);
-            if (!TextUtils.isEmpty(path)) {
+            Uri path = Utils.getLatestPhoto(context);
+            if (path != null) {
                 view = LayoutInflater.from(context).inflate(R.layout.view_photopicker, null, false);
-                initPhotoPicker(view, "file://" + path);
+                initPhotoPicker(view, path);
             }
         }
         if (view != null) {
@@ -226,7 +234,7 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
         });
     }
 
-    private void initPhotoPicker(View view, String path) {
+    private void initPhotoPicker(View view, Uri path) {
         SimpleDraweeView iv_camera_photopicker = view.findViewById(R.id.iv_camera_photopicker);
         Utils.loadFresco(path, SizeUtils.dp2px(45), SizeUtils.dp2px(45), iv_camera_photopicker);
         iv_camera_photopicker.setOnClickListener((v -> {

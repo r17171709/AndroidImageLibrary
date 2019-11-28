@@ -1,15 +1,19 @@
 package com.renyu.imagelibrary.photopicker;
 
+import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.ListPopupWindow;
 import androidx.core.content.ContextCompat;
@@ -28,7 +32,6 @@ import com.renyu.imagelibrary.commonutils.PhotoDirectoryLoader;
 import com.renyu.imagelibrary.commonutils.Utils;
 import com.renyu.imagelibrary.params.CommonParams;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -43,7 +46,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import static android.provider.BaseColumns._ID;
 import static android.provider.MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME;
 import static android.provider.MediaStore.Images.ImageColumns.BUCKET_ID;
-import static android.provider.MediaStore.MediaColumns.DATA;
 import static android.provider.MediaStore.MediaColumns.DATE_ADDED;
 
 /**
@@ -71,7 +73,7 @@ public class PhotoPickerActivity extends BaseActivity {
     //最大可选图片数量
     int maxNum = 0;
     //选中的图片
-    public ArrayList<String> imagePaths;
+    public ArrayList<Uri> imagePaths;
     //最大显示文件夹数量
     int COUNT_MAX = 4;
     //当前文件夹key
@@ -120,7 +122,7 @@ public class PhotoPickerActivity extends BaseActivity {
         tv_nav_right.setOnClickListener(v -> {
             Intent intent = new Intent();
             Bundle bundle = new Bundle();
-            bundle.putStringArrayList("choiceImages", imagePaths);
+            bundle.putParcelableArrayList("choiceImages", imagePaths);
             intent.putExtras(bundle);
             setResult(RESULT_OK, intent);
             finish();
@@ -130,7 +132,7 @@ public class PhotoPickerActivity extends BaseActivity {
         photopicker_rv.addItemDecoration(new SpaceItemDecoration(1, 3));
         adapter = new PhotoPickerAdapter(this, models, new PhotoPickerAdapter.OperImageListener() {
             @Override
-            public void add(String path) {
+            public void add(Uri path) {
                 if (!imagePaths.contains(path)) {
                     imagePaths.add(path);
 
@@ -142,7 +144,7 @@ public class PhotoPickerActivity extends BaseActivity {
             }
 
             @Override
-            public void remove(String path) {
+            public void remove(Uri path) {
                 imagePaths.remove(path);
 
                 if (imagePaths.size() == 0) {
@@ -169,7 +171,7 @@ public class PhotoPickerActivity extends BaseActivity {
         });
         photopicker_preview.setOnClickListener(v -> {
             if (imagePaths.size() > 0) {
-                Utils.showPreview(PhotoPickerActivity.this, 0, imagePaths, CommonParams.RESULT_PREVIEW);
+                Utils.showPreview(PhotoPickerActivity.this, 0, imagePaths);
             }
         });
 
@@ -253,16 +255,19 @@ public class PhotoPickerActivity extends BaseActivity {
 
         Bundle bundle = new Bundle();
         bundle.putBoolean(CommonParams.EXTRA_SHOW_GIF, false);
-        getSupportLoaderManager().initLoader(0, bundle, new LoaderManager.LoaderCallbacks<Cursor>() {
+
+        LoaderManager.getInstance(this).initLoader(0, bundle, new LoaderManager.LoaderCallbacks<Cursor>() {
+            @NonNull
             @Override
             public Loader<Cursor> onCreateLoader(int id, Bundle args) {
                 return new PhotoDirectoryLoader(PhotoPickerActivity.this, args.getBoolean(CommonParams.EXTRA_SHOW_GIF, false));
             }
 
+
             @Override
-            public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+            public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
                 if (data == null) {
-                    getSupportLoaderManager().destroyLoader(0);
+                    LoaderManager.getInstance(PhotoPickerActivity.this).destroyLoader(0);
                     return;
                 }
                 LinkedHashMap<String, PhotoDirectory> hashMap = new LinkedHashMap<>();
@@ -274,26 +279,21 @@ public class PhotoPickerActivity extends BaseActivity {
                     int imageId = data.getInt(data.getColumnIndexOrThrow(_ID));
                     String bucketId = data.getString(data.getColumnIndexOrThrow(BUCKET_ID));
                     String name = data.getString(data.getColumnIndexOrThrow(BUCKET_DISPLAY_NAME));
-                    String path = data.getString(data.getColumnIndexOrThrow(DATA));
-                    File file = new File(path);
-                    if (file.exists() && file.length() > 0) {
-
-                    } else {
-                        continue;
-                    }
+                    Uri uri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                            data.getLong(data.getColumnIndex(_ID)));
 //                    Log.d("PhotoPickerActivity", bucketId+" "+name+" "+path);
                     if (!hashMap.containsKey(bucketId)) {
                         PhotoDirectory photoDirectory = new PhotoDirectory();
                         photoDirectory.setId(bucketId);
                         photoDirectory.setName(name);
-                        photoDirectory.setCoverPath(path);
-                        photoDirectory.addPhoto(imageId, path);
+                        photoDirectory.setCoverPath(uri);
+                        photoDirectory.addPhoto(imageId, uri);
                         photoDirectory.setDateAdded(data.getLong(data.getColumnIndexOrThrow(DATE_ADDED)));
                         hashMap.put(bucketId, photoDirectory);
                     } else {
-                        hashMap.get(bucketId).addPhoto(imageId, path);
+                        hashMap.get(bucketId).addPhoto(imageId, uri);
                     }
-                    photoDirectoryAll.addPhoto(imageId, path);
+                    photoDirectoryAll.addPhoto(imageId, uri);
                 }
                 if (photoDirectoryAll.getPhotos().size() > 0) {
                     photoDirectoryAll.setCoverPath(photoDirectoryAll.getPhotos().get(0).getPath());
@@ -301,11 +301,11 @@ public class PhotoPickerActivity extends BaseActivity {
                 hashMap.put("0", photoDirectoryAll);
                 observableEmitter.onNext(hashMap);
 
-                getSupportLoaderManager().destroyLoader(0);
+                LoaderManager.getInstance(PhotoPickerActivity.this).destroyLoader(0);
             }
 
             @Override
-            public void onLoaderReset(Loader<Cursor> loader) {
+            public void onLoaderReset(@NonNull Loader<Cursor> loader) {
 
             }
         });
@@ -315,29 +315,12 @@ public class PhotoPickerActivity extends BaseActivity {
         ((GridLayoutManager) photopicker_rv.getLayoutManager()).scrollToPositionWithOffset(0, 0);
         models.clear();
         List<Photo> temp = allHashMap.get(key).getPhotos();
-        List<Photo> photos = new ArrayList<>();
         for (Photo photo : temp) {
-            File file = new File(photo.getPath());
-            if (file.exists() & file.length() > 0) {
-                photos.add(photo);
-            }
-        }
-        for (Photo photo : photos) {
             if (imagePaths.contains(photo.getPath())) {
                 photo.setSelect(true);
             }
         }
-        models.addAll(photos);
+        models.addAll(temp);
         adapter.notifyDataSetChanged();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CommonParams.RESULT_PREVIEW && resultCode == RESULT_OK) {
-            imagePaths.clear();
-            imagePaths.addAll(data.getStringArrayListExtra("urls"));
-            loadImages();
-        }
     }
 }
