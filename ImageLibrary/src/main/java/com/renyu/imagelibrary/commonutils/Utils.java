@@ -23,9 +23,12 @@ import androidx.fragment.app.Fragment;
 import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.drawee.interfaces.DraweeController;
+import com.facebook.drawee.backends.pipeline.PipelineDraweeControllerBuilder;
+import com.facebook.drawee.controller.ControllerListener;
+import com.facebook.drawee.generic.GenericDraweeHierarchy;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.common.ResizeOptions;
+import com.facebook.imagepipeline.image.ImageInfo;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.renyu.commonlibrary.params.InitParams;
@@ -257,21 +260,41 @@ public class Utils {
     }
 
     public static void loadFresco(String path, float width, float height, SimpleDraweeView simpleDraweeView) {
-        ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(path))
-                .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(width), SizeUtils.dp2px(height))).build();
-        DraweeController draweeController = Fresco.newDraweeControllerBuilder()
-                .setImageRequest(request).setAutoPlayAnimations(true).build();
-        simpleDraweeView.setController(draweeController);
-        simpleDraweeView.setTag(path);
+        loadFresco(path, width, height, simpleDraweeView, null, null);
     }
 
     public static void loadFresco(Uri path, float width, float height, SimpleDraweeView simpleDraweeView) {
+        loadFresco(path, width, height, simpleDraweeView, null, null);
+    }
+
+    public static void loadFresco(String path, float width, float height, SimpleDraweeView simpleDraweeView, GenericDraweeHierarchy hierarchy, ControllerListener<ImageInfo> listener) {
+        ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(path))
+                .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(width), SizeUtils.dp2px(height))).build();
+        PipelineDraweeControllerBuilder draweeControllerBuilder = Fresco.newDraweeControllerBuilder()
+                .setImageRequest(request).setAutoPlayAnimations(true);
+        if (listener != null) {
+            draweeControllerBuilder.setControllerListener(listener);
+        }
+        if (hierarchy != null) {
+            simpleDraweeView.setHierarchy(hierarchy);
+        }
+        simpleDraweeView.setController(draweeControllerBuilder.build());
+        simpleDraweeView.setTag(path);
+    }
+
+    public static void loadFresco(Uri path, float width, float height, SimpleDraweeView simpleDraweeView, GenericDraweeHierarchy hierarchy, ControllerListener<ImageInfo> listener) {
         ImageRequest request = ImageRequestBuilder.newBuilderWithSource(path)
                 .setResizeOptions(new ResizeOptions(SizeUtils.dp2px(width), SizeUtils.dp2px(height))).build();
-        DraweeController draweeController = Fresco.newDraweeControllerBuilder()
-                .setImageRequest(request).setAutoPlayAnimations(true).build();
-        simpleDraweeView.setController(draweeController);
-        simpleDraweeView.setTag(path);
+        PipelineDraweeControllerBuilder draweeControllerBuilder = Fresco.newDraweeControllerBuilder()
+                .setImageRequest(request).setAutoPlayAnimations(true);
+        if (listener != null) {
+            draweeControllerBuilder.setControllerListener(listener);
+        }
+        if (hierarchy != null) {
+            simpleDraweeView.setHierarchy(hierarchy);
+        }
+        simpleDraweeView.setController(draweeControllerBuilder.build());
+        simpleDraweeView.setTag(path.toString());
     }
 
     /**
