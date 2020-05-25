@@ -1,7 +1,9 @@
 package com.renyu.imagelibrary.commonutils;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -193,6 +195,33 @@ public class Utils {
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * 插入视频后刷新系统相册
+     *
+     * @param path 视频路径地址
+     */
+    public static void updateVideo(String path) {
+        if (new File(path).exists()) {
+            File file = new File(path);
+            ContentResolver localContentResolver = com.blankj.utilcode.util.Utils.getApp().getContentResolver();
+            ContentValues localContentValues = getVideoContentValues(file, System.currentTimeMillis());
+            localContentResolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, localContentValues);
+        }
+    }
+
+    private static ContentValues getVideoContentValues(File paramFile, long paramLong) {
+        ContentValues localContentValues = new ContentValues();
+        localContentValues.put("title", paramFile.getName());
+        localContentValues.put("_display_name", paramFile.getName());
+        localContentValues.put("mime_type", "video/3gp");
+        localContentValues.put("datetaken", Long.valueOf(paramLong));
+        localContentValues.put("date_modified", Long.valueOf(paramLong));
+        localContentValues.put("date_added", Long.valueOf(paramLong));
+        localContentValues.put("_data", paramFile.getAbsolutePath());
+        localContentValues.put("_size", Long.valueOf(paramFile.length()));
+        return localContentValues;
     }
 
     /**
