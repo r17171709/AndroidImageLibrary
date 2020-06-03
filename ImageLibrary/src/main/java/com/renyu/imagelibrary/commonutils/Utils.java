@@ -43,7 +43,6 @@ import com.renyu.imagelibrary.photopicker.PhotoPickerActivity;
 import com.renyu.imagelibrary.preview.ImagePreviewActivity;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -182,19 +181,15 @@ public class Utils {
     }
 
     /**
-     * 拍照后刷新系统相册
+     * 插入图片后刷新系统相册
      *
-     * @param context
-     * @param newFile
+     * @param path 图片路径地址
      */
-    public static void refreshAlbum(Context context, String newFile) {
-        if (new File(newFile).exists()) {
-            try {
-                MediaStore.Images.Media.insertImage(context.getContentResolver(), newFile, "", "");
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
+    public static void refreshAlbum(String path) {
+        File file = new File(path);
+        ContentResolver localContentResolver = com.blankj.utilcode.util.Utils.getApp().getContentResolver();
+        ContentValues localContentValues = getMediaContentValues(file, System.currentTimeMillis(), "image/jpeg");
+        Uri localUri = localContentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, localContentValues);
     }
 
     /**
@@ -206,16 +201,16 @@ public class Utils {
         if (new File(path).exists()) {
             File file = new File(path);
             ContentResolver localContentResolver = com.blankj.utilcode.util.Utils.getApp().getContentResolver();
-            ContentValues localContentValues = getVideoContentValues(file, System.currentTimeMillis());
+            ContentValues localContentValues = getMediaContentValues(file, System.currentTimeMillis(), "video/3gp");
             localContentResolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, localContentValues);
         }
     }
 
-    private static ContentValues getVideoContentValues(File paramFile, long paramLong) {
+    private static ContentValues getMediaContentValues(File paramFile, long paramLong, String mimeType) {
         ContentValues localContentValues = new ContentValues();
         localContentValues.put("title", paramFile.getName());
         localContentValues.put("_display_name", paramFile.getName());
-        localContentValues.put("mime_type", "video/3gp");
+        localContentValues.put("mime_type", mimeType);
         localContentValues.put("datetaken", Long.valueOf(paramLong));
         localContentValues.put("date_modified", Long.valueOf(paramLong));
         localContentValues.put("date_added", Long.valueOf(paramLong));
