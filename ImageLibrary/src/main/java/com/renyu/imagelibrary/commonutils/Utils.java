@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.hardware.Camera;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,6 +23,7 @@ import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.blankj.utilcode.util.ImageUtils;
 import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -40,6 +42,7 @@ import com.renyu.imagelibrary.camera.CameraFragment;
 import com.renyu.imagelibrary.camera.CameraLandscapeActivity;
 import com.renyu.imagelibrary.crop.UCrop;
 import com.renyu.imagelibrary.photopicker.PhotoPickerActivity;
+import com.renyu.imagelibrary.photopicker.VideoPickerActivity;
 import com.renyu.imagelibrary.preview.ImagePreviewActivity;
 
 import java.io.File;
@@ -146,6 +149,36 @@ public class Utils {
      */
     public static void choicePic(Fragment fragment, int maxNum, int requestCode) {
         Intent intent = new Intent(fragment.getContext(), PhotoPickerActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putInt("maxNum", maxNum);
+        intent.putExtras(bundle);
+        fragment.startActivityForResult(intent, requestCode);
+    }
+
+    /**
+     * 选择视频
+     *
+     * @param activity
+     * @param maxNum
+     * @param requestCode
+     */
+    public static void choiceVideo(Activity activity, int maxNum, int requestCode) {
+        Intent intent = new Intent(activity, VideoPickerActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putInt("maxNum", maxNum);
+        intent.putExtras(bundle);
+        activity.startActivityForResult(intent, requestCode);
+    }
+
+    /**
+     * 选择视频
+     *
+     * @param fragment
+     * @param maxNum
+     * @param requestCode
+     */
+    public static void choiceVideo(Fragment fragment, int maxNum, int requestCode) {
+        Intent intent = new Intent(fragment.getContext(), VideoPickerActivity.class);
         Bundle bundle = new Bundle();
         bundle.putInt("maxNum", maxNum);
         intent.putExtras(bundle);
@@ -467,5 +500,41 @@ public class Utils {
         while ((bytesRead = input.read(buffer)) != -1) {
             output.write(buffer, 0, bytesRead);
         }
+    }
+
+    /**
+     * 生成视频第一帧
+     *
+     * @param path
+     * @return
+     */
+    public static String getVideoThumb(String path) {
+        Bitmap bitmap = null;
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        try {
+            retriever.setDataSource(path);
+            bitmap = retriever.getFrameAtTime(1, MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                retriever.release();
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            }
+        }
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        int max = Math.max(width, height);
+        int scale = 1;
+        if (max > 480) {
+            scale = max / 480;
+        }
+        int w = Math.round(width / scale);
+        int h = Math.round(height / scale);
+        bitmap = Bitmap.createScaledBitmap(bitmap, w, h, true);
+        ImageUtils.save(bitmap, InitParams.IMAGE_PATH + File.separator + new File(path).getName() + ".jpg", Bitmap.CompressFormat.JPEG);
+        bitmap.recycle();
+        return InitParams.IMAGE_PATH + File.separator + new File(path).getName() + ".jpg";
     }
 }

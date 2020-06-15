@@ -4,12 +4,10 @@ import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.Gravity;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -26,6 +24,7 @@ import com.blankj.utilcode.util.SizeUtils;
 import com.renyu.commonlibrary.baseact.BaseActivity;
 import com.renyu.commonlibrary.commonutils.BarUtils;
 import com.renyu.imagelibrary.R;
+import com.renyu.imagelibrary.SpaceItemDecoration;
 import com.renyu.imagelibrary.bean.Photo;
 import com.renyu.imagelibrary.bean.PhotoDirectory;
 import com.renyu.imagelibrary.commonutils.PhotoDirectoryLoader;
@@ -42,6 +41,7 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 
 import static android.provider.BaseColumns._ID;
 import static android.provider.MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME;
@@ -52,32 +52,31 @@ import static android.provider.MediaStore.MediaColumns.DATE_ADDED;
  * Created by Clevo on 2016/8/31.
  */
 public class PhotoPickerActivity extends BaseActivity {
-    ImageView ib_nav_left;
-    TextView tv_nav_title;
-    TextView tv_nav_right;
-    RecyclerView photopicker_rv;
-    PhotoPickerAdapter adapter;
-    TextView photopicker_dict;
-    TextView photopicker_preview;
-    ListPopupWindow popupWindow;
-    DictAdapter dictAdapter;
+    private TextView tv_nav_right;
+    private RecyclerView photopicker_rv;
+    private PhotoPickerAdapter adapter;
+    private TextView photopicker_dict;
+    private TextView photopicker_preview;
+    private ListPopupWindow popupWindow;
+    private DictAdapter dictAdapter;
 
     //全部文件
-    LinkedHashMap<String, PhotoDirectory> allHashMap;
+    private LinkedHashMap<String, PhotoDirectory> allHashMap;
     //列表加载图片
-    ArrayList<Photo> models;
+    private ArrayList<Photo> models;
     //列表加载文件夹
-    ArrayList<PhotoDirectory> dictModels;
-    ArrayList<String> bucketIds;
-    ObservableEmitter<LinkedHashMap<String, PhotoDirectory>> observableEmitter;
+    private ArrayList<PhotoDirectory> dictModels;
+    private ArrayList<String> bucketIds;
+    private Disposable disposable = null;
+    private ObservableEmitter<LinkedHashMap<String, PhotoDirectory>> observableEmitter;
     //最大可选图片数量
     int maxNum = 0;
     //选中的图片
     public ArrayList<Uri> imagePaths;
     //最大显示文件夹数量
-    int COUNT_MAX = 4;
+    private int COUNT_MAX = 4;
     //当前文件夹key
-    String currentKey = "0";
+    private String currentKey = "0";
 
     @Override
     public int setStatusBarColor() {
@@ -96,14 +95,16 @@ public class PhotoPickerActivity extends BaseActivity {
     }
 
     @Override
-    public void initParams() {
-        ib_nav_left = findViewById(R.id.ib_nav_left);
-        tv_nav_title = findViewById(R.id.tv_nav_title);
-        tv_nav_right = findViewById(R.id.tv_nav_right);
-        photopicker_rv = findViewById(R.id.photopicker_rv);
-        photopicker_dict = findViewById(R.id.photopicker_dict);
-        photopicker_preview = findViewById(R.id.photopicker_preview);
+    protected void onDestroy() {
+        super.onDestroy();
+        if (disposable != null && !disposable.isDisposed()) {
+            disposable.dispose();
+            disposable = null;
+        }
+    }
 
+    @Override
+    public void initParams() {
         allHashMap = new LinkedHashMap<>();
         models = new ArrayList<>();
         dictModels = new ArrayList<>();
@@ -112,10 +113,13 @@ public class PhotoPickerActivity extends BaseActivity {
 
         maxNum = getIntent().getExtras().getInt("maxNum");
 
+        ImageView ib_nav_left = findViewById(R.id.ib_nav_left);
         ib_nav_left.setImageResource(R.mipmap.icon_back_black);
         ib_nav_left.setOnClickListener(v -> finish());
+        TextView tv_nav_title = findViewById(R.id.tv_nav_title);
         tv_nav_title.setTextColor(Color.parseColor("#333333"));
         tv_nav_title.setText("图片");
+        tv_nav_right = findViewById(R.id.tv_nav_right);
         tv_nav_right.setText("完成");
         tv_nav_right.setTextColor(Color.parseColor("#999999"));
         tv_nav_right.setEnabled(false);
@@ -127,6 +131,7 @@ public class PhotoPickerActivity extends BaseActivity {
             setResult(RESULT_OK, intent);
             finish();
         });
+        photopicker_rv = findViewById(R.id.photopicker_rv);
         photopicker_rv.setHasFixedSize(true);
         photopicker_rv.setLayoutManager(new GridLayoutManager(this, 3));
         photopicker_rv.addItemDecoration(new SpaceItemDecoration(1, 3));
@@ -161,6 +166,7 @@ public class PhotoPickerActivity extends BaseActivity {
             }
         });
         photopicker_rv.setAdapter(adapter);
+        photopicker_dict = findViewById(R.id.photopicker_dict);
         photopicker_dict.setOnClickListener(v -> {
             if (popupWindow.isShowing()) {
                 popupWindow.dismiss();
@@ -169,6 +175,7 @@ public class PhotoPickerActivity extends BaseActivity {
                 popupWindow.show();
             }
         });
+        photopicker_preview = findViewById(R.id.photopicker_preview);
         photopicker_preview.setOnClickListener(v -> {
             if (imagePaths.size() > 0) {
                 Utils.showPreview(PhotoPickerActivity.this, 0, imagePaths);
@@ -187,48 +194,8 @@ public class PhotoPickerActivity extends BaseActivity {
             currentKey = bucketIds.get(position);
             updateData(currentKey);
         });
-    }
 
-    @Override
-    public int initViews() {
-        return R.layout.activity_photopicker;
-    }
-
-    @Override
-    public void loadData() {
-        loadImages();
-    }
-
-    private void adjustHeight() {
-        if (dictModels.size() > 0) {
-            int count = dictModels.size() < COUNT_MAX ? dictModels.size() : COUNT_MAX;
-            if (popupWindow != null) {
-                popupWindow.setHeight(count * SizeUtils.dp2px(90));
-            }
-        }
-    }
-
-    public class SpaceItemDecoration extends RecyclerView.ItemDecoration {
-        private int space;
-        private int column;
-
-        SpaceItemDecoration(int space, int column) {
-            this.space = space;
-            this.column = column;
-        }
-
-        @Override
-        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-            outRect.left = SizeUtils.dp2px(space);
-            outRect.bottom = space;
-            if (parent.getChildLayoutPosition(view) % column == 0) {
-                outRect.left = 0;
-            }
-        }
-    }
-
-    private void loadImages() {
-        Observable.create((ObservableOnSubscribe<LinkedHashMap<String, PhotoDirectory>>) e -> PhotoPickerActivity.this.observableEmitter = e)
+        disposable = Observable.create((ObservableOnSubscribe<LinkedHashMap<String, PhotoDirectory>>) e -> PhotoPickerActivity.this.observableEmitter = e)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(stringPhotoDirectoryLinkedHashMap -> {
                     PhotoPickerActivity.this.allHashMap = stringPhotoDirectoryLinkedHashMap;
@@ -252,10 +219,30 @@ public class PhotoPickerActivity extends BaseActivity {
                         popupWindow.setAdapter(dictAdapter);
                     }
                 });
+    }
 
+    @Override
+    public int initViews() {
+        return R.layout.activity_photopicker;
+    }
+
+    @Override
+    public void loadData() {
+        loadImages();
+    }
+
+    private void adjustHeight() {
+        if (dictModels.size() > 0) {
+            int count = dictModels.size() < COUNT_MAX ? dictModels.size() : COUNT_MAX;
+            if (popupWindow != null) {
+                popupWindow.setHeight(count * SizeUtils.dp2px(90));
+            }
+        }
+    }
+
+    private void loadImages() {
         Bundle bundle = new Bundle();
         bundle.putBoolean(CommonParams.EXTRA_SHOW_GIF, false);
-
         LoaderManager.getInstance(this).initLoader(0, bundle, new LoaderManager.LoaderCallbacks<Cursor>() {
             @NonNull
             @Override

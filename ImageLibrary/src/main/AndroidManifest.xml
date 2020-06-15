@@ -25,6 +25,9 @@
             android:name=".photopicker.PhotoPickerActivity"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".photopicker.VideoPickerActivity"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".preview.PreviewActivity"
             android:screenOrientation="portrait" />
     </application>

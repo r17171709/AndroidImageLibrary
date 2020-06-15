@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="118dip">
+
+    <com.facebook.drawee.view.SimpleDraweeView xmlns:fresco="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/videopicker_image"
+        android:layout_width="match_parent"
+        android:layout_height="118dip"
+        fresco:failureImage="@mipmap/icon_default_image"
+        fresco:failureImageScaleType="focusCrop"
+        fresco:placeholderImage="@mipmap/icon_default_image"
+        fresco:placeholderImageScaleType="centerCrop"
+        fresco:retryImage="@mipmap/icon_default_image"
+        fresco:retryImageScaleType="focusCrop" />
+
+    <ImageView
+        android:id="@+id/videopicker_choice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="5dip" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#66666666"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dip"
+            android:src="@mipmap/ic_video" />
+
+        <TextView
+            android:id="@+id/videopicker_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dip"
+            android:textColor="@android:color/white" />
+    </LinearLayout>
+</RelativeLayout>
