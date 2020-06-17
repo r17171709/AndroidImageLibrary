@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
 //        intent.putExtras(bundle);
 //        startActivity(intent);
 
-        // 压缩
+        // 图片压缩
 //        BitmapFactory.Options options = new BitmapFactory.Options();
 //        options.inJustDecodeBounds = true;
 //        BitmapFactory.decodeFile(Environment.getExternalStorageDirectory().getPath()+"/1.jpg", options);
@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
 //            e.printStackTrace();
 //        }
 
+        // 视频选择
         Utils.choiceVideo(this, 4, CommonParams.RESULT_VIDEOPICKER);
     }
 
