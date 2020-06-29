@@ -2,15 +2,25 @@ package com.renyu.androidimagelibrary;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.renyu.imagelibrary.commonutils.Utils;
+import com.iceteck.silicompressorr.SiliCompressor;
+import com.renyu.commonlibrary.commonutils.RxBus;
+import com.renyu.imagelibrary.bean.CompressBean;
 import com.renyu.imagelibrary.params.CommonParams;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+
 public class MainActivity extends AppCompatActivity {
+    private Disposable disposable;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,7 +73,31 @@ public class MainActivity extends AppCompatActivity {
 //        }
 
         // 视频选择
-        Utils.choiceVideo(this, 4, CommonParams.RESULT_VIDEOPICKER);
+//        Utils.choiceVideo(this, 4, CommonParams.RESULT_VIDEOPICKER);
+
+        new Thread(() -> {
+            String inputDir = "/storage/emulated/0/DCIM/Camera/VID_20200502_133303.mp4";
+//                String inputDir = "/storage/emulated/0/DCIM/Camera/VID_20200616_130933.mp4";
+            String outputDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
+            try {
+                String filePath = SiliCompressor.with(MainActivity.this).compressVideo(inputDir, outputDir);
+                Log.d("TAGTAG", filePath);
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+        }).start();
+
+        disposable = RxBus.getDefault().toObservable(CompressBean.class).observeOn(AndroidSchedulers.mainThread()).doOnNext(compressBean -> {
+            Log.d("TAGTAG", compressBean.getCompressPercent() + "");
+        }).subscribe();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (disposable != null && !disposable.isDisposed()) {
+            disposable.dispose();
+        }
     }
 
     @Override
