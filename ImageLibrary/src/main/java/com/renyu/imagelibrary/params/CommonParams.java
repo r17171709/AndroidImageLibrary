@@ -10,4 +10,5 @@ public class CommonParams {
     public final static int RESULT_CROP = 1002;
     public final static int RESULT_PHOTOPICKER = 1003;
     public final static int RESULT_VIDEOPICKER = 1004;
+    public final static int RESULT_VIDEORECORD = 1005;
 }

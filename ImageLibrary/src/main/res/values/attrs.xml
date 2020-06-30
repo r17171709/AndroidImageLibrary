@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="RecordProgressCircleViewStyle">
+        <attr name="background_color" format="color" />
+        <attr name="foreground_color" format="color" />
+        <attr name="second_color" format="color" />
+        <attr name="pdirection" format="enum">
+            <enum name="left" value="1" />
+            <enum name="right" value="2" />
+        </attr>
+        <attr name="progress" format="float" />
+        <attr name="second_progress" format="integer" />
+        <attr name="width" format="dimension" />
+        <attr name="bgwidth" format="dimension" />
+        <attr name="stoke_width" format="dimension" />
+        <attr name="text_size" format="dimension" />
+        <attr name="arror" format="reference" />
+        <attr name="text_color" format="color" />
+        <attr name="text" format="string" />
+        <attr name="start_direction" format="enum">
+            <enum name="left" value="1" />
+            <enum name="top" value="2" />
+            <enum name="right" value="3" />
+            <enum name="botton" value="4" />
+        </attr>
+        <attr name="showcircle" format="boolean" />
+    </declare-styleable>
+</resources>
