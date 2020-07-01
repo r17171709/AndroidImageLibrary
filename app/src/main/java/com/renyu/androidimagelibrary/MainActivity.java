@@ -10,8 +10,8 @@ import com.iceteck.silicompressorr.SiliCompressor;
 import com.renyu.commonlibrary.commonutils.RxBus;
 import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.imagelibrary.bean.CompressBean;
-import com.renyu.imagelibrary.camera.VideoRecordActivity;
-import com.renyu.imagelibrary.params.CommonParams;
+import com.renyu.imagelibrary.camera.CameraFragment;
+import com.renyu.imagelibrary.commonutils.Utils;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -81,9 +81,18 @@ public class MainActivity extends AppCompatActivity {
             Log.d("TAGTAG", compressBean.getCompressPercent() + "");
         }).subscribe();
 
-        // 视频录制
-        Intent intent = new Intent(MainActivity.this, VideoRecordActivity.class);
-        startActivityForResult(intent, CommonParams.RESULT_VIDEORECORD);
+        // 拍照或拍视频
+        ArrayList<CameraFragment.ImageVideoFunction> imageVideoFunctions = new ArrayList<>();
+        imageVideoFunctions.add(CameraFragment.ImageVideoFunction.IMAGE);
+        imageVideoFunctions.add(CameraFragment.ImageVideoFunction.VIDEO);
+        Utils.takePicture3(this, com.renyu.androidimagelibrary.CommonParams.RESULT_TAKEPHOTO, imageVideoFunctions, false);
+
+//        ArrayList<CameraFragment.CameraFunction> lists = new ArrayList<>();
+//        lists.add(CameraFragment.CameraFunction.PhotoPicker);
+//        lists.add(CameraFragment.CameraFunction.ChangeCamera);
+//        Utils.takePicture2(this, com.renyu.androidimagelibrary.CommonParams.RESULT_TAKEPHOTO, lists, false);
+
+//        Utils.takePicture(this, CommonParams.RESULT_TAKEPHOTO, false);
     }
 
     @Override
@@ -101,17 +110,19 @@ public class MainActivity extends AppCompatActivity {
             String filePath = data.getExtras().getString("path");
         } else if (requestCode == CommonParams.RESULT_VIDEOPICKER && resultCode == RESULT_OK) {
             ArrayList<String> filePaths = data.getExtras().getStringArrayList("choiceVideos");
-        } else if (requestCode == CommonParams.RESULT_VIDEORECORD && resultCode == RESULT_OK) {
+        } else if (requestCode == CommonParams.RESULT_TAKEPHOTO && resultCode == RESULT_OK) {
             // 视频压缩
             new Thread(() -> {
                 String inputDir = data.getStringExtra("path");
-                String outputDir = InitParams.IMAGE_PATH;
-                if (new File(inputDir).exists()) {
-                    try {
-                        String filePath = SiliCompressor.with(MainActivity.this).compressVideo(inputDir, outputDir, 1280, 720, 2500000);
-                        Log.d("TAGTAG", filePath);
-                    } catch (URISyntaxException e) {
-                        e.printStackTrace();
+                if (inputDir.endsWith("mp4")) {
+                    String outputDir = InitParams.IMAGE_PATH;
+                    if (new File(inputDir).exists()) {
+                        try {
+                            String filePath = SiliCompressor.with(MainActivity.this).compressVideo(inputDir, outputDir, 1280, 720, 2500000);
+                            Log.d("TAGTAG", filePath);
+                        } catch (URISyntaxException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }).start();

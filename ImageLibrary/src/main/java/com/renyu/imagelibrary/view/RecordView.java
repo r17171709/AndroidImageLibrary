@@ -49,7 +49,7 @@ public class RecordView extends AppCompatImageView {
             case MotionEvent.ACTION_DOWN:
                 ViewGroup parent = (ViewGroup) getParent();
                 parent.requestDisallowInterceptTouchEvent(true);
-                mHandler.sendEmptyMessageDelayed(0, 500);
+                mHandler.sendEmptyMessage(0);
                 break;
             case MotionEvent.ACTION_MOVE:
 

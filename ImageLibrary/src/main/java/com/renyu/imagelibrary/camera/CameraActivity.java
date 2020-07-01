@@ -45,14 +45,30 @@ public class CameraActivity extends BaseActivity implements CameraFragment.Taken
             deniedDesp = "为了您可以正常使用照相机，\n请点击\"设置\"-\"权限\"-打开 \"存储空间\"与\"相机\" 权限。\n最后点击两次后退按钮，即可返回。")
     public void permissionApply() {
         if (getSupportFragmentManager().getFragments().size() == 0) {
-            CameraFragment cameraFragment;
-            if (getIntent().getSerializableExtra("cameraFunctions") != null) {
-                cameraFragment = CameraFragment.getInstance((ArrayList<CameraFragment.CameraFunction>) getIntent().getSerializableExtra("cameraFunctions"));
-            } else {
-                cameraFragment = CameraFragment.getInstance();
+            CameraFragment cameraFragment = null;
+            if (getIntent().getSerializableExtra("cameraFunctions") != null && getIntent().getSerializableExtra("imageVideoFunctions") != null) {
+                cameraFragment = CameraFragment.getInstance((ArrayList<CameraFragment.CameraFunction>) getIntent().getSerializableExtra("cameraFunctions"), (ArrayList<CameraFragment.ImageVideoFunction>) getIntent().getSerializableExtra("imageVideoFunctions"));
+            } else if (getIntent().getSerializableExtra("cameraFunctions") == null && getIntent().getSerializableExtra("imageVideoFunctions") == null) {
+                ArrayList<CameraFragment.CameraFunction> cameraFunctions = new ArrayList<>();
+                cameraFunctions.add(CameraFragment.CameraFunction.ChangeCamera);
+                cameraFunctions.add(CameraFragment.CameraFunction.Flash);
+                ArrayList<CameraFragment.ImageVideoFunction> imageVideoFunctions = new ArrayList<>();
+                imageVideoFunctions.add(CameraFragment.ImageVideoFunction.IMAGE);
+                cameraFragment = CameraFragment.getInstance(cameraFunctions, imageVideoFunctions);
+            } else if (getIntent().getSerializableExtra("cameraFunctions") != null) {
+                ArrayList<CameraFragment.ImageVideoFunction> imageVideoFunctions = new ArrayList<>();
+                imageVideoFunctions.add(CameraFragment.ImageVideoFunction.IMAGE);
+                cameraFragment = CameraFragment.getInstance((ArrayList<CameraFragment.CameraFunction>) getIntent().getSerializableExtra("cameraFunctions"), imageVideoFunctions);
+            } else if (getIntent().getSerializableExtra("imageVideoFunctions") != null) {
+                ArrayList<CameraFragment.CameraFunction> cameraFunctions = new ArrayList<>();
+                cameraFunctions.add(CameraFragment.CameraFunction.ChangeCamera);
+                cameraFunctions.add(CameraFragment.CameraFunction.Flash);
+                cameraFragment = CameraFragment.getInstance(cameraFunctions, (ArrayList<CameraFragment.ImageVideoFunction>) getIntent().getSerializableExtra("imageVideoFunctions"));
             }
-            getSupportFragmentManager().beginTransaction().replace(
-                    R.id.fragment_container, cameraFragment).commitAllowingStateLoss();
+            if (cameraFragment != null) {
+                getSupportFragmentManager().beginTransaction().replace(
+                        R.id.fragment_container, cameraFragment).commitAllowingStateLoss();
+            }
         }
     }
 

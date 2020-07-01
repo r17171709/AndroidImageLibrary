@@ -18,7 +18,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
-import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -98,6 +97,19 @@ public class Utils {
     public static void takePicture2(Activity activity, int requestCode, ArrayList<CameraFragment.CameraFunction> lists, boolean needLandscape) {
         Intent intent = new Intent(activity, needLandscape ? CameraLandscapeActivity.class : CameraActivity.class);
         intent.putExtra("cameraFunctions", lists);
+        activity.startActivityForResult(intent, requestCode);
+    }
+
+    public static void takePicture3(Activity activity, int requestCode, ArrayList<CameraFragment.ImageVideoFunction> lists, boolean needLandscape) {
+        Intent intent = new Intent(activity, needLandscape ? CameraLandscapeActivity.class : CameraActivity.class);
+        intent.putExtra("imageVideoFunctions", lists);
+        activity.startActivityForResult(intent, requestCode);
+    }
+
+    public static void takePicture4(Activity activity, int requestCode, ArrayList<CameraFragment.CameraFunction> lists, ArrayList<CameraFragment.ImageVideoFunction> lists2, boolean needLandscape) {
+        Intent intent = new Intent(activity, needLandscape ? CameraLandscapeActivity.class : CameraActivity.class);
+        intent.putExtra("cameraFunctions", lists);
+        intent.putExtra("imageVideoFunctions", lists2);
         activity.startActivityForResult(intent, requestCode);
     }
 
@@ -428,7 +440,7 @@ public class Utils {
             ArrayList<ChoiceSizeBean> tmp = new ArrayList<>();
             for (int i = 0; i < arry.length; i++) {
                 // 排除比例不同的
-                Log.d("CameraUtils", arry[i].getHeight() + " " + arry[i].getWidth() + " " + arry[i].getWidth() * 1.0f / arry[i].getHeight());
+//                Log.d("CameraUtils", arry[i].getHeight() + " " + arry[i].getWidth() + " " + arry[i].getWidth() * 1.0f / arry[i].getHeight());
                 // 比例差值不能太大
                 if (Math.abs(arry[i].getWidth() * 1.0f / arry[i].getHeight() - 16f / 9) > 0.1) {
                     continue;

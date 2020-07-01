@@ -12,8 +12,11 @@ import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Size;
 import android.hardware.SensorManager;
+import android.media.CamcorderProfile;
+import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.OrientationEventListener;
@@ -32,17 +35,21 @@ import androidx.exifinterface.media.ExifInterface;
 import com.blankj.utilcode.util.FileUtils;
 import com.blankj.utilcode.util.ImageUtils;
 import com.blankj.utilcode.util.SizeUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.renyu.commonlibrary.basefrag.BaseFragment;
 import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.imagelibrary.R;
 import com.renyu.imagelibrary.commonutils.Utils;
 import com.renyu.imagelibrary.params.CommonParams;
+import com.renyu.imagelibrary.view.ProgressCircleView;
+import com.renyu.imagelibrary.view.RecordView;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
@@ -50,6 +57,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import me.jessyan.autosize.internal.CancelAdapt;
+
+/**
+ * 建议参考 https://github.com/CameraKit/camerakit-android
+ */
 
 public class CameraFragment extends BaseFragment implements SurfaceHolder.Callback, Camera.PictureCallback, CancelAdapt {
     // 相机可用小功能
@@ -62,21 +73,17 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
         PhotoPicker
     }
 
-    public static CameraFragment getInstance(ArrayList<CameraFunction> functions) {
-        CameraFragment cameraFragment = new CameraFragment();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("cameraFunctions", functions);
-        cameraFragment.setArguments(bundle);
-        return cameraFragment;
+    public enum ImageVideoFunction {
+        // 拍照
+        IMAGE,
+        VIDEO
     }
 
-    public static CameraFragment getInstance() {
-        ArrayList<CameraFunction> functions = new ArrayList<>();
-        functions.add(CameraFunction.ChangeCamera);
-        functions.add(CameraFunction.Flash);
+    public static CameraFragment getInstance(ArrayList<CameraFunction> functions, ArrayList<ImageVideoFunction> imageVideoFunctions) {
         CameraFragment cameraFragment = new CameraFragment();
         Bundle bundle = new Bundle();
         bundle.putSerializable("cameraFunctions", functions);
+        bundle.putSerializable("imageVideoFunctions", imageVideoFunctions);
         cameraFragment.setArguments(bundle);
         return cameraFragment;
     }
@@ -91,9 +98,10 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
     private SquareCameraPreview mPreviewView;
     private SurfaceHolder mSurfaceHolder;
     private ProgressBar progress = null;
-    private ImageView takePhotoBtn = null;
     private RelativeLayout layout_camera_func1 = null;
     private RelativeLayout layout_camera_func2 = null;
+    private RecordView recordView;
+    private ProgressCircleView pc_record;
 
     private CameraOrientationListener mOrientationListener;
 
@@ -102,7 +110,25 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
     // 拍摄成功之后回调
     private TakenCompleteListener takenCompleteListener = null;
 
+    // 视频录制
+    private MediaRecorder mMediaRecorder;
+
+    private Disposable disposable;
+
+    // 最大时间
+    private int maxTime = 30;
+    private int tmpTime = 0;
+
+    // 图片或视频地址
     private String dirPath = "";
+
+    // 是否已经结束
+    private boolean isEnd = false;
+
+    // down时间
+    private long donwTime = 0;
+    private Handler downHandler = null;
+    private Runnable downRunnable = this::down;
 
     public interface TakenCompleteListener {
         void getPath(String filePath);
@@ -134,8 +160,6 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         FileUtils.createOrExistsDir(InitParams.IMAGE_PATH);
-        dirPath = InitParams.IMAGE_PATH + "/" + System.currentTimeMillis() + ".jpg";
-        FileUtils.createFileByDeleteOldFile(new File(dirPath));
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -160,15 +184,49 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
         layout_camera_func1 = view.findViewById(R.id.layout_camera_func1);
         layout_camera_func2 = view.findViewById(R.id.layout_camera_func2);
         try {
-            ArrayList<CameraFunction> functionArrayList = ((ArrayList<CameraFunction>) getArguments().getSerializable("cameraFunctions"));
+            ArrayList<CameraFunction> functionArrayList = (ArrayList<CameraFunction>) getArguments().getSerializable("cameraFunctions");
             addFunctionViews(functionArrayList.get(0), layout_camera_func1);
             addFunctionViews(functionArrayList.get(1), layout_camera_func2);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        ArrayList<ImageVideoFunction> imageVideoFunctionArrayList = (ArrayList<ImageVideoFunction>) getArguments().getSerializable("imageVideoFunctions");
+        if (imageVideoFunctionArrayList.contains(ImageVideoFunction.VIDEO)) {
+            view.findViewById(R.id.camera_tools_view).setVisibility(View.GONE);
+        }
 
-        takePhotoBtn = view.findViewById(R.id.capture_image_button);
-        takePhotoBtn.setOnClickListener(v -> takePicture());
+        recordView = view.findViewById(R.id.recordView);
+        recordView.setOnGestureListener(new RecordView.OnGestureListener() {
+            @Override
+            public void onDown() {
+                if (imageVideoFunctionArrayList.contains(ImageVideoFunction.VIDEO) && imageVideoFunctionArrayList.contains(ImageVideoFunction.IMAGE)) {
+                    donwTime = System.currentTimeMillis();
+                    downHandler = new Handler();
+                    downHandler.postDelayed(downRunnable, 500);
+                } else if (imageVideoFunctionArrayList.contains(ImageVideoFunction.VIDEO)) {
+                    down();
+                } else if (imageVideoFunctionArrayList.contains(ImageVideoFunction.IMAGE)) {
+                    takePicture();
+                }
+            }
+
+            @Override
+            public void onUp() {
+                if (imageVideoFunctionArrayList.contains(ImageVideoFunction.VIDEO) && imageVideoFunctionArrayList.contains(ImageVideoFunction.IMAGE)) {
+                    if (System.currentTimeMillis() - donwTime > 500) {
+                        up();
+                    } else {
+                        if (downHandler != null) {
+                            downHandler.removeCallbacks(downRunnable);
+                        }
+                        takePicture();
+                    }
+                } else if (imageVideoFunctionArrayList.contains(ImageVideoFunction.VIDEO)) {
+                    up();
+                }
+            }
+        });
+        pc_record = view.findViewById(R.id.pc_record);
     }
 
     /**
@@ -240,6 +298,85 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
         iv_camera_photopicker.setOnClickListener((v -> {
             Utils.choicePic(CameraFragment.this, 1, CommonParams.RESULT_PHOTOPICKER);
         }));
+    }
+
+    /**
+     * 开始录制
+     */
+    public void startRecord() {
+        initRecord();
+    }
+
+    private void initRecord() {
+        mCamera.unlock();
+        mMediaRecorder = new MediaRecorder();
+        try {
+            mMediaRecorder.reset();
+            if (mCamera != null)
+                mMediaRecorder.setCamera(mCamera);
+            mMediaRecorder.setOnErrorListener((mr, what, extra) -> {
+                try {
+                    if (mr != null)
+                        mr.reset();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+            mMediaRecorder.setPreviewDisplay(mSurfaceHolder.getSurface());
+            mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);//视频源
+            mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);//音频源
+            mMediaRecorder.setOrientationHint(90);//输出旋转90度，保持坚屏录制
+            CamcorderProfile cProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
+            mMediaRecorder.setProfile(cProfile);
+            dirPath = InitParams.IMAGE_PATH + "/" + System.currentTimeMillis() + ".mp4";
+            FileUtils.createFileByDeleteOldFile(new File(dirPath));
+            mMediaRecorder.setOutputFile(dirPath);
+            mMediaRecorder.prepare();
+            mMediaRecorder.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+            releaseRecord();
+        }
+    }
+
+    /**
+     * 停止录制
+     */
+    public void finishRecord() {
+        stopRecord();
+        releaseRecord();
+        progress.setVisibility(View.VISIBLE);
+        pc_record.setVisibility(View.GONE);
+        recordView.setVisibility(View.GONE);
+    }
+
+    /**
+     * 停止录制
+     */
+    private void stopRecord() {
+        if (mMediaRecorder != null) {
+            //设置后不会崩
+            mMediaRecorder.setOnErrorListener(null);
+            mMediaRecorder.setPreviewDisplay(null);
+            try {
+                mMediaRecorder.stop();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 释放资源
+     */
+    private void releaseRecord() {
+        if (mMediaRecorder != null) {
+            mMediaRecorder.setOnErrorListener(null);
+            mMediaRecorder.reset();
+            mMediaRecorder.release();
+            mMediaRecorder = null;
+            mCamera.lock();
+        }
     }
 
     @Override
@@ -401,7 +538,11 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
 
     private void restartPreview() {
         stopCameraPreview();
-        mCamera.release();
+        if (mCamera != null) {
+            mCamera.lock();
+            mCamera.release();
+            mCamera = null;
+        }
 
         if (getCamera(mCameraID))
             startCameraPreview();
@@ -425,7 +566,8 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
      */
     private void takePicture() {
         progress.setVisibility(View.VISIBLE);
-        takePhotoBtn.setVisibility(View.GONE);
+        pc_record.setVisibility(View.GONE);
+        recordView.setVisibility(View.GONE);
 
         mOrientationListener.rememberOrientation();
 
@@ -458,6 +600,7 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
         // stop the preview
         stopCameraPreview();
         if (mCamera != null) {
+            mCamera.lock();
             mCamera.release();
             mCamera = null;
         }
@@ -502,10 +645,6 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
     public void onPictureTaken(byte[] data, Camera camera) {
         camera.startPreview();
         mPreviewView.onPictureTaken();
-
-        progress.setVisibility(View.GONE);
-        takePhotoBtn.setVisibility(View.VISIBLE);
-
         Observable.just(data).map(bytes -> {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
@@ -523,6 +662,8 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
                 }
             }
             bmp = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, true);
+            dirPath = InitParams.IMAGE_PATH + "/" + System.currentTimeMillis() + ".jpg";
+            FileUtils.createFileByDeleteOldFile(new File(dirPath));
             return ImageUtils.save(bmp, dirPath, Bitmap.CompressFormat.JPEG, true);
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<Boolean>() {
@@ -603,5 +744,64 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
             }
         }
         return false;
+    }
+
+    private void down() {
+        startRecord();
+        ToastUtils.showShort("开始录制");
+
+        ViewGroup.LayoutParams paramsPcRecord = pc_record.getLayoutParams();
+        paramsPcRecord.height = SizeUtils.dp2px(100f);
+        paramsPcRecord.width = SizeUtils.dp2px(100f);
+        pc_record.setLayoutParams(paramsPcRecord);
+        pc_record.requestLayout();
+        ViewGroup.LayoutParams paramsRecordView = recordView.getLayoutParams();
+        paramsRecordView.height = SizeUtils.dp2px(35f);
+        paramsRecordView.width = SizeUtils.dp2px(35f);
+        recordView.setLayoutParams(paramsRecordView);
+        recordView.requestLayout();
+
+        disposable = Observable.interval(1, TimeUnit.SECONDS).observeOn(AndroidSchedulers.mainThread()).subscribe(aLong -> {
+            tmpTime++;
+            pc_record.setText("", tmpTime * 100 / maxTime);
+            if (tmpTime == maxTime) {
+                up();
+            }
+        });
+    }
+
+    private void up() {
+        if (isEnd) {
+            return;
+        }
+
+        isEnd = true;
+
+        finishRecord();
+        ToastUtils.showShort("录制成功");
+
+        if (disposable != null && !disposable.isDisposed()) {
+            disposable.dispose();
+        }
+
+        recordView.initState();
+        pc_record.setText("", 0);
+
+        ViewGroup.LayoutParams paramsPcRecord = pc_record.getLayoutParams();
+        paramsPcRecord.height = SizeUtils.dp2px(68f);
+        paramsPcRecord.width = SizeUtils.dp2px(68f);
+        pc_record.setLayoutParams(paramsPcRecord);
+        pc_record.requestLayout();
+        ViewGroup.LayoutParams paramsRecordView = recordView.getLayoutParams();
+        paramsRecordView.height = SizeUtils.dp2px(48f);
+        paramsRecordView.width = SizeUtils.dp2px(48f);
+        recordView.setLayoutParams(paramsRecordView);
+        recordView.requestLayout();
+
+        new Handler().postDelayed(() -> {
+            if (takenCompleteListener != null) {
+                takenCompleteListener.getPath(dirPath);
+            }
+        }, 2000);
     }
 }

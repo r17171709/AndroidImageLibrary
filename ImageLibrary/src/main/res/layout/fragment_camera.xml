@@ -9,10 +9,46 @@
         android:layout_height="match_parent"
         android:layout_centerHorizontal="true" />
 
+    <RelativeLayout
+        android:layout_width="120dip"
+        android:layout_height="120dip"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true">
+
+        <com.renyu.imagelibrary.view.ProgressCircleView xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/pc_record"
+            android:layout_width="68dip"
+            android:layout_height="68dip"
+            android:layout_centerInParent="true"
+            app:background_color="#99ffffff"
+            app:foreground_color="@android:color/holo_red_dark"
+            app:pdirection="right"
+            app:progress="0"
+            app:stoke_width="2dip"
+            app:text=""
+            app:text_color="@android:color/white"
+            app:text_size="10sp" />
+
+        <com.renyu.imagelibrary.view.RecordView
+            android:id="@+id/recordView"
+            android:layout_width="48dip"
+            android:layout_height="48dip"
+            android:layout_centerInParent="true"
+            android:src="@drawable/shape_record" />
+
+        <ProgressBar
+            android:id="@+id/progress"
+            android:layout_width="68dip"
+            android:layout_height="68dip"
+            android:layout_centerInParent="true"
+            android:visibility="gone" />
+
+    </RelativeLayout>
+
     <LinearLayout
         android:id="@+id/camera_tools_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="120dip"
         android:layout_alignParentBottom="true"
         android:layout_marginTop="10dp"
         android:gravity="center"
@@ -28,25 +64,12 @@
 
         </RelativeLayout>
 
-        <RelativeLayout
+        <View
             android:layout_width="0dp"
-            android:layout_height="69dip"
+            android:layout_height="match_parent"
             android:layout_weight="1">
 
-            <ImageView
-                android:id="@+id/capture_image_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:src="@drawable/capture_photo_button" />
-
-            <ProgressBar
-                android:id="@+id/progress"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:visibility="gone" />
-        </RelativeLayout>
+        </View>
 
         <RelativeLayout
             android:id="@+id/layout_camera_func2"
