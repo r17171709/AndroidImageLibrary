@@ -191,10 +191,6 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
             e.printStackTrace();
         }
         ArrayList<ImageVideoFunction> imageVideoFunctionArrayList = (ArrayList<ImageVideoFunction>) getArguments().getSerializable("imageVideoFunctions");
-        if (imageVideoFunctionArrayList.contains(ImageVideoFunction.VIDEO)) {
-            view.findViewById(R.id.camera_tools_view).setVisibility(View.GONE);
-        }
-
         recordView = view.findViewById(R.id.recordView);
         recordView.setOnGestureListener(new RecordView.OnGestureListener() {
             @Override
@@ -323,10 +319,10 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
                 }
             });
             mMediaRecorder.setPreviewDisplay(mSurfaceHolder.getSurface());
-            mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);//视频源
-            mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);//音频源
-            mMediaRecorder.setOrientationHint(90);//输出旋转90度，保持坚屏录制
-            CamcorderProfile cProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
+            mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+            mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
+            mMediaRecorder.setOrientationHint(determineMediaRecorderOrientation());
+            CamcorderProfile cProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_720P);
             mMediaRecorder.setProfile(cProfile);
             dirPath = InitParams.IMAGE_PATH + "/" + System.currentTimeMillis() + ".mp4";
             FileUtils.createFileByDeleteOldFile(new File(dirPath));
@@ -414,14 +410,12 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
      * Start the camera preview
      */
     private void startCameraPreview() {
-        determineDisplayOrientation();
+        mCamera.setDisplayOrientation(determineDisplayOrientation());
         setupCamera();
-
         try {
             mCamera.setPreviewDisplay(mSurfaceHolder);
             mCamera.startPreview();
         } catch (IOException e) {
-            Log.d(TAG, "Can't start camera preview due to IOException " + e);
             e.printStackTrace();
         }
     }
@@ -443,10 +437,11 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
     }
 
     /**
-     * Determine the current display orientation and rotate the camera preview
-     * accordingly
+     * 设置预览方向
+     *
+     * @return
      */
-    private void determineDisplayOrientation() {
+    private int determineDisplayOrientation() {
         CameraInfo cameraInfo = new CameraInfo();
         Camera.getCameraInfo(mCameraID, cameraInfo);
 
@@ -471,20 +466,29 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
                 break;
             }
         }
-
         int displayOrientation;
-
-        // Camera direction
         if (cameraInfo.facing == CameraInfo.CAMERA_FACING_FRONT) {
-            // Orientation is angle of rotation when facing the camera for
-            // the camera image to match the natural orientation of the device
             displayOrientation = (cameraInfo.orientation + degrees) % 360;
             displayOrientation = (360 - displayOrientation) % 360;
         } else {
             displayOrientation = (cameraInfo.orientation - degrees + 360) % 360;
         }
+        return displayOrientation;
+    }
 
-        mCamera.setDisplayOrientation(displayOrientation);
+    /**
+     * 设置视频录制方向
+     *
+     * @return
+     */
+    private int determineMediaRecorderOrientation() {
+        CameraInfo cameraInfo = new CameraInfo();
+        Camera.getCameraInfo(mCameraID, cameraInfo);
+        if (cameraInfo.facing == CameraInfo.CAMERA_FACING_FRONT) {
+            return 270;
+        } else {
+            return 90;
+        }
     }
 
     /**
