@@ -127,6 +127,8 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
 
     // down时间
     private long donwTime = 0;
+    // 录制时间
+    private long recordTime = 0;
     private Handler downHandler = null;
     private Runnable downRunnable = this::down;
 
@@ -341,9 +343,6 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
     public void finishRecord() {
         stopRecord();
         releaseRecord();
-        progress.setVisibility(View.VISIBLE);
-        pc_record.setVisibility(View.GONE);
-        recordView.setVisibility(View.GONE);
     }
 
     /**
@@ -751,6 +750,10 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
     }
 
     private void down() {
+        recordTime = System.currentTimeMillis();
+
+        isEnd = false;
+
         startRecord();
         ToastUtils.showShort("开始录制");
 
@@ -778,11 +781,19 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
         if (isEnd) {
             return;
         }
-
         isEnd = true;
 
         finishRecord();
-        ToastUtils.showShort("录制成功");
+
+        long useTime = System.currentTimeMillis() - recordTime;
+        if (useTime < 3000) {
+            ToastUtils.showShort("录制时间太短");
+        } else {
+            ToastUtils.showShort("录制成功");
+            progress.setVisibility(View.VISIBLE);
+            pc_record.setVisibility(View.GONE);
+            recordView.setVisibility(View.GONE);
+        }
 
         if (disposable != null && !disposable.isDisposed()) {
             disposable.dispose();
@@ -802,10 +813,12 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
         recordView.setLayoutParams(paramsRecordView);
         recordView.requestLayout();
 
-        new Handler().postDelayed(() -> {
-            if (takenCompleteListener != null) {
-                takenCompleteListener.getPath(dirPath);
-            }
-        }, 2000);
+        if (useTime >= 3000) {
+            new Handler().postDelayed(() -> {
+                if (takenCompleteListener != null) {
+                    takenCompleteListener.getPath(dirPath);
+                }
+            }, 2000);
+        }
     }
 }
