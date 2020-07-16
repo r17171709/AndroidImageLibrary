@@ -22,11 +22,11 @@ buildscript {
 
 allprojects {
     repositories {
-//        google()
-//        jcenter()
-        maven { url 'https://maven.aliyun.com/repository/google' }
-        maven { url 'https://maven.aliyun.com/repository/jcenter' }
-        maven { url 'https://maven.aliyun.com/nexus/content/groups/public' }
+        google()
+        jcenter()
+//        maven { url 'https://maven.aliyun.com/repository/google' }
+//        maven { url 'https://maven.aliyun.com/repository/jcenter' }
+//        maven { url 'https://maven.aliyun.com/nexus/content/groups/public' }
         maven { url 'https://jitpack.io' }
         maven { url 'https://dl.bintray.com/r17171709/AndroidCommonLibrary' }
         maven { url 'https://dl.bintray.com/r17171709/AndroidImageLibrary' }
