@@ -1,5 +1,7 @@
 package com.renyu.imagelibrary.bean;
 
+import android.net.Uri;
+
 /**
  * Created by Administrator on 2020/6/11.
  */
@@ -8,6 +10,8 @@ public class Video {
     private String path;
     private String duration;
     private boolean isSelect;
+    // 音频文件真实路径
+    private Uri uri;
 
     public int getId() {
         return id;
@@ -39,5 +43,13 @@ public class Video {
 
     public void setSelect(boolean select) {
         isSelect = select;
+    }
+
+    public Uri getUri() {
+        return uri;
+    }
+
+    public void setUri(Uri uri) {
+        this.uri = uri;
     }
 }

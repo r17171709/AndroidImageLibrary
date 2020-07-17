@@ -31,9 +31,9 @@ public class VideoPickerAdapter extends RecyclerView.Adapter<VideoPickerAdapter.
     private OperVideoListener listener;
 
     public interface OperVideoListener {
-        void add(String path);
+        void add(Uri uri);
 
-        void remove(String path);
+        void remove(Uri uri);
     }
 
     VideoPickerAdapter(ArrayList<Video> models, OperVideoListener listener) {
@@ -65,9 +65,9 @@ public class VideoPickerAdapter extends RecyclerView.Adapter<VideoPickerAdapter.
             models.get(position).setSelect(!flag);
             holder.videopicker_choice.setImageResource(!flag ? ResourceUtils.getMipmapId(holder.itemView.getContext(), "ic_choice_select") : ResourceUtils.getMipmapId(holder.itemView.getContext(), "ic_choice_normal"));
             if (!flag) {
-                listener.add(models.get(position).getPath());
+                listener.add(models.get(position).getUri());
             } else {
-                listener.remove(models.get(position).getPath());
+                listener.remove(models.get(position).getUri());
             }
         });
         Utils.loadFresco(Uri.parse("file://" + imagePath), SizeUtils.dp2px(118), SizeUtils.dp2px(118), holder.videopicker_image);

@@ -1,8 +1,10 @@
 package com.renyu.imagelibrary.photopicker;
 
+import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.Gravity;
@@ -42,6 +44,8 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 
+import static android.provider.BaseColumns._ID;
+
 /**
  * Created by Administrator on 2020/6/11.
  */
@@ -73,7 +77,7 @@ public class VideoPickerActivity extends BaseActivity {
     //最大可选视频数量
     int maxNum = 0;
     //选中的视频
-    public ArrayList<String> videoPaths;
+    public ArrayList<Uri> videoPaths;
     //最大显示文件夹数量
     private int COUNT_MAX = 4;
     //当前文件夹key
@@ -105,7 +109,7 @@ public class VideoPickerActivity extends BaseActivity {
         tv_nav_right.setOnClickListener(v -> {
             Intent intent = new Intent();
             Bundle bundle = new Bundle();
-            bundle.putStringArrayList("choiceVideos", videoPaths);
+            bundle.putParcelableArrayList("choiceVideos", videoPaths);
             intent.putExtras(bundle);
             setResult(RESULT_OK, intent);
             finish();
@@ -125,7 +129,7 @@ public class VideoPickerActivity extends BaseActivity {
         photopicker_rv.addItemDecoration(new SpaceItemDecoration(1, 3));
         videoPickerAdapter = new VideoPickerAdapter(models, new VideoPickerAdapter.OperVideoListener() {
             @Override
-            public void add(String path) {
+            public void add(Uri path) {
                 if (!videoPaths.contains(path)) {
                     videoPaths.add(path);
 
@@ -136,7 +140,7 @@ public class VideoPickerActivity extends BaseActivity {
             }
 
             @Override
-            public void remove(String path) {
+            public void remove(Uri path) {
                 videoPaths.remove(path);
 
                 if (videoPaths.size() == 0) {
@@ -256,8 +260,11 @@ public class VideoPickerActivity extends BaseActivity {
                     video.setId(_id);
                     video.setDuration(data.getString(data.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION)));
                     video.setPath(data.getString(data.getColumnIndexOrThrow(MediaStore.Video.Media.DATA)));
-                    String videoPath = data.getString(data.getColumnIndexOrThrow(MediaStore.Video.Media.DATA));
+                    Uri uri = ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                            data.getLong(data.getColumnIndex(_ID)));
+                    video.setUri(uri);
 
+                    String videoPath = data.getString(data.getColumnIndexOrThrow(MediaStore.Video.Media.DATA));
                     // 生成缩略图
                     Utils.getVideoThumb(videoPath, "" + _id);
 
@@ -297,7 +304,7 @@ public class VideoPickerActivity extends BaseActivity {
         models.clear();
         List<Video> temp = allHashMap.get(key).getVideos();
         for (Video photo : temp) {
-            if (videoPaths.contains(photo.getPath())) {
+            if (videoPaths.contains(photo.getUri())) {
                 photo.setSelect(true);
             }
         }

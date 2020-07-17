@@ -56,7 +56,6 @@ public class DictVideoAdapter extends BaseAdapter {
         }
         String imagePath = InitParams.IMAGE_PATH + File.separator + new File(models.get(position).getVideos().get(0).getPath()).getName() + ".jpg";
         Utils.loadFresco("file://" + imagePath, SizeUtils.dp2px(70), SizeUtils.dp2px(70), holder.adapter_dict_cover);
-        holder.adapter_dict_cover.setTag(models.get(position).getVideos().get(0).getPath());
         holder.adapter_dict_name.setText(models.get(position).getBucket_display_name());
         holder.adapter_dict_count.setText(models.get(position).getVideos().size() + "张");
         return convertView;

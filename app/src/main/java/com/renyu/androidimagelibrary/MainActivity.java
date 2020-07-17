@@ -1,19 +1,28 @@
 package com.renyu.androidimagelibrary;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.blankj.utilcode.util.ToastUtils;
 import com.iceteck.silicompressorr.SiliCompressor;
 import com.renyu.commonlibrary.commonutils.RxBus;
 import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.imagelibrary.bean.CompressBean;
-import com.renyu.imagelibrary.camera.CameraFragment;
 import com.renyu.imagelibrary.commonutils.Utils;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
@@ -75,17 +84,17 @@ public class MainActivity extends AppCompatActivity {
 //        }
 
         // 视频选择
-//        Utils.choiceVideo(this, 4, CommonParams.RESULT_VIDEOPICKER);
+        Utils.choiceVideo(this, 4, CommonParams.RESULT_VIDEOPICKER);
 
         disposable = RxBus.getDefault().toObservable(CompressBean.class).observeOn(AndroidSchedulers.mainThread()).doOnNext(compressBean -> {
             Log.d("TAGTAG", compressBean.getCompressPercent() + "");
         }).subscribe();
 
         // 拍照或拍视频
-        ArrayList<CameraFragment.ImageVideoFunction> imageVideoFunctions = new ArrayList<>();
-        imageVideoFunctions.add(CameraFragment.ImageVideoFunction.IMAGE);
-        imageVideoFunctions.add(CameraFragment.ImageVideoFunction.VIDEO);
-        Utils.takePicture3(this, com.renyu.androidimagelibrary.CommonParams.RESULT_TAKEPHOTO, imageVideoFunctions, false);
+//        ArrayList<CameraFragment.ImageVideoFunction> imageVideoFunctions = new ArrayList<>();
+//        imageVideoFunctions.add(CameraFragment.ImageVideoFunction.IMAGE);
+//        imageVideoFunctions.add(CameraFragment.ImageVideoFunction.VIDEO);
+//        Utils.takePicture3(this, com.renyu.androidimagelibrary.CommonParams.RESULT_TAKEPHOTO, imageVideoFunctions, false);
 
 //        ArrayList<CameraFragment.CameraFunction> lists = new ArrayList<>();
 //        lists.add(CameraFragment.CameraFunction.PhotoPicker);
@@ -109,7 +118,23 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == CommonParams.RESULT_CROP && resultCode == RESULT_OK) {
             String filePath = data.getExtras().getString("path");
         } else if (requestCode == CommonParams.RESULT_VIDEOPICKER && resultCode == RESULT_OK) {
-            ArrayList<String> filePaths = data.getExtras().getStringArrayList("choiceVideos");
+            ArrayList<Uri> filePaths = data.getExtras().getParcelableArrayList("choiceVideos");
+            if (filePaths.size() > 0) {
+                new Thread(() -> {
+                    try {
+                        ParcelFileDescriptor fileDescriptor = getContentResolver().openFileDescriptor(filePaths.get(0), "r", null);
+                        if (fileDescriptor != null) {
+                            FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
+                            writeFileFromIS(new File(InitParams.IMAGE_PATH + "/demo.mp4"), inputStream);
+                            runOnUiThread(() -> {
+                                ToastUtils.showShort("复制完成");
+                            });
+                        }
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
+            }
         } else if (requestCode == CommonParams.RESULT_TAKEPHOTO && resultCode == RESULT_OK) {
             // 视频压缩
             new Thread(() -> {
@@ -126,6 +151,35 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }).start();
+        }
+    }
+
+    private boolean writeFileFromIS(File file, InputStream is) {
+        OutputStream os = null;
+        try {
+            os = new BufferedOutputStream(new FileOutputStream(file));
+            byte data[] = new byte[8192];
+            int len;
+            while ((len = is.read(data, 0, 8192)) != -1) {
+                os.write(data, 0, len);
+            }
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                if (os != null) {
+                    os.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
