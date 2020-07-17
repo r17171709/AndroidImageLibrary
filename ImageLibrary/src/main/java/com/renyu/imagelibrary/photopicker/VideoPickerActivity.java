@@ -3,11 +3,9 @@ package com.renyu.imagelibrary.photopicker;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.Gravity;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,10 +19,8 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.blankj.utilcode.util.SizeUtils;
-import com.facebook.drawee.view.SimpleDraweeView;
 import com.renyu.commonlibrary.baseact.BaseActivity;
 import com.renyu.commonlibrary.commonutils.BarUtils;
-import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.imagelibrary.R;
 import com.renyu.imagelibrary.SpaceItemDecoration;
 import com.renyu.imagelibrary.bean.Video;
@@ -32,7 +28,6 @@ import com.renyu.imagelibrary.bean.VideoDirectory;
 import com.renyu.imagelibrary.commonutils.Utils;
 import com.renyu.imagelibrary.commonutils.VideoDirectoryLoader;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -257,11 +252,15 @@ public class VideoPickerActivity extends BaseActivity {
                 allVideoDirectory.setBucket_display_name("全部视频");
                 while (data.moveToNext()) {
                     Video video = new Video();
-                    video.setId(data.getInt(data.getColumnIndexOrThrow(MediaStore.Video.Media._ID)));
+                    int _id = data.getInt(data.getColumnIndexOrThrow(MediaStore.Video.Media._ID));
+                    video.setId(_id);
                     video.setDuration(data.getString(data.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION)));
                     video.setPath(data.getString(data.getColumnIndexOrThrow(MediaStore.Video.Media.DATA)));
-                    String imagePath = data.getString(data.getColumnIndexOrThrow(MediaStore.Video.Media.DATA));
-                    File imageFile = new File(InitParams.IMAGE_PATH + File.separator + new File(imagePath).getName() + ".jpg");
+                    String videoPath = data.getString(data.getColumnIndexOrThrow(MediaStore.Video.Media.DATA));
+
+                    // 生成缩略图
+                    Utils.getVideoThumb(videoPath, "" + _id);
+
                     if (hashMapVideoDirectory.containsKey(data.getString(data.getColumnIndexOrThrow(MediaStore.Video.Media.BUCKET_ID)))) {
                         VideoDirectory videoDirectory = hashMapVideoDirectory.get(data.getString(data.getColumnIndexOrThrow(MediaStore.Video.Media.BUCKET_ID)));
                         videoDirectory.addVideo(video);
@@ -291,56 +290,6 @@ public class VideoPickerActivity extends BaseActivity {
 
             }
         });
-    }
-
-    /**
-     * 加载缩略图
-     *
-     * @param path
-     */
-    public void loadThumbImage(String path) {
-        if (!servicesList.contains(path)) {
-            servicesList.add(path);
-            executorService.execute(new PathRunnable(path));
-        }
-    }
-
-    class PathRunnable implements Runnable {
-        String path;
-
-        PathRunnable(String path) {
-            this.path = path;
-        }
-
-        @Override
-        public void run() {
-            String filePath = Utils.getVideoThumb(path);
-            VideoPickerActivity.this.runOnUiThread(() -> {
-                int position = -1;
-                for (int i = 0; i < models.size(); i++) {
-                    Video model = models.get(i);
-                    if (model.getPath().equals(path)) {
-                        position = i;
-                    }
-                }
-                View view = photopicker_rv.findViewWithTag(path);
-                // 加载列表数据
-                // 如果当前SimpleDraweeView没有显示，则刷新对应的Item
-                if (view != null) {
-                    Utils.loadFresco(Uri.parse("file://" + filePath), SizeUtils.dp2px(118), SizeUtils.dp2px(118), (SimpleDraweeView) view);
-                } else {
-                    videoPickerAdapter.notifyItemChanged(position);
-                }
-
-                // 加载目录数据
-                if (popupWindow != null && popupWindow.getListView() != null) {
-                    View viewDict = popupWindow.getListView().findViewWithTag(path);
-                    if (viewDict != null) {
-                        Utils.loadFresco(Uri.parse("file://" + filePath), SizeUtils.dp2px(70), SizeUtils.dp2px(70), (SimpleDraweeView) viewDict);
-                    }
-                }
-            });
-        }
     }
 
     private void updateData(String key) {

@@ -515,6 +515,26 @@ public class Utils {
     }
 
     /**
+     * 相册使用：生成视频截图
+     *
+     * @param path
+     * @return
+     */
+    public static String getVideoThumb(String path, String id) {
+        String imagePath = InitParams.IMAGE_PATH + File.separator + new File(path).getName() + ".jpg";
+        if (new File(imagePath).exists() && new File(imagePath).length() > 0) {
+            return imagePath;
+        }
+        Bitmap bitmap = MediaStore.Video.Thumbnails.getThumbnail(com.blankj.utilcode.util.Utils.getApp().getContentResolver(), Integer.parseInt(id), MediaStore.Video.Thumbnails.MINI_KIND, null);
+        if (bitmap == null) {
+            return "";
+        }
+        ImageUtils.save(bitmap, imagePath, Bitmap.CompressFormat.JPEG);
+        bitmap.recycle();
+        return imagePath;
+    }
+
+    /**
      * 生成视频第一帧
      *
      * @param path
@@ -535,16 +555,9 @@ public class Utils {
                 e.printStackTrace();
             }
         }
-        int width = bitmap.getWidth();
-        int height = bitmap.getHeight();
-        int max = Math.max(width, height);
-        int scale = 1;
-        if (max > 480) {
-            scale = max / 480;
+        if (bitmap == null) {
+            return null;
         }
-        int w = Math.round(width / scale);
-        int h = Math.round(height / scale);
-        bitmap = Bitmap.createScaledBitmap(bitmap, w, h, true);
         ImageUtils.save(bitmap, InitParams.IMAGE_PATH + File.separator + new File(path).getName() + ".jpg", Bitmap.CompressFormat.JPEG);
         bitmap.recycle();
         return InitParams.IMAGE_PATH + File.separator + new File(path).getName() + ".jpg";

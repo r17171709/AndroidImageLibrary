@@ -71,10 +71,6 @@ public class VideoPickerAdapter extends RecyclerView.Adapter<VideoPickerAdapter.
             }
         });
         Utils.loadFresco(Uri.parse("file://" + imagePath), SizeUtils.dp2px(118), SizeUtils.dp2px(118), holder.videopicker_image);
-        holder.videopicker_image.setTag(models.get(position).getPath());
-        if (!new File(imagePath).exists()) {
-            ((VideoPickerActivity) (holder.itemView.getContext())).loadThumbImage(models.get(position).getPath());
-        }
     }
 
     @Override
