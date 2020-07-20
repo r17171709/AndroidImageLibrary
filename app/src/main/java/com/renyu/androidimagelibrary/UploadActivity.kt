@@ -33,6 +33,7 @@ import java.io.File
 class UploadActivity : BaseActivity() {
     // 选择的本地图片文件路径集合
     val picPath = ArrayList<String>()
+
     // 远程上传完成的图片文件集合
     private val urlMaps = HashMap<String, String>()
 
@@ -119,6 +120,8 @@ class UploadActivity : BaseActivity() {
                     val temp = data?.extras?.getParcelableArrayList<Uri>("choiceImages")
                     val filePaths = ArrayList<String>()
                     temp?.forEach {
+                        // AndroidQ以下使用
+//                        filePaths.add(FileUtils.getPath(this, it))
                         val extension = when (contentResolver.getType(it)) {
                             "image/png" -> ".png"
                             "image/jpeg" -> ".jpg"

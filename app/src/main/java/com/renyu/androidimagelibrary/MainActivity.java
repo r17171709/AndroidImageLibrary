@@ -124,6 +124,8 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         ParcelFileDescriptor fileDescriptor = getContentResolver().openFileDescriptor(filePaths.get(0), "r", null);
                         if (fileDescriptor != null) {
+                            // AndroidQ以下使用
+//                            FileInputStream inputStream = new FileInputStream(new File(FileUtils.getPath(this, filePaths.get(0))));
                             FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
                             writeFileFromIS(new File(InitParams.IMAGE_PATH + "/demo.mp4"), inputStream);
                             runOnUiThread(() -> {
