@@ -13,6 +13,7 @@ import com.iceteck.silicompressorr.SiliCompressor;
 import com.renyu.commonlibrary.commonutils.RxBus;
 import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.imagelibrary.bean.CompressBean;
+import com.renyu.imagelibrary.camera.CameraFragment;
 import com.renyu.imagelibrary.commonutils.Utils;
 
 import java.io.BufferedOutputStream;
@@ -84,17 +85,17 @@ public class MainActivity extends AppCompatActivity {
 //        }
 
         // 视频选择
-        Utils.choiceVideo(this, 4, CommonParams.RESULT_VIDEOPICKER);
+//        Utils.choiceVideo(this, 4, CommonParams.RESULT_VIDEOPICKER);
 
         disposable = RxBus.getDefault().toObservable(CompressBean.class).observeOn(AndroidSchedulers.mainThread()).doOnNext(compressBean -> {
             Log.d("TAGTAG", compressBean.getCompressPercent() + "");
         }).subscribe();
 
         // 拍照或拍视频
-//        ArrayList<CameraFragment.ImageVideoFunction> imageVideoFunctions = new ArrayList<>();
-//        imageVideoFunctions.add(CameraFragment.ImageVideoFunction.IMAGE);
-//        imageVideoFunctions.add(CameraFragment.ImageVideoFunction.VIDEO);
-//        Utils.takePicture3(this, com.renyu.androidimagelibrary.CommonParams.RESULT_TAKEPHOTO, imageVideoFunctions, false);
+        ArrayList<CameraFragment.ImageVideoFunction> imageVideoFunctions = new ArrayList<>();
+        imageVideoFunctions.add(CameraFragment.ImageVideoFunction.IMAGE);
+        imageVideoFunctions.add(CameraFragment.ImageVideoFunction.VIDEO);
+        Utils.takePicture3(this, com.renyu.androidimagelibrary.CommonParams.RESULT_TAKEPHOTO, imageVideoFunctions, false);
 
 //        ArrayList<CameraFragment.CameraFunction> lists = new ArrayList<>();
 //        lists.add(CameraFragment.CameraFunction.PhotoPicker);

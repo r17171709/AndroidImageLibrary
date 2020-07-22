@@ -125,6 +125,7 @@ class UploadActivity : BaseActivity() {
                         val extension = when (contentResolver.getType(it)) {
                             "image/png" -> ".png"
                             "image/jpeg" -> ".jpg"
+                            "image/jpg" -> ".jpg"
                             "image/gif" -> ".gif"
                             else -> ""
                         }
