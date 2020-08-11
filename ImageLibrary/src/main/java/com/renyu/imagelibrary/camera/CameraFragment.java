@@ -610,7 +610,7 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
 
         // 没有拍照，直接删除
         if (FileUtils.getFileLength(dirPath) == 0) {
-            FileUtils.deleteFile(dirPath);
+            FileUtils.delete(new File(dirPath));
         }
     }
 

@@ -3,17 +3,15 @@ package com.renyu.androidimagelibrary;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.blankj.utilcode.util.ToastUtils;
+import com.iceteck.silicompressorr.FileUtils;
 import com.iceteck.silicompressorr.SiliCompressor;
 import com.renyu.commonlibrary.commonutils.RxBus;
 import com.renyu.commonlibrary.params.InitParams;
 import com.renyu.imagelibrary.bean.CompressBean;
-import com.renyu.imagelibrary.camera.CameraFragment;
 import com.renyu.imagelibrary.commonutils.Utils;
 
 import java.io.BufferedOutputStream;
@@ -85,17 +83,17 @@ public class MainActivity extends AppCompatActivity {
 //        }
 
         // 视频选择
-//        Utils.choiceVideo(this, 4, CommonParams.RESULT_VIDEOPICKER);
+        Utils.choiceVideo(this, 4, CommonParams.RESULT_VIDEOPICKER);
 
         disposable = RxBus.getDefault().toObservable(CompressBean.class).observeOn(AndroidSchedulers.mainThread()).doOnNext(compressBean -> {
             Log.d("TAGTAG", compressBean.getCompressPercent() + "");
         }).subscribe();
 
         // 拍照或拍视频
-        ArrayList<CameraFragment.ImageVideoFunction> imageVideoFunctions = new ArrayList<>();
-        imageVideoFunctions.add(CameraFragment.ImageVideoFunction.IMAGE);
-        imageVideoFunctions.add(CameraFragment.ImageVideoFunction.VIDEO);
-        Utils.takePicture3(this, com.renyu.androidimagelibrary.CommonParams.RESULT_TAKEPHOTO, imageVideoFunctions, false);
+//        ArrayList<CameraFragment.ImageVideoFunction> imageVideoFunctions = new ArrayList<>();
+//        imageVideoFunctions.add(CameraFragment.ImageVideoFunction.IMAGE);
+//        imageVideoFunctions.add(CameraFragment.ImageVideoFunction.VIDEO);
+//        Utils.takePicture3(this, com.renyu.androidimagelibrary.CommonParams.RESULT_TAKEPHOTO, imageVideoFunctions, false);
 
 //        ArrayList<CameraFragment.CameraFunction> lists = new ArrayList<>();
 //        lists.add(CameraFragment.CameraFunction.PhotoPicker);
@@ -123,16 +121,17 @@ public class MainActivity extends AppCompatActivity {
             if (filePaths.size() > 0) {
                 new Thread(() -> {
                     try {
-                        ParcelFileDescriptor fileDescriptor = getContentResolver().openFileDescriptor(filePaths.get(0), "r", null);
-                        if (fileDescriptor != null) {
-                            // AndroidQ以下使用
-//                            FileInputStream inputStream = new FileInputStream(new File(FileUtils.getPath(this, filePaths.get(0))));
-                            FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
-                            writeFileFromIS(new File(InitParams.IMAGE_PATH + "/demo.mp4"), inputStream);
-                            runOnUiThread(() -> {
-                                ToastUtils.showShort("复制完成");
-                            });
-                        }
+                        FileInputStream inputStream = new FileInputStream(new File(FileUtils.getPath(this, filePaths.get(0))));
+
+                        // AndroidQ以下使用
+//                        ParcelFileDescriptor fileDescriptor = getContentResolver().openFileDescriptor(filePaths.get(0), "r", null);
+//                        if (fileDescriptor != null) {
+//                            FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
+//                            writeFileFromIS(new File(InitParams.IMAGE_PATH + "/demo.mp4"), inputStream);
+//                            runOnUiThread(() -> {
+//                                ToastUtils.showShort("复制完成");
+//                            });
+//                        }
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }

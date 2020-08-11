@@ -1,12 +1,10 @@
 package com.renyu.imagelibrary.photopicker;
 
-import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.Gravity;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -46,6 +44,7 @@ import io.reactivex.disposables.Disposable;
 import static android.provider.BaseColumns._ID;
 import static android.provider.MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME;
 import static android.provider.MediaStore.Images.ImageColumns.BUCKET_ID;
+import static android.provider.MediaStore.MediaColumns.DATA;
 import static android.provider.MediaStore.MediaColumns.DATE_ADDED;
 
 /**
@@ -266,8 +265,10 @@ public class PhotoPickerActivity extends BaseActivity {
                     int imageId = data.getInt(data.getColumnIndexOrThrow(_ID));
                     String bucketId = data.getString(data.getColumnIndexOrThrow(BUCKET_ID));
                     String name = data.getString(data.getColumnIndexOrThrow(BUCKET_DISPLAY_NAME));
-                    Uri uri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                            data.getLong(data.getColumnIndex(_ID)));
+                    String path = data.getString(data.getColumnIndexOrThrow(DATA));
+                    Uri uri = Uri.parse("file://" + path);
+//                    Uri uri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+//                            data.getLong(data.getColumnIndex(_ID)));
 //                    Log.d("PhotoPickerActivity", bucketId+" "+name+" "+path);
                     if (!hashMap.containsKey(bucketId)) {
                         PhotoDirectory photoDirectory = new PhotoDirectory();

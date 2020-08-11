@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
 import com.facebook.imagepipeline.image.ImageInfo;
-import com.renyu.commonlibrary.adapter.ViewPagerFragmentAdapter;
 import com.renyu.commonlibrary.baseact.BaseActivity;
 import com.renyu.imagelibrary.R;
 import com.renyu.imagelibrary.preview.impl.RightNavClickImpl;

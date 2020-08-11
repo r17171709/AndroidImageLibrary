@@ -213,12 +213,12 @@ public class Utils {
         File cropFile = null;
         try {
             cropFile = new Compressor(context)
-                    .setMaxWidth(options.outWidth / 2)
-                    .setMaxHeight(options.outHeight / 2)
+                    .setMaxWidth(options.outWidth == -1 ? 1080 : options.outWidth / 2)
+                    .setMaxHeight(options.outHeight == -1 ? 1920 : options.outHeight / 2)
                     .setQuality(70)
                     .setCompressFormat(Bitmap.CompressFormat.JPEG)
                     .setDestinationDirectoryPath(destinationDirectoryPath)
-                    .compressToFile(new File(filePath));
+                    .compressToFile(new File(filePath), System.currentTimeMillis() + ".jpg");
         } catch (Exception e) {
             e.printStackTrace();
         }

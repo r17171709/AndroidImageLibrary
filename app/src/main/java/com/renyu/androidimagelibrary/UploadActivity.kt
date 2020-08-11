@@ -119,24 +119,27 @@ class UploadActivity : BaseActivity() {
                     }
                     val temp = data?.extras?.getParcelableArrayList<Uri>("choiceImages")
                     val filePaths = ArrayList<String>()
+                    // AndroidQ以下使用
+//                    temp?.forEach {
+////                        filePaths.add(FileUtils.getPath(this, it))
+//                        val extension = when (contentResolver.getType(it)) {
+//                            "image/png" -> ".png"
+//                            "image/jpeg" -> ".jpg"
+//                            "image/jpg" -> ".jpg"
+//                            "image/gif" -> ".gif"
+//                            else -> ""
+//                        }
+//                        if (!TextUtils.isEmpty(extension)) {
+//                            val path =
+//                                externalCacheDir!!.path + File.separator + System.currentTimeMillis() + extension
+//                            Utils.copyFile(it, File(path))
+//                            if (File(path).length() > 0 && !tags.contains(path)) {
+//                                filePaths.add(path)
+//                            }
+//                        }
+//                    }
                     temp?.forEach {
-                        // AndroidQ以下使用
-//                        filePaths.add(FileUtils.getPath(this, it))
-                        val extension = when (contentResolver.getType(it)) {
-                            "image/png" -> ".png"
-                            "image/jpeg" -> ".jpg"
-                            "image/jpg" -> ".jpg"
-                            "image/gif" -> ".gif"
-                            else -> ""
-                        }
-                        if (!TextUtils.isEmpty(extension)) {
-                            val path =
-                                externalCacheDir!!.path + File.separator + System.currentTimeMillis() + extension
-                            Utils.copyFile(it, File(path))
-                            if (File(path).length() > 0 && !tags.contains(path)) {
-                                filePaths.add(path)
-                            }
-                        }
+                        filePaths.add(it.path!!)
                     }
                     if (filePaths.size == 0) {
                         return
