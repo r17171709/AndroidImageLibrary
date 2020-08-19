@@ -115,8 +115,8 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
 
     private Disposable disposable;
 
-    // 最大时间
-    private int maxTime = 30;
+    // 最大时间 s
+    private int maxTime = 90;
     private int tmpTime = 0;
 
     // 图片或视频地址
@@ -197,8 +197,8 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
         recordView.setOnGestureListener(new RecordView.OnGestureListener() {
             @Override
             public void onDown() {
+                donwTime = System.currentTimeMillis();
                 if (imageVideoFunctionArrayList.contains(ImageVideoFunction.VIDEO) && imageVideoFunctionArrayList.contains(ImageVideoFunction.IMAGE)) {
-                    donwTime = System.currentTimeMillis();
                     downHandler = new Handler();
                     downHandler.postDelayed(downRunnable, 500);
                 } else if (imageVideoFunctionArrayList.contains(ImageVideoFunction.VIDEO)) {
@@ -210,8 +210,9 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
 
             @Override
             public void onUp() {
+                long upTime = System.currentTimeMillis();
                 if (imageVideoFunctionArrayList.contains(ImageVideoFunction.VIDEO) && imageVideoFunctionArrayList.contains(ImageVideoFunction.IMAGE)) {
-                    if (System.currentTimeMillis() - donwTime > 500) {
+                    if (upTime - donwTime > 500) {
                         up();
                     } else {
                         if (downHandler != null) {

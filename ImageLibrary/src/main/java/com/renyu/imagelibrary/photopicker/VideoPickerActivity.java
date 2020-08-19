@@ -61,8 +61,6 @@ public class VideoPickerActivity extends BaseActivity {
     private static final int corePoolSize = Math.max(2, Math.min(CPU_COUNT - 1, 4));
 
     private ExecutorService executorService;
-    // 已经添加进入线程池
-    private ArrayList<String> servicesList;
 
     //全部文件
     private LinkedHashMap<String, VideoDirectory> allHashMap;
@@ -94,7 +92,6 @@ public class VideoPickerActivity extends BaseActivity {
         maxNum = getIntent().getExtras().getInt("maxNum");
 
         executorService = Executors.newFixedThreadPool(corePoolSize);
-        servicesList = new ArrayList<>();
 
         ImageView ib_nav_left = findViewById(R.id.ib_nav_left);
         ib_nav_left.setImageResource(R.mipmap.icon_back_black);
