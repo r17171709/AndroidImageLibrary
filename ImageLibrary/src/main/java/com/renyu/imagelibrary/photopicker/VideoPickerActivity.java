@@ -152,6 +152,7 @@ public class VideoPickerActivity extends BaseActivity {
             }
         });
         photopicker_rv.setAdapter(videoPickerAdapter);
+        ((TextView) findViewById(R.id.photopicker_dict)).setText("所有视频");
 
         popupWindow = new ListPopupWindow(this);
         popupWindow.setWidth(ListPopupWindow.MATCH_PARENT);
@@ -250,12 +251,16 @@ public class VideoPickerActivity extends BaseActivity {
                 // 所有视频
                 VideoDirectory allVideoDirectory = new VideoDirectory();
                 allVideoDirectory.setBucket_id("0");
-                allVideoDirectory.setBucket_display_name("全部视频");
+                allVideoDirectory.setBucket_display_name("所有视频");
                 while (data.moveToNext()) {
                     Video video = new Video();
                     int _id = data.getInt(data.getColumnIndexOrThrow(MediaStore.Video.Media._ID));
                     video.setId(_id);
-                    video.setDuration(data.getString(data.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION)));
+                    String duration = data.getString(data.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION));
+                    if (duration == null || duration.equals("0")) {
+                        continue;
+                    }
+                    video.setDuration(duration);
                     video.setPath(data.getString(data.getColumnIndexOrThrow(MediaStore.Video.Media.DATA)));
                     Uri uri = ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
                             data.getLong(data.getColumnIndex(_ID)));
