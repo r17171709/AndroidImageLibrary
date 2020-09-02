@@ -788,7 +788,7 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
 
         long useTime = System.currentTimeMillis() - recordTime;
         if (useTime < 3000) {
-            ToastUtils.showShort("录制时间太短");
+            ToastUtils.showShort("拍摄时长不可低于3秒");
         } else {
             ToastUtils.showShort("录制成功");
             progress.setVisibility(View.VISIBLE);
