@@ -16,9 +16,11 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
@@ -44,7 +46,10 @@ import com.renyu.imagelibrary.photopicker.PhotoPickerActivity;
 import com.renyu.imagelibrary.photopicker.VideoPickerActivity;
 import com.renyu.imagelibrary.preview.ImagePreviewActivity;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -242,7 +247,7 @@ public class Utils {
      *
      * @param path 视频路径地址
      */
-    public static void updateVideo(String path) {
+    public static void refreshVideo(String path) {
         if (new File(path).exists()) {
             File file = new File(path);
             ContentResolver localContentResolver = com.blankj.utilcode.util.Utils.getApp().getContentResolver();
@@ -253,15 +258,52 @@ public class Utils {
 
     private static ContentValues getMediaContentValues(File paramFile, long paramLong, String mimeType) {
         ContentValues localContentValues = new ContentValues();
-        localContentValues.put("title", paramFile.getName());
-        localContentValues.put("_display_name", paramFile.getName());
-        localContentValues.put("mime_type", mimeType);
-        localContentValues.put("datetaken", Long.valueOf(paramLong));
-        localContentValues.put("date_modified", Long.valueOf(paramLong));
-        localContentValues.put("date_added", Long.valueOf(paramLong));
-        localContentValues.put("_data", paramFile.getAbsolutePath());
-        localContentValues.put("_size", Long.valueOf(paramFile.length()));
+        localContentValues.put(MediaStore.Video.Media.TITLE, paramFile.getName());
+        localContentValues.put(MediaStore.Video.Media.DISPLAY_NAME, paramFile.getName());
+        localContentValues.put(MediaStore.Video.Media.MIME_TYPE, mimeType);
+        localContentValues.put(MediaStore.Video.Media.DATE_TAKEN, Long.valueOf(paramLong));
+        localContentValues.put(MediaStore.Video.Media.DATE_MODIFIED, Long.valueOf(paramLong));
+        localContentValues.put(MediaStore.Video.Media.DATE_ADDED, Long.valueOf(paramLong));
+        localContentValues.put(MediaStore.Video.Media.DATA, paramFile.getAbsolutePath());
+        localContentValues.put(MediaStore.Video.Media.SIZE, Long.valueOf(paramFile.length()));
         return localContentValues;
+    }
+
+    /**
+     * 向Mediastore添加内容
+     *
+     * @param file
+     */
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    public static void creatUUIDFile(File file, String mineType) {
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.DISPLAY_NAME, file.getName());
+        values.put(MediaStore.Images.Media.MIME_TYPE, mineType);
+        values.put(MediaStore.Images.Media.IS_PENDING, 1);
+
+        ContentResolver resolver = com.blankj.utilcode.util.Utils.getApp().getContentResolver();
+        Uri collection = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
+        Uri item = resolver.insert(collection, values);
+
+        try (ParcelFileDescriptor pfd = resolver.openFileDescriptor(item, "w", null)) {
+            BufferedInputStream bin = new BufferedInputStream(new FileInputStream(file));
+            ParcelFileDescriptor.AutoCloseOutputStream outputStream = new ParcelFileDescriptor.AutoCloseOutputStream(pfd);
+            BufferedOutputStream bot = new BufferedOutputStream(outputStream);
+            byte[] bt = new byte[2048];
+            int len;
+            while ((len = bin.read(bt)) >= 0) {
+                bot.write(bt, 0, len);
+                bot.flush();
+            }
+            bin.close();
+            bot.close();
+
+            values.clear();
+            values.put(MediaStore.Images.Media.IS_PENDING, 0);
+            resolver.update(item, values, null, null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

@@ -89,6 +89,22 @@ public class MainActivity extends AppCompatActivity {
             Log.d("TAGTAG", compressBean.getCompressPercent() + "");
         }).subscribe();
 
+        // 视频压缩
+//        new Thread(() -> {
+//            String inputDir = "/sdcard/Android/data/com.renyu.androidimagelibrary/files/image/1601279630847.mp4";
+//            if (inputDir.endsWith("mp4")) {
+//                String outputDir = InitParams.IMAGE_PATH;
+//                if (new File(inputDir).exists()) {
+//                    try {
+//                        String filePath = SiliCompressor.with(MainActivity.this).compressVideo(inputDir, outputDir, 1920, 1080,  1920 * 1080);
+//                        Log.d("TAGTAG", filePath);
+//                    } catch (URISyntaxException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
+//        }).start();
+
         // 拍照或拍视频
 //        ArrayList<CameraFragment.ImageVideoFunction> imageVideoFunctions = new ArrayList<>();
 //        imageVideoFunctions.add(CameraFragment.ImageVideoFunction.IMAGE);
@@ -145,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
                     String outputDir = InitParams.IMAGE_PATH;
                     if (new File(inputDir).exists()) {
                         try {
-                            String filePath = SiliCompressor.with(MainActivity.this).compressVideo(inputDir, outputDir, 1280, 720, 2500000);
+                            String filePath = SiliCompressor.with(MainActivity.this).compressVideo(inputDir, outputDir, 1280, 720, 44100 * 2 * 16 / 2);
                             Log.d("TAGTAG", filePath);
                         } catch (URISyntaxException e) {
                             e.printStackTrace();
