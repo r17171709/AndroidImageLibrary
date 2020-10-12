@@ -7,12 +7,8 @@ import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.iceteck.silicompressorr.FileUtils;
-import com.iceteck.silicompressorr.SiliCompressor;
-import com.renyu.commonlibrary.commonutils.RxBus;
 import com.renyu.commonlibrary.params.InitParams;
-import com.renyu.imagelibrary.bean.CompressBean;
-import com.renyu.imagelibrary.commonutils.Utils;
+import com.yalantis.ucrop.util.FileUtils;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -22,14 +18,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URISyntaxException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
+import io.microshow.rxffmpeg.RxFFmpegInvoke;
+import io.microshow.rxffmpeg.RxFFmpegSubscriber;
 
 public class MainActivity extends AppCompatActivity {
-    private Disposable disposable;
+    private MyRxFFmpegSubscriber myRxFFmpegSubscriber;
+
+    private String command = "ffmpeg -i " + InitParams.IMAGE_PATH + "/input.mp4 -s 720x1280 -vcodec libx264 -crf 22 -preset veryfast -c:a copy " + InitParams.IMAGE_PATH + "/result.mp4";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,27 +81,10 @@ public class MainActivity extends AppCompatActivity {
 //        }
 
         // 视频选择
-        Utils.choiceVideo(this, 4, CommonParams.RESULT_VIDEOPICKER);
-
-        disposable = RxBus.getDefault().toObservable(CompressBean.class).observeOn(AndroidSchedulers.mainThread()).doOnNext(compressBean -> {
-            Log.d("TAGTAG", compressBean.getCompressPercent() + "");
-        }).subscribe();
+//        Utils.choiceVideo(this, 4, CommonParams.RESULT_VIDEOPICKER);
 
         // 视频压缩
-//        new Thread(() -> {
-//            String inputDir = "/sdcard/Android/data/com.renyu.androidimagelibrary/files/image/1601279630847.mp4";
-//            if (inputDir.endsWith("mp4")) {
-//                String outputDir = InitParams.IMAGE_PATH;
-//                if (new File(inputDir).exists()) {
-//                    try {
-//                        String filePath = SiliCompressor.with(MainActivity.this).compressVideo(inputDir, outputDir, 1920, 1080,  1920 * 1080);
-//                        Log.d("TAGTAG", filePath);
-//                    } catch (URISyntaxException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }
-//        }).start();
+        runFFmpegRxJava(command);
 
         // 拍照或拍视频
 //        ArrayList<CameraFragment.ImageVideoFunction> imageVideoFunctions = new ArrayList<>();
@@ -122,8 +103,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (disposable != null && !disposable.isDisposed()) {
-            disposable.dispose();
+        if (myRxFFmpegSubscriber != null) {
+            myRxFFmpegSubscriber.dispose();
         }
     }
 
@@ -154,21 +135,10 @@ public class MainActivity extends AppCompatActivity {
                 }).start();
             }
         } else if (requestCode == CommonParams.RESULT_TAKEPHOTO && resultCode == RESULT_OK) {
-            // 视频压缩
-            new Thread(() -> {
-                String inputDir = data.getStringExtra("path");
-                if (inputDir.endsWith("mp4")) {
-                    String outputDir = InitParams.IMAGE_PATH;
-                    if (new File(inputDir).exists()) {
-                        try {
-                            String filePath = SiliCompressor.with(MainActivity.this).compressVideo(inputDir, outputDir, 1280, 720, 44100 * 2 * 16 / 2);
-                            Log.d("TAGTAG", filePath);
-                        } catch (URISyntaxException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }).start();
+            String inputDir = data.getStringExtra("path");
+            if (inputDir.endsWith("mp4")) {
+
+            }
         }
     }
 
@@ -197,6 +167,52 @@ public class MainActivity extends AppCompatActivity {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    private void runFFmpegRxJava(String text) {
+        myRxFFmpegSubscriber = new MyRxFFmpegSubscriber(this);
+        RxFFmpegInvoke.getInstance().runCommandRxJava(text.split(" ")).subscribe(myRxFFmpegSubscriber);
+    }
+
+    public static class MyRxFFmpegSubscriber extends RxFFmpegSubscriber {
+        private WeakReference<MainActivity> weakReference;
+
+        public MyRxFFmpegSubscriber(MainActivity mainActivity) {
+            Log.d("TAG", "onStart");
+            weakReference = new WeakReference<MainActivity>(mainActivity);
+        }
+
+        @Override
+        public void onFinish() {
+            MainActivity mainActivity = weakReference.get();
+            if (mainActivity != null) {
+                Log.d("TAG", "onFinish");
+            }
+        }
+
+        @Override
+        public void onProgress(int progress, long progressTime) {
+            MainActivity mainActivity = weakReference.get();
+            if (mainActivity != null) {
+                Log.d("TAG", "onProgress:  " + progressTime);
+            }
+        }
+
+        @Override
+        public void onCancel() {
+            MainActivity mainActivity = weakReference.get();
+            if (mainActivity != null) {
+                Log.d("TAG", "onCancel");
+            }
+        }
+
+        @Override
+        public void onError(String message) {
+            MainActivity mainActivity = weakReference.get();
+            if (mainActivity != null) {
+                Log.d("TAG", "onError");
             }
         }
     }

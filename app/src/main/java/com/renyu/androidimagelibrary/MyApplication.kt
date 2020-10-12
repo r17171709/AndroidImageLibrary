@@ -4,6 +4,7 @@ import androidx.multidex.MultiDexApplication
 import com.blankj.utilcode.util.Utils
 import com.github.piasy.biv.BigImageViewer
 import com.github.piasy.biv.loader.fresco.FrescoImageLoader
+import io.microshow.rxffmpeg.RxFFmpegInvoke
 import me.jessyan.autosize.AutoSizeConfig
 
 /**
@@ -17,5 +18,7 @@ class MyApplication : MultiDexApplication() {
         BigImageViewer.initialize(FrescoImageLoader.with(this))
 
         AutoSizeConfig.getInstance().isCustomFragment = true
+
+        RxFFmpegInvoke.getInstance().setDebug(BuildConfig.DEBUG);
     }
 }
