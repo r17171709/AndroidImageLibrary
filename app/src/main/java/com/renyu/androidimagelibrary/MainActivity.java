@@ -27,7 +27,8 @@ import io.microshow.rxffmpeg.RxFFmpegSubscriber;
 public class MainActivity extends AppCompatActivity {
     private MyRxFFmpegSubscriber myRxFFmpegSubscriber;
 
-    private String command = "ffmpeg -i " + InitParams.IMAGE_PATH + "/input.mp4 -s 720x1280 -vcodec libx264 -crf 22 -preset veryfast -c:a copy " + InitParams.IMAGE_PATH + "/result.mp4";
+    //    private String command = "ffmpeg -i " + InitParams.IMAGE_PATH + "/input.mp4 -s 480x800 -vcodec libx264 -crf 22 -preset superfast -c:a copy " + InitParams.IMAGE_PATH + "/result.mp4";
+    private String command = "ffmpeg -y -i " + InitParams.IMAGE_PATH + "/input.mp4 -b 2097k -r 30 -vcodec libx264 -preset superfast " + InitParams.IMAGE_PATH + "/result.mp4";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -196,7 +197,8 @@ public class MainActivity extends AppCompatActivity {
         public void onProgress(int progress, long progressTime) {
             MainActivity mainActivity = weakReference.get();
             if (mainActivity != null) {
-                Log.d("TAG", "onProgress:  " + progressTime);
+                File file = new File(InitParams.IMAGE_PATH + "/input.mp4");
+                Log.d("TAG", "onProgress:  " + progress);
             }
         }
 
