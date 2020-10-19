@@ -197,7 +197,6 @@ public class MainActivity extends AppCompatActivity {
         public void onProgress(int progress, long progressTime) {
             MainActivity mainActivity = weakReference.get();
             if (mainActivity != null) {
-                File file = new File(InitParams.IMAGE_PATH + "/input.mp4");
                 Log.d("TAG", "onProgress:  " + progress);
             }
         }
