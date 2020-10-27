@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.os.Message
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -214,11 +215,11 @@ class UploadActivity : BaseActivity() {
         )
     }
 
-    private var handler: Handler = object : Handler() {
-        override fun handleMessage(msg: Message?) {
+    private var handler: Handler = object : Handler(Looper.myLooper()!!) {
+        override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
 
-            if (msg != null && msg.data != null) {
+            if (msg.data != null) {
                 val path = msg.data.getString("path")
                 val percent = msg.data.getInt("percent")
                 val statue = msg.data.getSerializable("statue") as UploadTaskBean.UploadState

@@ -1,6 +1,7 @@
 package com.renyu.imagelibrary.photopicker;
 
 import android.content.Context;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,7 +56,7 @@ public class DictAdapter extends BaseAdapter {
         } else {
             holder = (DictHolder) convertView.getTag();
         }
-        Utils.loadFresco(models.get(position).getCoverPath(), SizeUtils.dp2px(70), SizeUtils.dp2px(70), holder.adapter_dict_cover);
+        Utils.loadFresco(models.get(position).getCoverPath() == null ? Uri.parse("") : models.get(position).getCoverPath(), SizeUtils.dp2px(70), SizeUtils.dp2px(70), holder.adapter_dict_cover);
         holder.adapter_dict_name.setText(models.get(position).getName());
         holder.adapter_dict_count.setText(models.get(position).getPhotos().size() + "张");
         return convertView;

@@ -1,10 +1,13 @@
 package com.renyu.imagelibrary.photopicker;
 
+import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Gravity;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -269,7 +272,7 @@ public class PhotoPickerActivity extends BaseActivity {
                     Uri uri = Uri.parse("file://" + path);
 //                    Uri uri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
 //                            data.getLong(data.getColumnIndex(_ID)));
-//                    Log.d("PhotoPickerActivity", bucketId+" "+name+" "+path);
+//                    Log.d("PhotoPickerActivity", bucketId+" "+name+" "+path + " " + uri.getPath());
                     if (!hashMap.containsKey(bucketId)) {
                         PhotoDirectory photoDirectory = new PhotoDirectory();
                         photoDirectory.setId(bucketId);
