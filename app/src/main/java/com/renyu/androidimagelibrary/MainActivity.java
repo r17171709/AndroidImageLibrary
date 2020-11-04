@@ -27,8 +27,8 @@ import io.microshow.rxffmpeg.RxFFmpegSubscriber;
 public class MainActivity extends AppCompatActivity {
     private MyRxFFmpegSubscriber myRxFFmpegSubscriber;
 
-    //    private String command = "ffmpeg -i " + InitParams.IMAGE_PATH + "/input.mp4 -s 480x800 -vcodec libx264 -crf 22 -preset superfast -c:a copy " + InitParams.IMAGE_PATH + "/result.mp4";
-    private String command = "ffmpeg -y -i " + InitParams.IMAGE_PATH + "/input.mp4 -b 2097k -r 30 -vcodec libx264 -preset superfast " + InitParams.IMAGE_PATH + "/result.mp4";
+//    private String command = "ffmpeg -y -i " + InitParams.IMAGE_PATH + "/input.mp4 -b 2097k -r 30 -vcodec libx264 -preset superfast " + InitParams.IMAGE_PATH + "/result.mp4";
+    private String command = "ffmpeg -y -i " + InitParams.IMAGE_PATH + "/input.mp4 -vf scale=iw/2:ih/2 -vcodec libx264 -b " + 1920 * 1080 / 2 + " " + InitParams.IMAGE_PATH + "/result.mp4";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
