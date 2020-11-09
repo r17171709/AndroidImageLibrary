@@ -41,10 +41,11 @@ import com.renyu.imagelibrary.bean.ChoiceSizeBean;
 import com.renyu.imagelibrary.camera.CameraActivity;
 import com.renyu.imagelibrary.camera.CameraFragment;
 import com.renyu.imagelibrary.camera.CameraLandscapeActivity;
-import com.renyu.imagelibrary.crop.UCrop;
+import com.renyu.imagelibrary.crop.CropUActivity;
 import com.renyu.imagelibrary.photopicker.PhotoPickerActivity;
 import com.renyu.imagelibrary.photopicker.VideoPickerActivity;
 import com.renyu.imagelibrary.preview.ImagePreviewActivity;
+import com.yalantis.ucrop.UCrop;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -128,18 +129,21 @@ public class Utils {
      */
     public static void cropImage(String sourcePath, Activity activity, int requestCode, float ratio) {
         String destinationPath = InitParams.IMAGE_PATH + "/" + System.currentTimeMillis() + ".jpg";
-        UCrop uCrop = UCrop.of(Uri.fromFile(new File(sourcePath)), Uri.fromFile(new File(destinationPath)));
-        UCrop.Options options = new UCrop.Options();
+        Intent mCropIntent = new Intent(activity, CropUActivity.class);
+        Bundle mCropOptionsBundle = new Bundle();
+        mCropOptionsBundle.putParcelable(UCrop.EXTRA_INPUT_URI, Uri.fromFile(new File(sourcePath)));
+        mCropOptionsBundle.putParcelable(UCrop.EXTRA_OUTPUT_URI, Uri.fromFile(new File(destinationPath)));
         if (ratio != 0) {
-            options.withAspectRatio(ratio, 1);
+            mCropOptionsBundle.putFloat(UCrop.EXTRA_ASPECT_RATIO_X, ratio);
+            mCropOptionsBundle.putFloat(UCrop.EXTRA_ASPECT_RATIO_Y, 1);
         } else {
-            options.setFreeStyleCropEnabled(true);
+            mCropOptionsBundle.putBoolean(UCrop.Options.EXTRA_FREE_STYLE_CROP, true);
         }
-        options.setCompressionFormat(Bitmap.CompressFormat.JPEG);
-        options.setCompressionQuality(80);
-        options.setHideBottomControls(true);
-        uCrop.withOptions(options);
-        uCrop.start(activity, requestCode);
+        mCropOptionsBundle.putString(UCrop.Options.EXTRA_COMPRESSION_FORMAT_NAME, Bitmap.CompressFormat.JPEG.name());
+        mCropOptionsBundle.putInt(UCrop.Options.EXTRA_COMPRESSION_QUALITY, 80);
+        mCropOptionsBundle.putBoolean(UCrop.Options.EXTRA_HIDE_BOTTOM_CONTROLS, true);
+        mCropIntent.putExtras(mCropOptionsBundle);
+        activity.startActivityForResult(mCropIntent, requestCode);
     }
 
     /**

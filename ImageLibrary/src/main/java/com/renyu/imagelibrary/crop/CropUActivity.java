@@ -67,12 +67,7 @@ public class CropUActivity extends BaseActivity {
         ib_nav_left.setVisibility(View.VISIBLE);
         ib_nav_left.setImageResource(R.mipmap.icon_back_white);
         tv_nav_right.setText("完成");
-        tv_nav_right.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                crop();
-            }
-        });
+        tv_nav_right.setOnClickListener(v -> crop());
         tv_nav_right.setTextColor(Color.WHITE);
         tv_nav_right.setVisibility(View.VISIBLE);
 
