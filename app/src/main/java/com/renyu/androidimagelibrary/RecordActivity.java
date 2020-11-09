@@ -123,4 +123,16 @@ public class RecordActivity extends AppCompatActivity {
             Log.d("TAG", "转换结束时间：" + TimeUtils.date2String(new Date()));
         }).start();
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (mCameraHelp != null) {
+            mCameraHelp.release();
+        }
+        if (recordUtil != null) {
+            recordUtil.stop();
+        }
+    }
 }
