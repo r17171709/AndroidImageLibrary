@@ -12,7 +12,6 @@ import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Size;
 import android.hardware.SensorManager;
-import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
@@ -321,12 +320,24 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
                     e.printStackTrace();
                 }
             });
-            mMediaRecorder.setPreviewDisplay(mSurfaceHolder.getSurface());
             mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-            mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
+            mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+            mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+            mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+            mMediaRecorder.setVideoFrameRate(30);
+            mMediaRecorder.setVideoSize(1280, 720);
             mMediaRecorder.setOrientationHint(determineMediaRecorderOrientation());
-            CamcorderProfile cProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_720P);
-            mMediaRecorder.setProfile(cProfile);
+            //录制视频比特率
+//            public static final int MEDIA_QUALITY_HIGH = 20 * 100000;
+//            public static final int MEDIA_QUALITY_MIDDLE = 16 * 100000;
+//            public static final int MEDIA_QUALITY_LOW = 12 * 100000;
+//            public static final int MEDIA_QUALITY_POOR = 8 * 100000;
+//            public static final int MEDIA_QUALITY_FUNNY = 4 * 100000;
+//            public static final int MEDIA_QUALITY_DESPAIR = 2 * 100000;
+//            public static final int MEDIA_QUALITY_SORRY = 1 * 80000;
+            mMediaRecorder.setVideoEncodingBitRate(20 * 100000);
+            mMediaRecorder.setPreviewDisplay(mSurfaceHolder.getSurface());
             dirPath = InitParams.IMAGE_PATH + "/" + System.currentTimeMillis() + ".mp4";
             FileUtils.createFileByDeleteOldFile(new File(dirPath));
             mMediaRecorder.setOutputFile(dirPath);
