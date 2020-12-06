@@ -63,10 +63,10 @@ public class UploadImageManager {
             bean.setStatue(UploadTaskBean.UploadState.UPLOADING);
 
             // 剪裁图片
-            File cropFile = Utils.compressPic(com.blankj.utilcode.util.Utils.getApp(), filePath, InitParams.CACHE_PATH);
+            File cropFile = Utils.compressPic(com.blankj.utilcode.util.Utils.getApp(), filePath, InitParams.CACHE_PATH, new File(filePath).getName());
 
             HashMap<String, File> fileHashMap = new HashMap<>();
-            fileHashMap.put("fileData", cropFile);
+            fileHashMap.put("fileData", cropFile == null ? new File(filePath) : cropFile);
             String uploadValue = okHttpUtils.syncUpload(url, null, fileHashMap, null, (l, l1) -> {
                 Log.d("UploadImageManager", "UploadImageManager " + l + " " + l1);
                 // 上传每20%进度刷新一次，上传完成不进行修改以防止与后续成功的回调不一致
@@ -151,7 +151,7 @@ public class UploadImageManager {
      *
      * @param tag
      */
-    public void cancelTask(String tag) {
+    public synchronized void cancelTask(String tag) {
         if (tasks.containsKey(tag)) {
             tasks.remove(tag).cancel(true);
         }

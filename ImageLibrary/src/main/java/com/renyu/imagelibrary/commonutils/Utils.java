@@ -215,6 +215,19 @@ public class Utils {
      * @return
      */
     public static File compressPic(Context context, String filePath, String destinationDirectoryPath) {
+        return compressPic(context, filePath, destinationDirectoryPath, System.currentTimeMillis() + ".jpg");
+    }
+
+    /**
+     * 图片压缩
+     *
+     * @param context
+     * @param filePath
+     * @param destinationDirectoryPath
+     * @param destinationPath
+     * @return
+     */
+    public static File compressPic(Context context, String filePath, String destinationDirectoryPath, String destinationPath) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(filePath, options);
@@ -227,7 +240,7 @@ public class Utils {
                     .setQuality(70)
                     .setCompressFormat(Bitmap.CompressFormat.JPEG)
                     .setDestinationDirectoryPath(destinationDirectoryPath)
-                    .compressToFile(new File(filePath), System.currentTimeMillis() + ".jpg");
+                    .compressToFile(new File(filePath), destinationPath);
         } catch (Exception e) {
             e.printStackTrace();
         }
