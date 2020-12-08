@@ -64,11 +64,12 @@ public class UploadImageManager {
 
             // 剪裁图片
             File cropFile = Utils.compressPic(com.blankj.utilcode.util.Utils.getApp(), filePath, InitParams.CACHE_PATH, new File(filePath).getName());
+            File tmp = cropFile == null ? new File(filePath) : cropFile;
 
             HashMap<String, File> fileHashMap = new HashMap<>();
-            fileHashMap.put("fileData", cropFile == null ? new File(filePath) : cropFile);
+            fileHashMap.put("fileData", tmp);
             String uploadValue = okHttpUtils.syncUpload(url, null, fileHashMap, null, (l, l1) -> {
-                Log.d("UploadImageManager", "UploadImageManager " + l + " " + l1);
+//                Log.d("UploadImageManager", "UploadImageManager " + l + " " + l1);
                 // 上传每20%进度刷新一次，上传完成不进行修改以防止与后续成功的回调不一致
                 if ((l * 100 / l1 - bean.getProgress() >= 20) && l != l1) {
                     bean.setUrl("");
@@ -80,17 +81,18 @@ public class UploadImageManager {
                 }
             });
             if (uploadValue == null) {
-                Log.d("UploadImageManager", filePath + "发布失败");
+                Log.d("UploadImageManager", tmp.getPath() + "发布失败");
             } else {
                 JSONObject jsonObject;
                 try {
                     // 上传成功
                     jsonObject = new JSONObject(uploadValue);
+                    Log.d("UploadImageManager", tmp.getPath() + "返回值" + uploadValue);
                     String picUrl = jsonObject.getJSONObject("data").getString("picUrl");
                     if (TextUtils.isEmpty(picUrl)) {
-                        Log.d("UploadImageManager", filePath + "发布失败");
+                        Log.d("UploadImageManager", tmp.getPath() + "发布失败");
                     } else {
-                        Log.d("UploadImageManager", filePath + "发布成功:" + picUrl);
+                        Log.d("UploadImageManager", tmp.getPath() + "发布成功:" + picUrl);
 
                         bean.setProgress(100);
                         bean.setUrl(picUrl);
@@ -102,7 +104,7 @@ public class UploadImageManager {
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Log.d("UploadImageManager", filePath + "发布失败");
+                    Log.d("UploadImageManager", tmp.getPath() + "发布失败");
                 }
             }
 
