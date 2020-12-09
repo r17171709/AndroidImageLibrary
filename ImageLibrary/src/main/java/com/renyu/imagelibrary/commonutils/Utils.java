@@ -12,6 +12,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.hardware.Camera;
 import android.media.MediaMetadataRetriever;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.blankj.utilcode.util.FileUtils;
 import com.blankj.utilcode.util.ImageUtils;
 import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.SizeUtils;
@@ -268,8 +270,26 @@ public class Utils {
         if (new File(path).exists()) {
             File file = new File(path);
             ContentResolver localContentResolver = com.blankj.utilcode.util.Utils.getApp().getContentResolver();
-            ContentValues localContentValues = getMediaContentValues(file, System.currentTimeMillis(), "video/3gp");
+            ContentValues localContentValues = getMediaContentValues(file, System.currentTimeMillis(), "video/mp4");
             localContentResolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, localContentValues);
+
+            if (Build.VERSION_CODES.Q > Build.VERSION.SDK_INT) {
+                try {
+                    File outputFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), file.getName());
+                    if (outputFile.exists()) {
+                        outputFile.delete();
+                    }
+                    outputFile.createNewFile();
+                    FileUtils.copy(file, outputFile);
+                    MediaScannerConnection mMediaScanner = new MediaScannerConnection(com.blankj.utilcode.util.Utils.getApp(), null);
+                    mMediaScanner.connect();
+                    if (mMediaScanner != null && mMediaScanner.isConnected()) {
+                        mMediaScanner.scanFile(outputFile.getPath(), "video/mp4");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
