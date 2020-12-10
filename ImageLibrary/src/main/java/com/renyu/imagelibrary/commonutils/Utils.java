@@ -90,34 +90,59 @@ public class Utils {
      *
      * @param activity
      * @param requestCode
+     * @param needLandscape
      */
-    public static void takePicture(Activity activity, int requestCode, boolean needLandscape) {
+    public static void takePhoto(Activity activity, int requestCode, boolean needLandscape) {
         Intent intent = new Intent(activity, needLandscape ? CameraLandscapeActivity.class : CameraActivity.class);
         activity.startActivityForResult(intent, requestCode);
     }
 
     /**
-     * 自定义小功能组件的拍照
+     * 包含自定义小功能组件的拍照
      *
      * @param activity
      * @param requestCode
      */
-    public static void takePicture2(Activity activity, int requestCode, ArrayList<CameraFragment.CameraFunction> lists, boolean needLandscape) {
+    public static void takePhoto(Activity activity, int requestCode, ArrayList<CameraFragment.CameraFunction> lists, boolean needLandscape) {
         Intent intent = new Intent(activity, needLandscape ? CameraLandscapeActivity.class : CameraActivity.class);
         intent.putExtra("cameraFunctions", lists);
         activity.startActivityForResult(intent, requestCode);
     }
 
-    public static void takePicture3(Activity activity, int requestCode, ArrayList<CameraFragment.ImageVideoFunction> lists, boolean needLandscape) {
+    /**
+     * 录制视频
+     *
+     * @param activity
+     * @param requestCode
+     * @param needLandscape
+     */
+    public static void takeVideo(Activity activity, int requestCode, int maxTime, boolean needLandscape) {
         Intent intent = new Intent(activity, needLandscape ? CameraLandscapeActivity.class : CameraActivity.class);
+        ArrayList<CameraFragment.ImageVideoFunction> lists = new ArrayList<>();
+        lists.add(CameraFragment.ImageVideoFunction.VIDEO);
         intent.putExtra("imageVideoFunctions", lists);
+        intent.putExtra("maxTime", maxTime);
         activity.startActivityForResult(intent, requestCode);
     }
 
-    public static void takePicture4(Activity activity, int requestCode, ArrayList<CameraFragment.CameraFunction> lists, ArrayList<CameraFragment.ImageVideoFunction> lists2, boolean needLandscape) {
+    /**
+     * 包含自定义小功能组件的拍摄功能
+     *
+     * @param activity
+     * @param requestCode
+     * @param lists
+     * @param lists2
+     * @param needLandscape
+     */
+    public static void takeMedia(Activity activity, int requestCode, ArrayList<CameraFragment.CameraFunction> lists, ArrayList<CameraFragment.ImageVideoFunction> lists2, int maxTime, boolean needLandscape) {
         Intent intent = new Intent(activity, needLandscape ? CameraLandscapeActivity.class : CameraActivity.class);
-        intent.putExtra("cameraFunctions", lists);
-        intent.putExtra("imageVideoFunctions", lists2);
+        if (lists != null) {
+            intent.putExtra("cameraFunctions", lists);
+        }
+        if (lists2 != null) {
+            intent.putExtra("imageVideoFunctions", lists2);
+        }
+        intent.putExtra("maxTime", maxTime);
         activity.startActivityForResult(intent, requestCode);
     }
 

@@ -78,11 +78,12 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
         VIDEO
     }
 
-    public static CameraFragment getInstance(ArrayList<CameraFunction> functions, ArrayList<ImageVideoFunction> imageVideoFunctions) {
+    public static CameraFragment getInstance(ArrayList<CameraFunction> functions, ArrayList<ImageVideoFunction> imageVideoFunctions, int maxTime) {
         CameraFragment cameraFragment = new CameraFragment();
         Bundle bundle = new Bundle();
         bundle.putSerializable("cameraFunctions", functions);
         bundle.putSerializable("imageVideoFunctions", imageVideoFunctions);
+        bundle.putInt("maxTime", maxTime);
         cameraFragment.setArguments(bundle);
         return cameraFragment;
     }
@@ -225,6 +226,11 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
             }
         });
         pc_record = view.findViewById(R.id.pc_record);
+
+        maxTime = getArguments().getInt("maxTime");
+        if (maxTime == 0) {
+            maxTime = 90;
+        }
     }
 
     /**
@@ -780,10 +786,10 @@ public class CameraFragment extends BaseFragment implements SurfaceHolder.Callba
         recordView.setLayoutParams(paramsRecordView);
         recordView.requestLayout();
 
-        disposable = Observable.interval(1, TimeUnit.SECONDS).observeOn(AndroidSchedulers.mainThread()).subscribe(aLong -> {
+        disposable = Observable.interval(250, TimeUnit.MILLISECONDS).observeOn(AndroidSchedulers.mainThread()).subscribe(aLong -> {
             tmpTime++;
-            pc_record.setText("", tmpTime * 100 / maxTime);
-            if (tmpTime == maxTime) {
+            pc_record.setText("", tmpTime * 100 / (maxTime * 4));
+            if (tmpTime == maxTime * 4) {
                 up();
             }
         });

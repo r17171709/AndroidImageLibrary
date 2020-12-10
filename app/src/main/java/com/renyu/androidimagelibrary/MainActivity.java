@@ -8,6 +8,7 @@ import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.renyu.commonlibrary.params.InitParams;
+import com.renyu.imagelibrary.commonutils.Utils;
 import com.yalantis.ucrop.util.FileUtils;
 
 import java.io.BufferedOutputStream;
@@ -42,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
 //        ArrayList<CameraFragment.CameraFunction> lists = new ArrayList<>();
 //        lists.add(CameraFragment.CameraFunction.PhotoPicker);
 //        lists.add(CameraFragment.CameraFunction.ChangeCamera);
-//        Utils.takePicture2(this, 100, lists, true);
+//        Utils.takePhoto(this, 100, lists, true);
 
         // 大图浏览
 //        ArrayList<Uri> uris = new ArrayList<>();
@@ -85,20 +86,13 @@ public class MainActivity extends AppCompatActivity {
 //        Utils.choiceVideo(this, 4, CommonParams.RESULT_VIDEOPICKER);
 
         // 视频压缩
-        runFFmpegRxJava(command);
+//        runFFmpegRxJava(command);
 
-        // 拍照或拍视频
-//        ArrayList<CameraFragment.ImageVideoFunction> imageVideoFunctions = new ArrayList<>();
-//        imageVideoFunctions.add(CameraFragment.ImageVideoFunction.IMAGE);
-//        imageVideoFunctions.add(CameraFragment.ImageVideoFunction.VIDEO);
-//        Utils.takePicture3(this, com.renyu.androidimagelibrary.CommonParams.RESULT_TAKEPHOTO, imageVideoFunctions, false);
+        // 拍视频
+        Utils.takeVideo(this, CommonParams.RESULT_TAKEPHOTO, 30, false);
 
-//        ArrayList<CameraFragment.CameraFunction> lists = new ArrayList<>();
-//        lists.add(CameraFragment.CameraFunction.PhotoPicker);
-//        lists.add(CameraFragment.CameraFunction.ChangeCamera);
-//        Utils.takePicture2(this, com.renyu.androidimagelibrary.CommonParams.RESULT_TAKEPHOTO, lists, false);
-
-//        Utils.takePicture(this, CommonParams.RESULT_TAKEPHOTO, false);
+        // 拍照
+//        Utils.takePhoto(this, CommonParams.RESULT_TAKEPHOTO, false);
     }
 
     @Override

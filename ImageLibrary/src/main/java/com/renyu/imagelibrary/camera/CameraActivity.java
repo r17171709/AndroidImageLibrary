@@ -47,23 +47,31 @@ public class CameraActivity extends BaseActivity implements CameraFragment.Taken
         if (getSupportFragmentManager().getFragments().size() == 0) {
             CameraFragment cameraFragment = null;
             if (getIntent().getSerializableExtra("cameraFunctions") != null && getIntent().getSerializableExtra("imageVideoFunctions") != null) {
-                cameraFragment = CameraFragment.getInstance((ArrayList<CameraFragment.CameraFunction>) getIntent().getSerializableExtra("cameraFunctions"), (ArrayList<CameraFragment.ImageVideoFunction>) getIntent().getSerializableExtra("imageVideoFunctions"));
+                cameraFragment = CameraFragment.getInstance((ArrayList<CameraFragment.CameraFunction>) getIntent().getSerializableExtra("cameraFunctions"),
+                        (ArrayList<CameraFragment.ImageVideoFunction>) getIntent().getSerializableExtra("imageVideoFunctions"),
+                        getIntent().getIntExtra("maxTime", 0));
             } else if (getIntent().getSerializableExtra("cameraFunctions") == null && getIntent().getSerializableExtra("imageVideoFunctions") == null) {
+                // 全部为空，采用拍摄照片模式
                 ArrayList<CameraFragment.CameraFunction> cameraFunctions = new ArrayList<>();
                 cameraFunctions.add(CameraFragment.CameraFunction.ChangeCamera);
                 cameraFunctions.add(CameraFragment.CameraFunction.Flash);
                 ArrayList<CameraFragment.ImageVideoFunction> imageVideoFunctions = new ArrayList<>();
                 imageVideoFunctions.add(CameraFragment.ImageVideoFunction.IMAGE);
-                cameraFragment = CameraFragment.getInstance(cameraFunctions, imageVideoFunctions);
+                cameraFragment = CameraFragment.getInstance(cameraFunctions, imageVideoFunctions, 0);
             } else if (getIntent().getSerializableExtra("cameraFunctions") != null) {
+                // 只有相机小功能场景，使用拍摄照片模式
                 ArrayList<CameraFragment.ImageVideoFunction> imageVideoFunctions = new ArrayList<>();
                 imageVideoFunctions.add(CameraFragment.ImageVideoFunction.IMAGE);
-                cameraFragment = CameraFragment.getInstance((ArrayList<CameraFragment.CameraFunction>) getIntent().getSerializableExtra("cameraFunctions"), imageVideoFunctions);
+                cameraFragment = CameraFragment.getInstance((ArrayList<CameraFragment.CameraFunction>) getIntent().getSerializableExtra("cameraFunctions"), imageVideoFunctions, 0);
             } else if (getIntent().getSerializableExtra("imageVideoFunctions") != null) {
                 ArrayList<CameraFragment.CameraFunction> cameraFunctions = new ArrayList<>();
                 cameraFunctions.add(CameraFragment.CameraFunction.ChangeCamera);
-                cameraFunctions.add(CameraFragment.CameraFunction.Flash);
-                cameraFragment = CameraFragment.getInstance(cameraFunctions, (ArrayList<CameraFragment.ImageVideoFunction>) getIntent().getSerializableExtra("imageVideoFunctions"));
+                // 如果只有拍摄模式，并且不包含录制功能，则不启动闪光灯功能
+                ArrayList<CameraFragment.ImageVideoFunction> imageVideoFunctions = (ArrayList<CameraFragment.ImageVideoFunction>) getIntent().getSerializableExtra("imageVideoFunctions");
+                if (imageVideoFunctions.contains(CameraFragment.ImageVideoFunction.IMAGE)) {
+                    cameraFunctions.add(CameraFragment.CameraFunction.Flash);
+                }
+                cameraFragment = CameraFragment.getInstance(cameraFunctions, imageVideoFunctions, getIntent().getIntExtra("maxTime", 0));
             }
             if (cameraFragment != null) {
                 getSupportFragmentManager().beginTransaction().replace(
