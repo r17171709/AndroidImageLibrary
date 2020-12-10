@@ -280,10 +280,30 @@ public class Utils {
      * @param path 图片路径地址
      */
     public static void refreshAlbum(String path) {
-        File file = new File(path);
-        ContentResolver localContentResolver = com.blankj.utilcode.util.Utils.getApp().getContentResolver();
-        ContentValues localContentValues = getMediaContentValues(file, System.currentTimeMillis(), "image/jpeg");
-        Uri localUri = localContentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, localContentValues);
+        if (new File(path).exists()) {
+            File file = new File(path);
+            ContentResolver localContentResolver = com.blankj.utilcode.util.Utils.getApp().getContentResolver();
+            ContentValues localContentValues = getMediaContentValues(file, System.currentTimeMillis(), "image/jpeg");
+            localContentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, localContentValues);
+
+            if (Build.VERSION_CODES.Q > Build.VERSION.SDK_INT) {
+                try {
+                    File outputFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), file.getName());
+                    if (outputFile.exists()) {
+                        outputFile.delete();
+                    }
+                    outputFile.createNewFile();
+                    FileUtils.copy(file, outputFile);
+                    MediaScannerConnection mMediaScanner = new MediaScannerConnection(com.blankj.utilcode.util.Utils.getApp(), null);
+                    mMediaScanner.connect();
+                    if (mMediaScanner != null && mMediaScanner.isConnected()) {
+                        mMediaScanner.scanFile(outputFile.getPath(), "image/jpeg");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     /**
