@@ -1,13 +1,10 @@
 package com.renyu.imagelibrary.photopicker;
 
-import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.util.Log;
 import android.view.Gravity;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -38,11 +35,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.ObservableEmitter;
+import io.reactivex.rxjava3.core.ObservableOnSubscribe;
+import io.reactivex.rxjava3.disposables.Disposable;
 
 import static android.provider.BaseColumns._ID;
 import static android.provider.MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME;
