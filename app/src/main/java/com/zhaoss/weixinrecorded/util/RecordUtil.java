@@ -20,7 +20,7 @@ public class RecordUtil {
 
     public final static int TIMEOUT_USEC = 10000;
     public final static int frameRate = 25;
-    public final static int frameTime = 1000/frameRate;
+    public final static int frameTime = 1000 / frameRate;
     public final static int sampleRateInHz = 44100;
     public final static int channelConfig = AudioFormat.CHANNEL_IN_MONO;
     public final static int channelCount = 1;
@@ -39,7 +39,7 @@ public class RecordUtil {
     private int rotation;
     private boolean isFrontCamera;
 
-    public RecordUtil(String videoPath, String audioPath, int videoWidth, int videoHeight, int rotation, boolean isFrontCamera, ArrayBlockingQueue<byte[]> videoQueue){
+    public RecordUtil(String videoPath, String audioPath, int videoWidth, int videoHeight, int rotation, boolean isFrontCamera, ArrayBlockingQueue<byte[]> videoQueue) {
 
         this.videoQueue = videoQueue;
         this.videoWidth = videoWidth;
@@ -52,14 +52,14 @@ public class RecordUtil {
             initAudioRecord();
 
             File videoFile = new File(videoPath);
-            if(videoFile.exists()){
+            if (videoFile.exists()) {
                 videoFile.delete();
             }
             videoFile.createNewFile();
             videoOut = new FileOutputStream(videoFile);
 
             File audioFile = new File(audioPath);
-            if(audioFile.exists()){
+            if (audioFile.exists()) {
                 audioFile.delete();
             }
             audioFile.createNewFile();
@@ -69,15 +69,15 @@ public class RecordUtil {
         }
     }
 
-    private void initVideoMediaCodec()throws Exception{
+    private void initVideoMediaCodec() throws Exception {
         MediaFormat mediaFormat;
-        if(rotation==90 || rotation==270){
+        if (rotation == 90 || rotation == 270) {
             mediaFormat = MediaFormat.createVideoFormat(MediaFormat.MIMETYPE_VIDEO_AVC, videoHeight, videoWidth);
-        }else{
+        } else {
             mediaFormat = MediaFormat.createVideoFormat(MediaFormat.MIMETYPE_VIDEO_AVC, videoWidth, videoHeight);
         }
         mediaFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar);
-        mediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, videoWidth*videoHeight*3);
+        mediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, videoWidth * videoHeight * 3);
         mediaFormat.setInteger(MediaFormat.KEY_FRAME_RATE, frameRate);
         mediaFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1);
         videoMediaCodec = MediaCodec.createEncoderByType(MediaFormat.MIMETYPE_VIDEO_AVC);
@@ -85,18 +85,18 @@ public class RecordUtil {
         videoMediaCodec.start();
     }
 
-    private void initAudioRecord(){
+    private void initAudioRecord() {
         audioBufferSize = AudioRecord.getMinBufferSize(sampleRateInHz, channelConfig, AudioFormat.ENCODING_PCM_16BIT);
         audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRateInHz, channelConfig, AudioFormat.ENCODING_PCM_16BIT, audioBufferSize);
     }
 
-    public void start(){
+    public void start() {
         isRecording.set(true);
         startRecordAudio();
         startWhile();
     }
 
-    private void startRecordAudio(){
+    private void startRecordAudio() {
         RxJavaUtil.run(new RxJavaUtil.OnRxAndroidListener<Boolean>() {
             @Override
             public Boolean doInBackground() throws Throwable {
@@ -104,7 +104,7 @@ public class RecordUtil {
                 while (isRecording.get()) {
                     byte[] data = new byte[audioBufferSize];
                     if (audioRecord.read(data, 0, audioBufferSize) != AudioRecord.ERROR_INVALID_OPERATION) {
-                        if(audioQueue.size() >= 10){
+                        if (audioQueue.size() >= 10) {
                             audioQueue.poll();
                         }
                         audioQueue.add(data);
@@ -112,9 +112,11 @@ public class RecordUtil {
                 }
                 return true;
             }
+
             @Override
             public void onFinish(Boolean result) {
             }
+
             @Override
             public void onError(Throwable e) {
                 e.printStackTrace();
@@ -122,28 +124,30 @@ public class RecordUtil {
         });
     }
 
-    private void startWhile(){
+    private void startWhile() {
         RxJavaUtil.run(new RxJavaUtil.OnRxAndroidListener<Boolean>() {
             @Override
             public Boolean doInBackground() throws Throwable {
 
                 startTime = System.currentTimeMillis();
-                while (isRecording.get() || videoQueue.size()>0 || audioQueue.size()>0) {
+                while (isRecording.get() || videoQueue.size() > 0 || audioQueue.size() > 0) {
                     byte[] videoData = videoQueue.poll();
-                    if(videoData != null){
+                    if (videoData != null) {
                         encodeVideo(videoData);
                     }
                     byte[] audioData = audioQueue.poll();
-                    if(audioData != null){
+                    if (audioData != null) {
                         audioOut.write(audioData);
                     }
                 }
                 return true;
             }
+
             @Override
             public void onFinish(Boolean result) {
                 release();
             }
+
             @Override
             public void onError(Throwable e) {
                 e.printStackTrace();
@@ -155,14 +159,15 @@ public class RecordUtil {
     private long startTime = 0;
     private int frameNum = 0;
     private byte[] configByte;
-    private void encodeVideo(byte[] nv21)throws IOException {
+
+    private void encodeVideo(byte[] nv21) throws IOException {
 
         frameNum++;
-        int rightTime = frameNum*frameTime;
-        int runTime = (int) (System.currentTimeMillis()-startTime+frameTime);
+        int rightTime = frameNum * frameTime;
+        int runTime = (int) (System.currentTimeMillis() - startTime + frameTime);
         if (runTime < rightTime) {
             frameNum--;
-            return ;
+            return;
         }
 
         byte[] nv12 = new byte[nv21.length];
@@ -182,11 +187,11 @@ public class RecordUtil {
             //把要编码的数据添加进去
             inputBuffer.put(nv12);
             //塞到编码序列中, 等待MediaCodec编码
-            videoMediaCodec.queueInputBuffer(inputBufferIndex, 0, nv12.length,  System.nanoTime()/1000, 0);
+            videoMediaCodec.queueInputBuffer(inputBufferIndex, 0, nv12.length, System.nanoTime() / 1000, 0);
         }
 
         MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
-        //读取MediaCodec编码后的数据
+        // 返回已成功编码的输出缓冲区的索引
         int outputBufferIndex = videoMediaCodec.dequeueOutputBuffer(bufferInfo, TIMEOUT_USEC);
         while (outputBufferIndex >= 0) {
             ByteBuffer outputBuffer = videoMediaCodec.getOutputBuffer(outputBufferIndex);
@@ -220,7 +225,7 @@ public class RecordUtil {
         return isRecording.get();
     }
 
-    public void release(){
+    public void release() {
         try {
             audioRecord.stop();
             audioRecord.release();
@@ -282,19 +287,19 @@ public class RecordUtil {
         return yuv;
     }
 
-    private void NV21ToNV12(byte[] nv21,byte[] nv12,int width,int height){
-        if(nv21 == null || nv12 == null)return;
-        int framesize = width*height;
-        int i = 0,j = 0;
+    private void NV21ToNV12(byte[] nv21, byte[] nv12, int width, int height) {
+        if (nv21 == null || nv12 == null) return;
+        int framesize = width * height;
+        int i = 0, j = 0;
         System.arraycopy(nv21, 0, nv12, 0, framesize);
-        for(i = 0; i < framesize; i++){
+        for (i = 0; i < framesize; i++) {
             nv12[i] = nv21[i];
         }
-        for (j = 0; j < framesize/2; j+=2) {
-            nv12[framesize + j-1] = nv21[j+framesize];
+        for (j = 0; j < framesize / 2; j += 2) {
+            nv12[framesize + j - 1] = nv21[j + framesize];
         }
-        for (j = 0; j < framesize/2; j+=2) {
-            nv12[framesize + j] = nv21[j+framesize-1];
+        for (j = 0; j < framesize / 2; j += 2) {
+            nv12[framesize + j] = nv21[j + framesize - 1];
         }
     }
 }

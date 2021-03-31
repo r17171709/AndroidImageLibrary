@@ -1,18 +1,27 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.hujiang.android-aspectjx'
-apply plugin: 'com.github.dcendents.android-maven'
-apply plugin: 'com.novoda.bintray-release'
+apply plugin: 'maven'
 
-group = 'com.github.renyu'
-
-publish {
-    userOrg = 'r17171709'
-    groupId = 'com.github.renyu'
-    artifactId = 'AndroidImageLibrary'
-    publishVersion = '3.5.2'
-    desc = 'Image Library'
-    website = 'https://github.com/r17171709'
-    repoName = 'AndroidImageLibrary'
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: rootProject.ext.maven.repositoryUrl) {
+                authentication(
+                        userName: rootProject.ext.maven.username,
+                        password: rootProject.ext.maven.password
+                )
+            }
+            snapshotRepository(url: rootProject.ext.maven.repositorySnapshotUrl) {
+                authentication(
+                        userName: rootProject.ext.maven.username,
+                        password: rootProject.ext.maven.password
+                )
+            }
+            pom.version = '3.5.2'
+            pom.artifactId = 'AndroidImageLibrary'
+            pom.groupId = rootProject.ext.maven.groupId
+        }
+    }
 }
 
 android {
@@ -47,8 +56,8 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-    api 'com.github.renyu:AndroidCommonLibrary:3.2.2'
-    api 'com.github.renyu:AndroidPermissionLibrary:2.2.0'
+    api 'com.github.renyu17:AndroidCommonLibrary:3.2.2'
+    api 'com.github.renyu17:AndroidPermissionLibrary:2.2.0'
     api 'com.facebook.fresco:animated-webp:2.3.0'
     // BigImageViewer  Big image viewer supporting pan and zoom, with very little memory usage and full featured image loading choices. Powered by Subsampling Scale Image View, Fresco, Glide, and Picasso. Even with gif and webp support!
     api('com.github.piasy:BigImageViewer:1.7.0') {
@@ -68,7 +77,7 @@ dependencies {
         exclude group: 'com.squareup.okhttp3'
     }
     // Compressor  An android image compression library.
-    api 'id.zelory:compressor:2.1.0'
+    api 'id.zelory:compressor:2.1.1'
     // AspectJ 每一个application和library都需要
     implementation 'org.aspectj:aspectjrt:1.8.9'
 }
