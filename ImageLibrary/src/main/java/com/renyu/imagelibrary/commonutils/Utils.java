@@ -270,6 +270,12 @@ public class Utils {
                     .compressToFile(new File(filePath), destinationPath);
         } catch (Exception e) {
             e.printStackTrace();
+            boolean copyValue = FileUtils.copy(new File(filePath), new File(destinationDirectoryPath, destinationPath));
+            if (copyValue) {
+                cropFile = new File(destinationDirectoryPath, destinationPath);
+            } else {
+                cropFile = new File(filePath);
+            }
         }
         return cropFile;
     }
