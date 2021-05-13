@@ -1,14 +1,14 @@
 package com.renyu.androidimagelibrary;
 
 import android.content.Intent;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.renyu.commonlibrary.params.InitParams;
-import com.renyu.imagelibrary.commonutils.Utils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.yalantis.ucrop.util.FileUtils;
 
 import java.io.BufferedOutputStream;
@@ -27,9 +27,6 @@ import io.microshow.rxffmpeg.RxFFmpegSubscriber;
 
 public class MainActivity extends AppCompatActivity {
     private MyRxFFmpegSubscriber myRxFFmpegSubscriber;
-
-    //    private String command = "ffmpeg -y -i " + InitParams.IMAGE_PATH + "/input.mp4 -b 2097k -r 30 -vcodec libx264 -preset superfast " + InitParams.IMAGE_PATH + "/result.mp4";
-    private String command = "ffmpeg -y -i " + InitParams.IMAGE_PATH + "/input.mp4 -vf scale=iw/2:ih/2 -vcodec libx264 -b " + 1920 * 1080 / 2 + " " + InitParams.IMAGE_PATH + "/result.mp4";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,10 +83,10 @@ public class MainActivity extends AppCompatActivity {
 //        Utils.choiceVideo(this, 4, CommonParams.RESULT_VIDEOPICKER);
 
         // 视频压缩
-//        runFFmpegRxJava(command);
+//        runFFmpegRxJava(new File(InitParams.IMAGE_PATH + "/input.mp4"), new File(InitParams.IMAGE_PATH + "/result.mp4"));
 
         // 拍视频
-        Utils.takeVideo(this, CommonParams.RESULT_TAKEPHOTO, 30, false);
+//        Utils.takeVideo(this, CommonParams.RESULT_TAKEPHOTO, 30, false);
 
         // 拍照
 //        Utils.takePhoto(this, CommonParams.RESULT_TAKEPHOTO, false);
@@ -166,9 +163,33 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void runFFmpegRxJava(String text) {
+    private void runFFmpegRxJava(File srcfile, File destFile) {
+//        private String command = "ffmpeg -y -i " + InitParams.IMAGE_PATH + "/input.mp4 -b 2097k -r 30 -vcodec libx264 -preset superfast " + InitParams.IMAGE_PATH + "/result.mp4";
+//        private String command = "ffmpeg -y -i " + InitParams.IMAGE_PATH + "/input.mp4 -vf scale=iw/2:ih/2 -vcodec libx264 -b " + 1920 * 1080 / 2 + " " + InitParams.IMAGE_PATH + "/result.mp4";
+
+        if (!srcfile.exists()) {
+            return;
+        }
+        if (!destFile.exists()) {
+            try {
+                destFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        ToastUtils.showShort("准备开始转换");
+
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(srcfile.getPath());
+        String width = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
+        String height = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
+        int targetWidth = Integer.parseInt(width) / 2;
+        int targetHeight = Integer.parseInt(height) / 2;
+        int targetBitrate = targetWidth * targetHeight * 2;
+        String commend = "ffmpeg -y -i " + srcfile.getPath() + " -vf scale=iw/2:ih/2 -vcodec libx264 -b " + targetBitrate + " " + destFile.getPath();
+
         myRxFFmpegSubscriber = new MyRxFFmpegSubscriber(this);
-        RxFFmpegInvoke.getInstance().runCommandRxJava(text.split(" ")).subscribe(myRxFFmpegSubscriber);
+        RxFFmpegInvoke.getInstance().runCommandRxJava(commend.split(" ")).subscribe(myRxFFmpegSubscriber);
     }
 
     public static class MyRxFFmpegSubscriber extends RxFFmpegSubscriber {
