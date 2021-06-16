@@ -1,5 +1,6 @@
 package com.renyu.imagelibrary.photopicker;
 
+import android.Manifest;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
@@ -23,6 +24,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.blankj.utilcode.util.SizeUtils;
 import com.renyu.commonlibrary.baseact.BaseActivity;
 import com.renyu.commonlibrary.commonutils.BarUtils;
+import com.renyu.commonlibrary.permission.annotation.NeedPermission;
+import com.renyu.commonlibrary.permission.annotation.PermissionDenied;
 import com.renyu.imagelibrary.R;
 import com.renyu.imagelibrary.SpaceItemDecoration;
 import com.renyu.imagelibrary.bean.Video;
@@ -204,7 +207,7 @@ public class VideoPickerActivity extends BaseActivity {
 
     @Override
     public void loadData() {
-        loadVideos();
+        permissionApply();
     }
 
     @Override
@@ -321,5 +324,16 @@ public class VideoPickerActivity extends BaseActivity {
                 popupWindow.setHeight(count * SizeUtils.dp2px(90));
             }
         }
+    }
+
+    @NeedPermission(permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
+            deniedDesp = "为了您可以正常访问相册，\n请点击\"设置\"-\"权限\"-打开 \"存储空间\" 权限。\n最后点击两次后退按钮，即可返回。")
+    public void permissionApply() {
+        loadVideos();
+    }
+
+    @PermissionDenied(permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE})
+    public void permissionDenied() {
+        finish();
     }
 }

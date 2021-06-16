@@ -1,6 +1,5 @@
 package com.renyu.androidimagelibrary
 
-import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
@@ -17,8 +16,6 @@ import androidx.gridlayout.widget.GridLayout
 import com.blankj.utilcode.util.SizeUtils
 import com.renyu.androidimagelibrary.view.UploadView
 import com.renyu.commonlibrary.baseact.BaseActivity
-import com.renyu.commonlibrary.permission.annotation.NeedPermission
-import com.renyu.commonlibrary.permission.annotation.PermissionDenied
 import com.renyu.commonlibrary.views.actionsheet.ActionSheetFactory
 import com.renyu.imagelibrary.bean.UploadTaskBean
 import com.renyu.imagelibrary.camera.CameraFragment
@@ -230,10 +227,6 @@ class UploadActivity : BaseActivity() {
         }
     }
 
-    @NeedPermission(
-        permissions = [(Manifest.permission.READ_EXTERNAL_STORAGE), (Manifest.permission.WRITE_EXTERNAL_STORAGE)],
-        deniedDesp = "请授予存储卡读取权限"
-    )
     fun choicePic() {
         val view_clearmessage: View = LayoutInflater.from(this)
             .inflate(R.layout.view_actionsheet_button_3, null, false)
@@ -284,10 +277,5 @@ class UploadActivity : BaseActivity() {
                 else -> uploadView.uploadMaskPercent(percent)
             }
         }
-    }
-
-    @PermissionDenied(permissions = [(Manifest.permission.READ_EXTERNAL_STORAGE), (Manifest.permission.WRITE_EXTERNAL_STORAGE)])
-    fun denied() {
-
     }
 }
