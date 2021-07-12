@@ -1,4 +1,4 @@
-package com.renyu.imagelibrary.preview;
+package com.renyu.androidimagelibrary;
 
 import android.net.Uri;
 import android.view.LayoutInflater;
@@ -13,6 +13,7 @@ import com.github.piasy.biv.view.BigImageView;
 import com.github.piasy.biv.view.FrescoImageViewFactory;
 import com.github.piasy.biv.view.ImageViewFactory;
 import com.renyu.imagelibrary.R;
+import com.renyu.imagelibrary.preview.ProgressPieIndicator;
 
 import java.util.List;
 

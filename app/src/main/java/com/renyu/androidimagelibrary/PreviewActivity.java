@@ -1,4 +1,4 @@
-package com.renyu.imagelibrary.preview;
+package com.renyu.androidimagelibrary;
 
 import android.net.Uri;
 import android.view.Gravity;
