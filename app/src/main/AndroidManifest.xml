@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.renyu.androidimagelibrary">
+
+    <!--  强制合并华为滤镜库  -->
+    <uses-sdk tools:overrideLibrary="com.huawei.hms.image.vision, com.huawei.hms.feature.dynamic.descriptors.huawei_module_imagevision" />
 
     <application
         android:name=".MyApplication"
@@ -12,7 +16,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".UploadActivity">
+        <activity android:name=".HWFilterActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
