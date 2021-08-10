@@ -70,5 +70,5 @@ dependencies {
     implementation "com.huawei.hms:image-vision:1.0.3.304"
     implementation "com.huawei.hms:image-vision-fallback:1.0.3.304"
     implementation project(':ImageLibrary')
-//    implementation 'com.github.renyu17:AndroidImageLibrary:3.5.4'
+//    implementation 'com.github.renyu17:AndroidImageLibrary:3.5.5'
 }
