@@ -1,5 +1,7 @@
 package com.renyu.imagelibrary.commonutils;
 
+import static android.provider.BaseColumns._ID;
+
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -22,7 +24,6 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.blankj.utilcode.util.FileUtils;
@@ -46,7 +47,6 @@ import com.renyu.imagelibrary.camera.CameraLandscapeActivity;
 import com.renyu.imagelibrary.crop.CropUActivity;
 import com.renyu.imagelibrary.photopicker.PhotoPickerActivity;
 import com.renyu.imagelibrary.photopicker.VideoPickerActivity;
-import com.renyu.imagelibrary.preview.ImagePreviewActivity;
 import com.yalantis.ucrop.UCrop;
 
 import java.io.BufferedInputStream;
@@ -63,8 +63,6 @@ import java.util.Collections;
 import java.util.List;
 
 import id.zelory.compressor.Compressor;
-
-import static android.provider.BaseColumns._ID;
 
 /**
  * Created by renyu on 2017/1/3.
@@ -494,22 +492,6 @@ public class Utils {
         }
         simpleDraweeView.setController(draweeControllerBuilder.build());
         simpleDraweeView.setTag(path.toString());
-    }
-
-    /**
-     * 相册预览
-     *
-     * @param activity
-     * @param position
-     * @param urls
-     */
-    public static void showPreview(AppCompatActivity activity, int position, ArrayList<Uri> urls) {
-        Intent intent = new Intent(activity, ImagePreviewActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putInt("position", position);
-        bundle.putParcelableArrayList("urls", urls);
-        intent.putExtras(bundle);
-        activity.startActivity(intent);
     }
 
     //用于微信分享时用白色替换bitmap中的透明色

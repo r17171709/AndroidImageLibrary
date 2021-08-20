@@ -33,7 +33,7 @@ afterEvaluate {
         publications {
             mavenAndroid(MavenPublication) {
                 groupId rootProject.ext.maven.groupId
-                artifactId 'AndroidImageLibrary'
+                artifactId 'AndroidImageViewerLibrary'
                 version '3.6.0'
                 artifact sourcesJar
                 artifact javadocJar

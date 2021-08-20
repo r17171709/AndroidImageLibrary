@@ -33,6 +33,8 @@ public class PhotoPickerAdapter extends RecyclerView.Adapter<PhotoPickerAdapter.
         void add(Uri path);
 
         void remove(Uri path);
+
+        void showPreview(Uri path, SimpleDraweeView simpleDraweeView);
     }
 
     PhotoPickerAdapter(Context context, ArrayList<Photo> models, OperImageListener listener) {
@@ -51,7 +53,7 @@ public class PhotoPickerAdapter extends RecyclerView.Adapter<PhotoPickerAdapter.
     @Override
     public void onBindViewHolder(@NonNull final PhotoPickerViewHolder holder, final int position) {
         Utils.loadFresco(models.get(position).getPath(), SizeUtils.dp2px(118), SizeUtils.dp2px(118), holder.photopicker_image);
-        holder.photopicker_image.setOnClickListener(v -> {
+        holder.photopicker_choice.setOnClickListener(v -> {
             boolean flag = models.get(position).isSelect();
             if (((PhotoPickerActivity) context).imagePaths.size() == ((PhotoPickerActivity) context).maxNum && !flag) {
                 Toast.makeText(context, "您最多只能选择" + ((PhotoPickerActivity) context).maxNum + "张图片", Toast.LENGTH_SHORT).show();
@@ -66,6 +68,9 @@ public class PhotoPickerAdapter extends RecyclerView.Adapter<PhotoPickerAdapter.
             }
         });
         holder.photopicker_choice.setImageResource(models.get(position).isSelect() ? ResourceUtils.getMipmapId(context, "ic_choice_select") : ResourceUtils.getMipmapId(context, "ic_choice_normal"));
+        holder.photopicker_image.setOnClickListener(v -> {
+            listener.showPreview(models.get(position).getPath(), holder.photopicker_image);
+        });
     }
 
     @Override
@@ -73,9 +78,9 @@ public class PhotoPickerAdapter extends RecyclerView.Adapter<PhotoPickerAdapter.
         return models.size();
     }
 
-    class PhotoPickerViewHolder extends RecyclerView.ViewHolder {
-        private SimpleDraweeView photopicker_image;
-        private ImageView photopicker_choice;
+    static class PhotoPickerViewHolder extends RecyclerView.ViewHolder {
+        private final SimpleDraweeView photopicker_image;
+        private final ImageView photopicker_choice;
 
         PhotoPickerViewHolder(View itemView) {
             super(itemView);

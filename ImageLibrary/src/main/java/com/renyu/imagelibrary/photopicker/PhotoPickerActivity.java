@@ -1,5 +1,11 @@
 package com.renyu.imagelibrary.photopicker;
 
+import static android.provider.BaseColumns._ID;
+import static android.provider.MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME;
+import static android.provider.MediaStore.Images.ImageColumns.BUCKET_ID;
+import static android.provider.MediaStore.MediaColumns.DATA;
+import static android.provider.MediaStore.MediaColumns.DATE_ADDED;
+
 import android.Manifest;
 import android.content.Intent;
 import android.database.Cursor;
@@ -20,6 +26,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.blankj.utilcode.util.SizeUtils;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.renyu.commonlibrary.baseact.BaseActivity;
 import com.renyu.commonlibrary.commonutils.BarUtils;
 import com.renyu.commonlibrary.permission.annotation.NeedPermission;
@@ -29,8 +36,8 @@ import com.renyu.imagelibrary.SpaceItemDecoration;
 import com.renyu.imagelibrary.bean.Photo;
 import com.renyu.imagelibrary.bean.PhotoDirectory;
 import com.renyu.imagelibrary.commonutils.PhotoDirectoryLoader;
-import com.renyu.imagelibrary.commonutils.Utils;
 import com.renyu.imagelibrary.params.CommonParams;
+import com.stfalcon.imageviewer.common.util.ImagePreviewUtils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -43,12 +50,6 @@ import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableEmitter;
 import io.reactivex.rxjava3.core.ObservableOnSubscribe;
 import io.reactivex.rxjava3.disposables.Disposable;
-
-import static android.provider.BaseColumns._ID;
-import static android.provider.MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME;
-import static android.provider.MediaStore.Images.ImageColumns.BUCKET_ID;
-import static android.provider.MediaStore.MediaColumns.DATA;
-import static android.provider.MediaStore.MediaColumns.DATE_ADDED;
 
 /**
  * Created by Clevo on 2016/8/31.
@@ -80,6 +81,8 @@ public class PhotoPickerActivity extends BaseActivity {
     //当前文件夹key
     private String currentKey = "0";
 
+    private ImagePreviewUtils imagePreviewUtils = new ImagePreviewUtils();
+
     @Override
     public int setStatusBarColor() {
         return Color.WHITE;
@@ -103,6 +106,7 @@ public class PhotoPickerActivity extends BaseActivity {
             disposable.dispose();
             disposable = null;
         }
+        imagePreviewUtils.closePreview();
     }
 
     @Override
@@ -166,6 +170,13 @@ public class PhotoPickerActivity extends BaseActivity {
                     photopicker_preview.setText("预览(" + imagePaths.size() + ")");
                 }
             }
+
+            @Override
+            public void showPreview(Uri path, SimpleDraweeView simpleDraweeView) {
+                ArrayList<Uri> tmp = new ArrayList<>();
+                tmp.add(path);
+                imagePreviewUtils.showPreview(PhotoPickerActivity.this, simpleDraweeView, 0, tmp);
+            }
         });
         photopicker_rv.setAdapter(adapter);
         photopicker_dict = findViewById(R.id.photopicker_dict);
@@ -180,7 +191,7 @@ public class PhotoPickerActivity extends BaseActivity {
         photopicker_preview = findViewById(R.id.photopicker_preview);
         photopicker_preview.setOnClickListener(v -> {
             if (imagePaths.size() > 0) {
-                Utils.showPreview(PhotoPickerActivity.this, 0, imagePaths);
+                imagePreviewUtils.showPreview(this, 0, imagePaths);
             }
         });
 
